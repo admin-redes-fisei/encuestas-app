@@ -13,13 +13,16 @@ RUN npm install
 COPY . .
 
 # Construimos la aplicación React
-RUN npm run build
+#RUN npm run build
 
 # Segunda etapa: configurar Apache y servir la aplicación React construida
-FROM httpd:alpine
+#FROM httpd:alpine
 
 # Copiamos los archivos de construcción del frontend React desde la fase de compilación anterior
-COPY --from=build /app/build/ /usr/local/apache2/htdocs/
+#COPY --from=build /app/build/ /usr/local/apache2/htdocs/
 
 # Exponemos el puerto 80 para que Apache pueda servir la aplicación
 EXPOSE 80
+
+# Comando para iniciar la aplicación backend
+CMD ["npm", "start"]
