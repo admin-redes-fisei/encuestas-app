@@ -153,7 +153,7 @@ function Bachilleres() {
       try {
         const formularioId = 2; // Reemplaza 1 con el ID del formulario deseado
         const response = await fetch(
-          `http://localhost:3001/formulario/${formularioId}`
+          `http://172.21.123.36:4000/formulario/${formularioId}`
         );
         const data = await response.json();
 
@@ -168,7 +168,7 @@ function Bachilleres() {
 
   //envio de datos
   const enviarRespuestas = () => {
-    fetch("http://localhost:3001/respuestas", {
+    fetch("http://172.21.123.36:4000/respuestas", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -186,7 +186,7 @@ function Bachilleres() {
   //navegacion
   const navigate = useNavigate();
   const redirectToAboutPage = () => {
-    navigate("/endpage");
+    navigate("/encuestas/endpage");
   };
 
   //Para la paginacion

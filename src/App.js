@@ -10,10 +10,13 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={<StartPage />} />
-          <Route path="/empleabilidad" element={<Empleabilidad />} />
-          <Route path="/demanda-estudiantes" element={<Bachilleres />} />
-          <Route path="/endpage" element={<EndPage />} />
+          <Route path="/encuestas" element={<StartPage />} />
+          <Route path="/encuestas/empleabilidad" element={<Empleabilidad />} />
+          <Route
+            path="/encuestas/demanda-estudiantes"
+            element={<Bachilleres />}
+          />
+          <Route path="/encuestas/endpage" element={<EndPage />} />
         </Routes>
       </Router>
     </div>
