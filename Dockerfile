@@ -13,7 +13,7 @@ RUN npm install
 COPY . .
 
 # Construimos la aplicación React
-#RUN npm run build
+RUN npm run build
 
 # Segunda etapa: configurar Apache y servir la aplicación React construida
 #FROM httpd:alpine
