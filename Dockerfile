@@ -22,7 +22,7 @@ COPY . .
 #COPY --from=build /app/build/ /usr/local/apache2/htdocs/
 
 # Exponemos el puerto 80 para que Apache pueda servir la aplicación
-EXPOSE 80
+EXPOSE 4000
 
 # Comando para iniciar la aplicación backend
 CMD ["npm", "start"]

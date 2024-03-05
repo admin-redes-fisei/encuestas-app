@@ -213,9 +213,8 @@ function Empleabilidad() {
   useEffect(() => {
     const obtenerPreguntas = async () => {
       try {
-        const formularioId = 1; // Reemplaza 1 con el ID del formulario deseado
         const response = await fetch(
-          `http://172.21.123.36:4000/formulario/${formularioId}`
+          `https://hatunsoft.uta.edu.ec/back_encuestas/formulario.php?id=1`
         );
         const preguntas = await response.json();
 
@@ -288,7 +287,7 @@ function Empleabilidad() {
 
   //envio de datos
   const enviarRespuestas = () => {
-    fetch("http://172.21.123.36:4000/respuestas", {
+    fetch("http://172:4000/respuestas", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -388,6 +387,7 @@ function Empleabilidad() {
         }
       });
     }
+    console.log(respuestas);
   };
 
   const [respuestasTexto, setRespuestaTexto] = useState("");
