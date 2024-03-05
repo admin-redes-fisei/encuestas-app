@@ -151,9 +151,8 @@ function Bachilleres() {
   useEffect(() => {
     const obtenerPreguntas = async () => {
       try {
-        const formularioId = 2; // Reemplaza 1 con el ID del formulario deseado
         const response = await fetch(
-          `https://hatunsoft.uta.edu.ec/back_encuestas/formulario.php?id=1`
+          `https://hatunsoft.uta.edu.ec/back_encuestas/formulario.php?id=2`
         );
         const data = await response.json();
 
@@ -168,7 +167,7 @@ function Bachilleres() {
 
   //envio de datos
   const enviarRespuestas = () => {
-    fetch("http://backend:4000/respuestas", {
+    fetch("https://hatunsoft.uta.edu.ec/back_encuestas/respuestas.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -457,7 +456,7 @@ function Bachilleres() {
                 <Col sm="10">
                   <Form.Select
                     name={"genero"}
-                    style={{ width: "30vw" }}
+                    style={{ width: ampliarElemento ? "30vw" : "80vw" }}
                     defaultValue={0}
                     onChange={(e) => {
                       handleInputChange(
@@ -491,7 +490,7 @@ function Bachilleres() {
                 </Form.Label>
                 <Col sm="10">
                   <Form.Select
-                    style={{ width: "30vw" }}
+                    style={{ width: ampliarElemento ? "30vw" : "80vw" }}
                     name="edad"
                     defaultValue={0}
                     onChange={(e) =>
@@ -537,7 +536,7 @@ function Bachilleres() {
                         )?.provincia,
                       });
                     }}
-                    style={{ width: "30vw" }}
+                    style={{ width: ampliarElemento ? "30vw" : "80vw" }}
                   >
                     <option key={0} value={0}>
                       Seleccione
@@ -560,7 +559,7 @@ function Bachilleres() {
                 </Form.Label>
                 <Col sm="10">
                   <Form.Select
-                    style={{ width: "30vw" }}
+                    style={{ width: ampliarElemento ? "30vw" : "80vw" }}
                     defaultValue={0}
                     name="ciudad"
                     onChange={(e) => {

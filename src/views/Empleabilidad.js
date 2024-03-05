@@ -14,17 +14,6 @@ import InfoIcon from "../assets/infoIncon";
 import { useNavigate } from "react-router-dom";
 
 function Empleabilidad() {
-  const itemStyle = {
-    backgroundColor: "#fff",
-    width: "70%",
-    borderRadius: "5px",
-    border: "1px solid #e0e0e0",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    textAlign: "left",
-    paddingLeft: "12px",
-  };
   const extraData = [
     {
       id: 1,
@@ -287,7 +276,7 @@ function Empleabilidad() {
 
   //envio de datos
   const enviarRespuestas = () => {
-    fetch("http://172:4000/respuestas", {
+    fetch("https://hatunsoft.uta.edu.ec/back_encuestas/respuestas.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -453,6 +442,18 @@ function Empleabilidad() {
     };
   }, []);
 
+  const itemStyle = {
+    backgroundColor: "#fff",
+    width: ampliarElemento ? "70%" : "90%",
+    borderRadius: "5px",
+    border: "1px solid #e0e0e0",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    textAlign: "left",
+    paddingLeft: "12px",
+  };
+
   return (
     <div
       style={{
@@ -558,7 +559,7 @@ function Empleabilidad() {
                       <Overlay
                         target={buttonRefs.current[`${item.id}${option.id}`]}
                         show={tooltipStates[`${item.id}${option.id}`]} //
-                        placement="right"
+                        placement={ampliarElemento ? "right" : "bottom"}
                         key={`tool-${item.id}${option.id}`}
                       >
                         {(props) => (
@@ -577,7 +578,7 @@ function Empleabilidad() {
               {item.suboptions?.map((option, index1) => (
                 <Accordion
                   style={{
-                    width: "70%",
+                    width: ampliarElemento ? "70%" : "90%",
                   }}
                 >
                   <Accordion.Item eventKey="0">
