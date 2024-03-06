@@ -35,6 +35,7 @@ function Bachilleres() {
           ciudades: [
             "Latacunga",
             "La Maná",
+            "Pangua",
             "Pujilí",
             "Salcedo",
             "Saquisilí",
@@ -71,11 +72,19 @@ function Bachilleres() {
           ciudades: [
             "Ambato",
             "Baños",
+            "Cevallos",
+            "Mocha",
             "Pelileo",
             "Patate",
             "Píllaro",
             "Quero",
           ],
+        },
+        {
+          id: 15,
+          name: "residencia",
+          provincia: "Otra",
+          ciudades: [],
         },
       ],
     },
@@ -267,7 +276,7 @@ function Bachilleres() {
   const progress = ((currentPage - 1) / (totalPages - 1)) * 100;
 
   //para provincias y ciudades
-  const [selectedProvincia, setsSlectedProvincia] = useState(null);
+  const [selectedProvincia, setsSlectedProvincia] = useState(0);
 
   //para almacenar respuestas
   const [respuestas, setRespuestas] = useState([]);
@@ -493,7 +502,7 @@ function Bachilleres() {
                     style={{ width: ampliarElemento ? "30vw" : "80vw" }}
                     name="edad"
                     defaultValue={0}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       handleInputChange(
                         e,
                         preguntas[1].id,
@@ -501,8 +510,9 @@ function Bachilleres() {
                           (op) => op.id === parseInt(e.target.value)
                         )?.label,
                         "radio"
-                      )
-                    }
+                      );
+                      console.log(selectedProvincia);
+                    }}
                   >
                     <option key={0} value={0}>
                       Seleccione
@@ -562,6 +572,7 @@ function Bachilleres() {
                     style={{ width: ampliarElemento ? "30vw" : "80vw" }}
                     defaultValue={0}
                     name="ciudad"
+                    disabled={selectedProvincia === 4}
                     onChange={(e) => {
                       handleChange({
                         pregunta_id: 55,
