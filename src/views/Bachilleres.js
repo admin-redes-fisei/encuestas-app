@@ -1230,7 +1230,7 @@ function Bachilleres() {
                         src="https://firebasestorage.googleapis.com/v0/b/encuestas-71bc8.appspot.com/o/ii1.png?alt=media&token=b578c196-6cdc-48fc-bf7f-5d16d03587c2"
                         style={{ height: "auto", width: "100%" }}
                       />
-                      Hermione Granger, del universo de Harry Potter, demuestra
+                      Hermione Granger, del universo de Harry Potter, demuestra
                       habilidades de organización y gestión en situaciones de
                       crisis. Su capacidad para planificar y coordinar es
                       esencial en la ingeniería industrial, donde se busca
@@ -1310,7 +1310,7 @@ function Bachilleres() {
                         src="https://firebasestorage.googleapis.com/v0/b/encuestas-71bc8.appspot.com/o/ar1.jpg?alt=media&token=766cee24-1751-4995-8e29-7520a498fab8"
                         style={{ height: "auto", width: "100%" }}
                       />
-                      R2-D2, el astromecánico de la saga “Star Wars”, es un
+                      R2-D2, el astromecánico de la saga “Star Wars”, es un
                       ejemplo icónico de automatización y robótica. Su
                       versatilidad para reparar naves espaciales y su interfaz
                       con otros sistemas lo convierten en un modelo a seguir

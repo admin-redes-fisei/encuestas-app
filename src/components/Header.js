@@ -8,6 +8,11 @@ const Header = () => {
         alignItems: "center",
         justifyContent: "space-between",
         backgroundColor: "#AA1415",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        zIndex: 100,
       }}
     >
       <div

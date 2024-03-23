@@ -1,16 +1,49 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import { Card } from "react-bootstrap";
-import FacebookIcon from "../assets/facebookIcon";
-import InstagramIcon from "../assets/instagramIcon";
-import MailIcon from "../assets/mailIcon";
+import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { obtenerPreguntas } from "../services/FormulariosService";
 
 function StartPage() {
+  //para navegacion
+  const navigate = useNavigate();
   //para responsividad
   const [ampliarElemento, setAmpliarElemento] = useState(true);
+  //para obtener preguntas
+  const rutaActual = window.location.pathname;
 
+  //para obtener preguntas
   useEffect(() => {
-    // Escucha el cambio de tamaño de la ventana
+    const partesRuta = rutaActual.split("/");
+
+    obtenerPreguntas(partesRuta[partesRuta.length - 1]).then((response) => {
+      const preguntas = JSON.stringify(response);
+      localStorage.setItem("for_pub_preguntas", preguntas);
+      seleccionarSecciones(response);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //para almacenar secciones
+  const seleccionarSecciones = (preguntas) => {
+    const seccionesSet = new Set();
+    preguntas.forEach((item) => {
+      seccionesSet.add(item.seccion);
+    });
+
+    const secciones = Array.from(seccionesSet);
+    const seccionesJson = JSON.stringify(secciones);
+    localStorage.setItem("for_pub_secciones", seccionesJson);
+  };
+
+  //para navegacion
+  const handleStarButton = () => {
+    const rutaDestino = `${rutaActual}/0`;
+    navigate(rutaDestino);
+  };
+
+  //para responsividad
+  useEffect(() => {
     const handleResize = () => {
       const anchoVentana = window.innerWidth;
       if (anchoVentana <= 644) {
@@ -19,19 +52,11 @@ function StartPage() {
         setAmpliarElemento(true);
       }
     };
-
-    // Agrega el evento al montar el componente
     window.addEventListener("resize", handleResize);
-
-    // Limpia el evento al desmontar el componente
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  const handleRedirect = (url) => {
-    window.open(url, "_blank"); // Abre el URL en una nueva ventana del navegador
-  };
 
   return (
     <div
@@ -54,123 +79,18 @@ function StartPage() {
         }}
       >
         <Header />
-        <br />
-        <div
-          className="titles"
+        <Button
+          variant="light"
+          onClick={handleStarButton}
           style={{
-            textAlign: "center",
-            margin: "20px 40px",
-            width: "60%",
-            marginRight: "auto",
-            marginLeft: "auto",
+            alignSelf: "left",
+            bottom: 0,
+            zIndex: 210,
+            marginTop: "200px",
           }}
         >
-          <h2>
-            <strong>Encuestas FISEI</strong>
-          </h2>
-          <p></p>
-        </div>
-        <div
-          className="contactsection2"
-          style={{
-            justifyContent: "space-around",
-            width: "80%",
-            marginLeft: "auto",
-            marginRight: "auto",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          }}
-        >
-          <div
-            className="cardemail"
-            style={{
-              display: "flex",
-              float: "left",
-              flexDirection: "column",
-              textAlign: "left",
-              marginTop: "15%",
-              marginLeft: "5%",
-              marginRight: "5%",
-            }}
-          >
-            <p
-              style={{
-                fontSize: "12px",
-                letterSpacing: "2px",
-                marginBottom: "0px",
-              }}
-            >
-              <b>ENCUESTA</b>
-            </p>
-            <h1>
-              <b style={{ color: "#AA1415" }}>Empleabilidad</b>
-            </h1>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "left",
-                width: "100%",
-              }}
-            >
-              <Card>
-                <Card.Body>
-                  <MailIcon /> <b>informacion.fisei@uta.edu.ec</b>
-                </Card.Body>
-              </Card>
-            </div>
-          </div>
-          <div
-            className="cardredes"
-            style={{
-              display: "flex",
-              float: "right",
-              flexDirection: "column",
-              marginTop: "5%",
-              marginLeft: "5%",
-              marginRight: "5%",
-              textAlign: "right",
-            }}
-          >
-            <p
-              style={{
-                fontSize: "12px",
-                letterSpacing: "2px",
-                marginBottom: "0px",
-              }}
-            >
-              <b>ENCUESTA</b>
-            </p>
-            <h1>
-              <b style={{ color: "#AA1415" }}>Bachilleres</b>
-            </h1>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-around",
-                alignItems: "center",
-                width: "75%",
-                marginLeft: "20%",
-              }}
-            >
-              <FacebookIcon
-                onClick={() => {
-                  handleRedirect(
-                    "https://www.facebook.com/UniversidadTecnicadeAmbatoOficial/?locale=es_LA"
-                  );
-                }}
-                style={{ cursor: "pointer" }}
-              />
-              <InstagramIcon
-                onClick={() => {
-                  handleRedirect("https://fisei.uta.edu.ec/v4.0/");
-                }}
-                style={{ cursor: "pointer" }}
-              />
-            </div>
-          </div>
-        </div>
+          Comenzar
+        </Button>
       </div>
     </div>
   );
