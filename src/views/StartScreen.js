@@ -19,7 +19,7 @@ function StartPage() {
     obtenerPreguntas(partesRuta[partesRuta.length - 1]).then((response) => {
       const preguntas = JSON.stringify(response);
       localStorage.setItem("for_pub_preguntas", preguntas);
-      //localStorage.setItem("respuestas", []);
+      localStorage.setItem("respuestas", JSON.stringify([]));
       seleccionarSecciones(response);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,26 +68,52 @@ function StartPage() {
         justifyContent: "center",
       }}
     >
+      <Header />
       <div
         style={{
-          width: ampliarElemento ? "70%" : "100%",
+          width: ampliarElemento ? "100%" : "100%",
           height: "90vh",
           float: "right",
-          margin: "20px",
+          padding: "20px",
           borderRadius: "25px",
           justifyContent: "center",
           backgroundColor: "#F5F5F5",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        <Header />
+        <br />
+        <div
+          className="titles"
+          style={{
+            textAlign: "center",
+            marginTop: "100px",
+            width: "60%",
+            marginRight: "auto",
+            marginLeft: "auto",
+          }}
+        >
+          <h2>
+            <strong>¡BIENVENIDO/A!</strong>
+          </h2>
+          <p>
+            ¡Estamos emocionados de contar con tu participación. Tu opinión es
+            muy valiosa para nosotros. Por favor, tómate el tiempo necesario
+            para responder con sinceridad y detalle. ¡Gracias por formar parte
+            de este proceso!
+          </p>
+        </div>
         <Button
-          variant="light"
+          variant="secondary"
           onClick={handleStarButton}
           style={{
             alignSelf: "left",
             bottom: 0,
             zIndex: 210,
-            marginTop: "200px",
+            marginTop: "20px",
+            backgroundColor: "#aa1415",
+            border: "none",
           }}
         >
           Comenzar

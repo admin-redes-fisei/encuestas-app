@@ -2,15 +2,15 @@ import {
   Accordion,
   Button,
   Card,
-  Col,
   Form,
   Image,
   Overlay,
-  Row,
+  OverlayTrigger,
   Tooltip,
 } from "react-bootstrap";
 import InfoIcon from "../assets/infoIncon";
 import { useEffect, useRef, useState } from "react";
+import IdeaIcon from "../assets/infoIncon copy";
 
 function OptionsQuestionCard({
   question,
@@ -105,6 +105,8 @@ function OptionsQuestionCard({
             ?.respuesta_otra_texto)
     )?.id || 0
   );
+  //para pregunta respondida
+  const [respondida, setRespondida] = useState(respuestas[question.pre_alias]);
 
   //para tooltip
   const handleButtonClick = (optionId) => {
@@ -149,7 +151,30 @@ function OptionsQuestionCard({
       }}
     >
       <Card.Body>
-        <Card.Title>{question.title}</Card.Title>
+        <Card.Title>
+          {question.title}{" "}
+          {question.pre_tooltip_texto && (
+            <OverlayTrigger
+              placement="bottom"
+              overlay={
+                <Tooltip id={7}>
+                  <Image
+                    src={question.pre_tooltip_imagen}
+                    style={{ height: "auto", width: "100%" }}
+                  />
+                  {question.pre_tooltip_texto}
+                </Tooltip>
+              }
+            >
+              <Button
+                variant="light"
+                className="d-inline-flex align-items-center"
+              >
+                <IdeaIcon />
+              </Button>
+            </OverlayTrigger>
+          )}
+        </Card.Title>
         <Card.Text>{question.question}</Card.Text>
         <div
           style={{
@@ -185,14 +210,15 @@ function OptionsQuestionCard({
                       whiteSpace: "normal",
                       marginRight: "5px",
                     }}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       handleCheckChange(
                         e,
                         question.id,
                         option.label,
                         question.questionType
-                      )
-                    }
+                      );
+                      setRespondida(e.target.checked);
+                    }}
                     checked={
                       question.questionType === "radio"
                         ? respuestas[option.name]?.respuesta_texto ===
@@ -423,7 +449,7 @@ function OptionsQuestionCard({
               </Form.Select>
             </div>
           )}
-          {question.isOpenQuestion == 1 && (
+          {parseInt(question.isOpenQuestion) === 1 && (
             <Form.Group
               style={{
                 width: "100%",
@@ -439,12 +465,10 @@ function OptionsQuestionCard({
           )}
         </div>
       </Card.Body>
-
-      {question.pre_url_imagen && (
-        <Card.Img
-          variant="top"
-          src={question.pre_url_imagen}
-        />
+      {question.pre_url_imagen && parseInt(question.pre_tipo_imagen) === 2 ? (
+        respondida && <Card.Img variant="top" src={question.pre_url_imagen} />
+      ) : (
+        <Card.Img variant="top" src={question.pre_url_imagen} />
       )}
     </Card>
   );

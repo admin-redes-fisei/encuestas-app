@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import { Card } from "react-bootstrap";
 import FacebookIcon from "../assets/facebookIcon";
@@ -6,29 +5,7 @@ import InstagramIcon from "../assets/instagramIcon";
 import MailIcon from "../assets/mailIcon";
 
 function EndPage() {
-  //para responsividad
-  const [ampliarElemento, setAmpliarElemento] = useState(true);
-
-  useEffect(() => {
-    // Escucha el cambio de tamaño de la ventana
-    const handleResize = () => {
-      const anchoVentana = window.innerWidth;
-      if (anchoVentana <= 644) {
-        setAmpliarElemento(false);
-      } else {
-        setAmpliarElemento(true);
-      }
-    };
-
-    // Agrega el evento al montar el componente
-    window.addEventListener("resize", handleResize);
-
-    // Limpia el evento al desmontar el componente
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
+  localStorage.setItem("respuestas", JSON.stringify([]));
   const handleRedirect = (url) => {
     window.open(url, "_blank"); // Abre el URL en una nueva ventana del navegador
   };
@@ -42,24 +19,24 @@ function EndPage() {
         justifyContent: "center",
       }}
     >
+      <Header />
       <div
         style={{
-          width: ampliarElemento ? "70%" : "100%",
-          height: "90vh",
+          width: "100%",
+          height: "100vh",
           float: "right",
-          margin: "20px",
+          padding: "20px",
           borderRadius: "25px",
           justifyContent: "center",
           backgroundColor: "#F5F5F5",
         }}
       >
-        <Header />
         <br />
         <div
           className="titles"
           style={{
             textAlign: "center",
-            margin: "20px 40px",
+            margin: "100px 40px",
             width: "60%",
             marginRight: "auto",
             marginLeft: "auto",

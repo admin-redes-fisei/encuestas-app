@@ -5,8 +5,11 @@ import EncuestaSideBar from "../components/FormSidebar";
 import { Button, ProgressBar } from "react-bootstrap";
 import OptionsQuestionCard from "../components/OptionsQuestionCard";
 import { useNavigate } from "react-router-dom";
+import { enviarRespuestas } from "../services/FormulariosService";
 
 function FormularioPublico() {
+  //para redirigir
+  const navigate = useNavigate();
   //obtener los datos de local storage
   const preguntas_completo = JSON.parse(
     localStorage.getItem("for_pub_preguntas")
@@ -19,11 +22,14 @@ function FormularioPublico() {
   const [data, setData] = useState([]);
   //para responsividad
   const [ampliarElemento, setAmpliarElemento] = useState(true);
-  //para repsuestas
+  //para respuestas
   const [respuestas, setRespuestas] = useState(
     JSON.parse(localStorage.getItem("respuestas")) || []
   );
+  //para progresbar
+  const [scrollValue, setScrollValue] = useState(0);
 
+  //para secciones
   useEffect(() => {
     const filtrada = preguntas_completo.filter((pregunta) => {
       return pregunta.seccion === secciones[seccionIndex];
@@ -124,13 +130,39 @@ function FormularioPublico() {
   };
 
   //para redirigir
-  const navigate = useNavigate();
-
   const handleRedirect = (index) => {
     const rutaDestino = `${rutaRaiz}/${index}`;
     navigate(rutaDestino);
-    window.location.reload();
-    console.log(JSON.parse(localStorage.getItem("respuestas")));
+    window.scrollTo(0, 0);
+  };
+
+  //para progresbar
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      const scrollPercentage =
+        (scrollPosition / (documentHeight - windowHeight)) * 100;
+      setScrollValue(scrollPercentage);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  //para enviar respuestas
+  const handleEnviarRespuestas = () => {
+    enviarRespuestas(JSON.parse(localStorage.getItem("respuestas"))).then(
+      (response) => {
+        navigate("/encuestas/endpage");
+        console.log(response);
+      }
+    );
   };
 
   return (
@@ -163,9 +195,29 @@ function FormularioPublico() {
             paddingLeft: ampliarElemento ? "0px" : "0px",
           }}
         >
-          <ProgressBar now={60} variant="danger" style={{ color: "#aa1415" }} />
+          <ProgressBar
+            now={scrollValue}
+            variant="danger"
+            style={{ color: "#aa1415" }}
+          />
         </div>
-        <div style={{ marginTop: "60px" }}>
+        <div
+          style={{
+            marginTop: "60px",
+          }}
+        >
+          <Button
+            variant="light"
+            onClick={() => {
+              handleRedirect(parseInt(seccionIndex) - 1);
+            }}
+            disabled={parseInt(seccionIndex) === 0}
+            style={{ alignSelf: "left", display: "flex" }}
+          >
+            ← Regresar
+          </Button>
+        </div>
+        <div style={{ marginTop: "20px" }}>
           {data.map((question) => (
             <OptionsQuestionCard
               key={question.id}
@@ -176,21 +228,37 @@ function FormularioPublico() {
             />
           ))}
         </div>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            //handleRedirect(parseInt(seccionIndex) + 1);
-            console.log(JSON.parse(localStorage.getItem("respuestas")));
-          }}
-          style={{
-            marginLeft: "auto",
-            backgroundColor: "#aa1415",
-            marginRight: "20px",
-            border: "none",
-          }}
-        >
-          Siguiente ⭢
-        </Button>
+        {seccionIndex < secciones.length - 1 ? (
+          <Button
+            variant="secondary"
+            onClick={() => {
+              handleRedirect(parseInt(seccionIndex) + 1);
+            }}
+            style={{
+              marginLeft: "auto",
+              backgroundColor: "#aa1415",
+              marginRight: "20px",
+              marginBottom: "40px",
+              border: "none",
+            }}
+          >
+            Siguiente ⭢
+          </Button>
+        ) : (
+          <Button
+            variant="secondary"
+            onClick={handleEnviarRespuestas}
+            style={{
+              marginLeft: "auto",
+              backgroundColor: "#aa1415",
+              marginRight: "20px",
+              border: "none",
+              marginBottom: "40px",
+            }}
+          >
+            Finalizar
+          </Button>
+        )}
       </div>
     </div>
   );

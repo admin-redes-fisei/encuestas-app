@@ -17,3 +17,18 @@ export async function obtenerPreguntas(for_alias) {
     console.error("Error al obtener las preguntas:", error);
   }
 }
+
+export async function enviarRespuestas(respuestas) {
+  fetch(`${URL_acceso}respuestas.php`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(respuestas),
+  })
+    .then((response) => response.json())
+    .then((data) => {})
+    .catch((error) => {
+      console.error("Error al enviar la respuesta:", error);
+    });
+};
