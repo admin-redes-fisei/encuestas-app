@@ -19,6 +19,7 @@ function StartPage() {
     obtenerPreguntas(partesRuta[partesRuta.length - 1]).then((response) => {
       const preguntas = JSON.stringify(response);
       localStorage.setItem("for_pub_preguntas", preguntas);
+      //localStorage.setItem("respuestas", []);
       seleccionarSecciones(response);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

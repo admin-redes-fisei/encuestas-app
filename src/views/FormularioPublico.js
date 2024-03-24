@@ -2,8 +2,9 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import EncuestaSideBar from "../components/FormSidebar";
-import { ProgressBar } from "react-bootstrap";
+import { Button, ProgressBar } from "react-bootstrap";
 import OptionsQuestionCard from "../components/OptionsQuestionCard";
+import { useNavigate } from "react-router-dom";
 
 function FormularioPublico() {
   //obtener los datos de local storage
@@ -13,8 +14,15 @@ function FormularioPublico() {
   const secciones = JSON.parse(localStorage.getItem("for_pub_secciones"));
   const rutaActual = window.location.pathname;
   const partesRuta = rutaActual.split("/");
+  const rutaRaiz = partesRuta.slice(0, -1).join("/");
   const seccionIndex = String(partesRuta[partesRuta.length - 1]);
   const [data, setData] = useState([]);
+  //para responsividad
+  const [ampliarElemento, setAmpliarElemento] = useState(true);
+  //para repsuestas
+  const [respuestas, setRespuestas] = useState(
+    JSON.parse(localStorage.getItem("respuestas")) || []
+  );
 
   useEffect(() => {
     const filtrada = preguntas_completo.filter((pregunta) => {
@@ -24,8 +32,6 @@ function FormularioPublico() {
   }, [seccionIndex]);
 
   //para responsividad
-  const [ampliarElemento, setAmpliarElemento] = useState(true);
-
   useEffect(() => {
     // Escucha el cambio de tamaño de la ventana
     const handleResize = () => {
@@ -42,6 +48,90 @@ function FormularioPublico() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  //para repsuestas
+  const handleCheckChange = (event, questionId, optionLabel, questionType) => {
+    if (questionType === "radio") {
+      const { name, value } = event.target;
+      setRespuestas((prevRespuestas) => ({
+        ...prevRespuestas,
+        [name]: {
+          formulario_id: 1,
+          pregunta_id: questionId,
+          opcion_id: value,
+          respuesta_texto: optionLabel,
+          ip_usuario: "",
+        },
+      }));
+    }
+    if (questionType === "checkbox") {
+      const { name, value, checked } = event.target;
+
+      setRespuestas((prevRespuestas) => {
+        if (checked) {
+          // Si el checkbox está marcado, agregamos la respuesta al arreglo
+          return {
+            ...prevRespuestas,
+            [name]: [
+              ...(prevRespuestas[name] || []),
+              {
+                formulario_id: 1,
+                pregunta_id: questionId,
+                opcion_id: value,
+                respuesta_texto: optionLabel,
+                ip_usuario: "",
+              },
+            ],
+          };
+        } else {
+          // Si el checkbox está desmarcado, filtramos la respuesta del arreglo
+          return {
+            ...prevRespuestas,
+            [name]: (prevRespuestas[name] || []).filter(
+              (item) => item.opcion_id !== value
+            ),
+          };
+        }
+      });
+    }
+  };
+
+  useEffect(() => {
+    localStorage.setItem("respuestas", JSON.stringify(respuestas));
+  }, [respuestas]);
+
+  //para respustas de texto
+  const handleOtrosChange = (respuestasTexto) => {
+    setRespuestas((prevRespuestas) => {
+      const updatedOthers = [...(prevRespuestas["otros"] || [])];
+      const existingOptionIndex = updatedOthers.findIndex(
+        (op) => op.pregunta_id === respuestasTexto.pregunta_id
+      );
+
+      if (existingOptionIndex !== -1) {
+        // Si ya existe una opción con la misma pregunta_id, actualiza su valor
+        updatedOthers[existingOptionIndex] = respuestasTexto;
+      } else {
+        // Si no existe, agrega la nueva opción al arreglo
+        updatedOthers.push(respuestasTexto);
+      }
+
+      return {
+        ...prevRespuestas,
+        otros: updatedOthers,
+      };
+    });
+  };
+
+  //para redirigir
+  const navigate = useNavigate();
+
+  const handleRedirect = (index) => {
+    const rutaDestino = `${rutaRaiz}/${index}`;
+    navigate(rutaDestino);
+    window.location.reload();
+    console.log(JSON.parse(localStorage.getItem("respuestas")));
+  };
 
   return (
     <div
@@ -77,9 +167,30 @@ function FormularioPublico() {
         </div>
         <div style={{ marginTop: "60px" }}>
           {data.map((question) => (
-            <OptionsQuestionCard key={question.id} question={question} />
+            <OptionsQuestionCard
+              key={question.id}
+              question={question}
+              handleCheckChange={handleCheckChange}
+              handleOtrosChange={handleOtrosChange}
+              respuestas={respuestas}
+            />
           ))}
         </div>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            //handleRedirect(parseInt(seccionIndex) + 1);
+            console.log(JSON.parse(localStorage.getItem("respuestas")));
+          }}
+          style={{
+            marginLeft: "auto",
+            backgroundColor: "#aa1415",
+            marginRight: "20px",
+            border: "none",
+          }}
+        >
+          Siguiente ⭢
+        </Button>
       </div>
     </div>
   );

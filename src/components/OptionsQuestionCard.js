@@ -1,13 +1,112 @@
-import { Button, Card, Form, Image, Overlay, Tooltip } from "react-bootstrap";
+import {
+  Accordion,
+  Button,
+  Card,
+  Col,
+  Form,
+  Image,
+  Overlay,
+  Row,
+  Tooltip,
+} from "react-bootstrap";
 import InfoIcon from "../assets/infoIncon";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-function OptionsQuestionCard({ question }) {
+function OptionsQuestionCard({
+  question,
+  handleCheckChange,
+  handleOtrosChange,
+  respuestas,
+}) {
+  //para almacenar secciones
+  const [subsecciones, setSubsecciones] = useState([]);
+  useEffect(() => {
+    seleccionarSecciones(question.options);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   //para tooltip
-  const [tooltipStates, setTooltipStates] = useState({}); // Estado individual para cada tooltip
-  const buttonRefs = useRef([]); // Array de refs para los botones
-  console.log(question);
+  const [tooltipStates, setTooltipStates] = useState({});
+  const buttonRefs = useRef([]);
+  //para campos de texto
+  const [respuestasTexto, setRespuestaTexto] = useState("");
+  const [inputValue, setInputValue] = useState(
+    (respuestas["otros"] &&
+      respuestas["otros"].find((otro) => otro.pregunta_id === question.id)
+        ?.respuesta_otra_texto) ||
+      ""
+  );
+  //para provincia y ciudad
+  const options = [
+    {
+      id: 1,
+      name: "residencia",
+      provincia: "Cotopaxi",
+      ciudades: [
+        "Latacunga",
+        "La Maná",
+        "Pangua",
+        "Pujilí",
+        "Salcedo",
+        "Saquisilí",
+        "Sigchos",
+      ],
+    },
+    {
+      id: 2,
+      name: "residencia",
+      provincia: "Chimborazo",
+      ciudades: [
+        "Riobamba",
+        "Alausí",
+        "Guano",
+        "Chambo",
+        "Chunchi",
+        "Colta",
+        "Cumandá",
+        "Guamote",
+        "Pallatanga",
+        "Penipe",
+      ],
+    },
+    {
+      id: 3,
+      name: "residencia",
+      provincia: "Pastaza",
+      ciudades: ["Puyo", "Arajuno", "Mera", "Santa Clara"],
+    },
+    {
+      id: 4,
+      name: "residencia",
+      provincia: "Tungurahua",
+      ciudades: [
+        "Ambato",
+        "Baños",
+        "Cevallos",
+        "Mocha",
+        "Pelileo",
+        "Patate",
+        "Píllaro",
+        "Quero",
+      ],
+    },
+    {
+      id: 5,
+      name: "residencia",
+      provincia: "Otra",
+      ciudades: [],
+    },
+  ];
+  const [selectedProvincia, setsSlectedProvincia] = useState(
+    options.find(
+      (op) =>
+        op.provincia ===
+        (respuestas["otros"] &&
+          respuestas["otros"].find((otro) => otro.pregunta_id === question.id)
+            ?.respuesta_otra_texto)
+    )?.id || 0
+  );
 
+  //para tooltip
   const handleButtonClick = (optionId) => {
     setTooltipStates((prevState) => ({
       ...prevState,
@@ -16,19 +115,6 @@ function OptionsQuestionCard({ question }) {
   };
 
   //para campos de texto
-  const [respuestasTexto, setRespuestaTexto] = useState("");
-  const [inputValue, setInputValue] = useState("");
-
-  /*useEffect(() => {
-    const text = respuestas["otros"]?.some(
-      (op) => op.pregunta_id === currentPage
-    )
-      ? respuestas["otros"]?.some((op) => op.pregunta_id === currentPage)
-          .respuesta_otra_texto
-      : "";
-    setInputValue(text);
-  }, [currentPage]);*/
-
   const handleTextChange = (e, pregunta_id) => {
     const { value } = e.target;
     setInputValue(e.target.value);
@@ -36,34 +122,25 @@ function OptionsQuestionCard({ question }) {
       pregunta_id: pregunta_id,
       respuesta_otra_texto: value,
     });
+    handleOtrosChange(respuestasTexto);
   };
-  /*const handleChange = (respuestasTexto) => {
-    setRespuestas((prevRespuestas) => {
-      const updatedOthers = [...(prevRespuestas["otros"] || [])];
-      const existingOptionIndex = updatedOthers.findIndex(
-        (op) => op.pregunta_id === respuestasTexto.pregunta_id
-      );
 
-      if (existingOptionIndex !== -1) {
-        // Si ya existe una opción con la misma pregunta_id, actualiza su valor
-        updatedOthers[existingOptionIndex] = respuestasTexto;
-      } else {
-        // Si no existe, agrega la nueva opción al arreglo
-        updatedOthers.push(respuestasTexto);
-      }
-
-      return {
-        ...prevRespuestas,
-        otros: updatedOthers,
-      };
+  //para almacenar secciones
+  const seleccionarSecciones = (opciones) => {
+    const seccionesSet = new Set();
+    opciones.forEach((item) => {
+      seccionesSet.add(item.padre);
     });
-  };*/
+
+    const secciones = Array.from(seccionesSet);
+    setSubsecciones(secciones);
+  };
 
   return (
     <Card
       style={{
         width: "95%",
-        display: "flex",
+        display: question.questionType === "ciudad" ? "none" : "flex",
         marginBottom: "20px",
         marginLeft: "auto",
         marginRight: "auto",
@@ -77,74 +154,279 @@ function OptionsQuestionCard({ question }) {
         <div
           style={{
             width: "fit-content",
-            maxWidth: "90%",
+            maxWidth: "60%",
             padding: "10px",
             textAlign: "left",
             marginLeft: "auto",
             marginRight: "auto",
           }}
         >
-          {question.options?.map((option, index) => (
-            <Form.Group
-              className="mb-3"
-              key={option.id}
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <Form.Check
-                label={option.label}
-                type={question.questionType}
-                name={option.name}
-                value={option.id}
-                style={{
-                  minHeight: "30px",
-                  marginTop: "5px",
-                  whiteSpace: "normal",
-                  marginRight: "5px",
-                }}
-              />
-              {option.tooltip_texto && (
-                <>
-                  <Button
-                    variant="outline-light"
-                    ref={(ref) =>
-                      (buttonRefs.current[`${question.id}${option.id}`] = ref)
-                    } // Asigna un ref al botón
-                    onClick={() =>
-                      handleButtonClick(`${question.id}${option.id}`)
+          {(question.questionType === "radio" ||
+            question.questionType === "checkbox") && (
+            <div>
+              {question.options?.map((option, index) => (
+                <Form.Group
+                  className="mb-3"
+                  key={option.id}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Form.Check
+                    label={option.label}
+                    type={question.questionType}
+                    name={option.name}
+                    value={option.id}
+                    style={{
+                      minHeight: "30px",
+                      marginTop: "5px",
+                      whiteSpace: "normal",
+                      marginRight: "5px",
+                    }}
+                    onChange={(e) =>
+                      handleCheckChange(
+                        e,
+                        question.id,
+                        option.label,
+                        question.questionType
+                      )
                     }
-                  >
-                    <InfoIcon width="20px" />
-                  </Button>
-                  <Overlay
-                    target={buttonRefs.current[`${question.id}${option.id}`]}
-                    show={tooltipStates[`${question.id}${option.id}`]} //
-                    placement="bottom"
-                    key={`${question.id}${option.id}`}
-                  >
-                    {(props) => (
-                      <Tooltip id={`${question.id}${option.id}`} {...props}>
-                        {option.tooltip_img && (
-                          <Image
-                            src={option.tooltip_img}
-                            style={{ height: "auto", width: "100%" }}
-                          />
+                    checked={
+                      question.questionType === "radio"
+                        ? respuestas[option.name]?.respuesta_texto ===
+                          option.label
+                        : respuestas[option.name]?.some(
+                            (item) => item.respuesta_texto === option.label
+                          )
+                    }
+                  />
+                  {option.tooltip_texto && (
+                    <>
+                      <Button
+                        variant="outline-light"
+                        ref={(ref) =>
+                          (buttonRefs.current[`${question.id}${option.id}`] =
+                            ref)
+                        } // Asigna un ref al botón
+                        onClick={() =>
+                          handleButtonClick(`${question.id}${option.id}`)
+                        }
+                      >
+                        <InfoIcon width="20px" />
+                      </Button>
+                      <Overlay
+                        target={
+                          buttonRefs.current[`${question.id}${option.id}`]
+                        }
+                        show={tooltipStates[`${question.id}${option.id}`]} //
+                        placement="bottom"
+                        key={`${question.id}${option.id}`}
+                      >
+                        {(props) => (
+                          <Tooltip id={`${question.id}${option.id}`} {...props}>
+                            {option.tooltip_img && (
+                              <Image
+                                src={option.tooltip_img}
+                                style={{ height: "auto", width: "100%" }}
+                              />
+                            )}
+                            {option.tooltip_texto}
+                          </Tooltip>
                         )}
-                        {option.tooltip_texto}
-                      </Tooltip>
-                    )}
-                  </Overlay>
-                </>
-              )}
-            </Form.Group>
-          ))}
+                      </Overlay>
+                    </>
+                  )}
+                </Form.Group>
+              ))}
+            </div>
+          )}
+          {question.questionType === "accordeon" && (
+            <div>
+              {subsecciones?.map((subseccion) => (
+                <Accordion>
+                  <Accordion.Item eventKey="0">
+                    <Accordion.Header>{subseccion}</Accordion.Header>
+                    <Accordion.Body>
+                      {question.options
+                        ?.filter((option) => option.padre === subseccion)
+                        ?.map((option, index) => (
+                          <Form.Group
+                            className="mb-3"
+                            key={option.id}
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Form.Check
+                              label={option.label}
+                              type="checkbox"
+                              name={option.name}
+                              value={option.id}
+                              style={{
+                                minHeight: "30px",
+                                marginTop: "5px",
+                                whiteSpace: "normal",
+                                marginRight: "5px",
+                              }}
+                              onChange={(e) =>
+                                handleCheckChange(
+                                  e,
+                                  question.id,
+                                  option.label,
+                                  "checkbox"
+                                )
+                              }
+                              checked={respuestas[option.name]?.some(
+                                (item) => item.respuesta_texto === option.label
+                              )}
+                            />
+                            {option.tooltip_texto && (
+                              <>
+                                <Button
+                                  variant="outline-light"
+                                  ref={(ref) =>
+                                    (buttonRefs.current[
+                                      `${question.id}${option.id}`
+                                    ] = ref)
+                                  } // Asigna un ref al botón
+                                  onClick={() =>
+                                    handleButtonClick(
+                                      `${question.id}${option.id}`
+                                    )
+                                  }
+                                >
+                                  <InfoIcon width="20px" />
+                                </Button>
+                                <Overlay
+                                  target={
+                                    buttonRefs.current[
+                                      `${question.id}${option.id}`
+                                    ]
+                                  }
+                                  show={
+                                    tooltipStates[`${question.id}${option.id}`]
+                                  } //
+                                  placement="bottom"
+                                  key={`${question.id}${option.id}`}
+                                >
+                                  {(props) => (
+                                    <Tooltip
+                                      id={`${question.id}${option.id}`}
+                                      {...props}
+                                    >
+                                      {option.tooltip_img && (
+                                        <Image
+                                          src={option.tooltip_img}
+                                          style={{
+                                            height: "auto",
+                                            width: "100%",
+                                          }}
+                                        />
+                                      )}
+                                      {option.tooltip_texto}
+                                    </Tooltip>
+                                  )}
+                                </Overlay>
+                              </>
+                            )}
+                          </Form.Group>
+                        ))}
+                    </Accordion.Body>
+                  </Accordion.Item>
+                </Accordion>
+              ))}
+            </div>
+          )}
+          {question.questionType === "text" && (
+            <div>
+              <Form.Group
+                style={{
+                  width: "100%",
+                }}
+              >
+                <Form.Control
+                  type="text"
+                  placeholder="Nombre del Colegio"
+                  value={inputValue}
+                  onChange={(e) => handleTextChange(e, question.id)}
+                />
+              </Form.Group>
+            </div>
+          )}
+          {question.questionType === "provincia" && (
+            <div>
+              <Form.Select
+                defaultValue={selectedProvincia}
+                name="provincia"
+                onChange={(e) => {
+                  setsSlectedProvincia(parseInt(e.target.value) - 1);
+                  handleOtrosChange({
+                    pregunta_id: question.id,
+                    respuesta_otra_texto: options.find(
+                      (op) => op.id === parseInt(e.target.value)
+                    )?.provincia,
+                  });
+                }}
+              >
+                <option key={0} value={0}>
+                  Seleccione
+                </option>
+                {options.map((opcion) => (
+                  <option key={opcion.id} value={opcion.id}>
+                    {opcion.provincia}
+                  </option>
+                ))}
+              </Form.Select>
+              <br />
+              <p>
+                <strong>Ciudad</strong>
+              </p>
+              <br />
+              <Form.Select
+                defaultValue={
+                  options[selectedProvincia].ciudades.findIndex(
+                    (op) =>
+                      op ===
+                      (
+                        respuestas["otros"] &&
+                        respuestas["otros"].find((otro) => otro.pregunta_id) ===
+                          parseInt(question.id) + 1
+                      )?.respuesta_otra_texto
+                  ) || 0
+                }
+                name="ciudad"
+                disabled={selectedProvincia === 4}
+                onChange={(e) => {
+                  handleOtrosChange({
+                    pregunta_id: parseInt(question.id) + 1,
+                    respuesta_otra_texto:
+                      options[selectedProvincia].ciudades[
+                        parseInt(e.target.value)
+                      ],
+                  });
+                }}
+              >
+                <option key={0} value={0}>
+                  Seleccione
+                </option>
+                {options[
+                  selectedProvincia ? selectedProvincia : 0
+                ].ciudades.map((opcion, index) => (
+                  <option key={index} value={index}>
+                    {opcion}
+                  </option>
+                ))}
+              </Form.Select>
+            </div>
+          )}
           {question.isOpenQuestion == 1 && (
             <Form.Group
               style={{
-                width: "70%",
+                width: "100%",
               }}
             >
               <Form.Control
@@ -157,10 +439,11 @@ function OptionsQuestionCard({ question }) {
           )}
         </div>
       </Card.Body>
+
       {question.pre_url_imagen && (
         <Card.Img
           variant="top"
-          src="https://firebasestorage.googleapis.com/v0/b/encuestas-71bc8.appspot.com/o/carrera-sw.png?alt=media&token=df9c5e9b-6c2c-4e08-8c33-9d1cd29da045"
+          src={question.pre_url_imagen}
         />
       )}
     </Card>

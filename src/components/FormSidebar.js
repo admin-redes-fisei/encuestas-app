@@ -37,7 +37,8 @@ function EncuestaSideBar() {
   const handleRedirect = (index) => {
     const rutaDestino = `${rutaRaiz}/${index}`;
     navigate(rutaDestino);
-    window.location.reload();
+    //window.location.reload();
+    console.log(JSON.parse(localStorage.getItem("respuestas")));
   };
 
   return (
