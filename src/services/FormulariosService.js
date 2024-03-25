@@ -1,4 +1,5 @@
-const URL_acceso = "http://localhost:8084/pruebaTesis/";
+//const URL_acceso = "http://localhost:8084/pruebaTesis/";
+const URL_acceso = "https://hatunsoft.uta.edu.ec/back_encuestas/";
 
 export async function obtenerPreguntas(for_alias) {
   try {
