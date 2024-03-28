@@ -62,7 +62,7 @@ function FormularioPublico() {
       setRespuestas((prevRespuestas) => ({
         ...prevRespuestas,
         [name]: {
-          formulario_id: 1,
+          formulario_id: data[0].for_id,
           pregunta_id: questionId,
           opcion_id: value,
           respuesta_texto: optionLabel,
@@ -131,6 +131,11 @@ function FormularioPublico() {
 
   //para redirigir
   const handleRedirect = (index) => {
+    /*if (validarPreguntas(seccionIndex) === true) {
+      const rutaDestino = `${rutaRaiz}/${index}`;
+      navigate(rutaDestino);
+      window.scrollTo(0, 0);
+    }*/
     const rutaDestino = `${rutaRaiz}/${index}`;
     navigate(rutaDestino);
     window.scrollTo(0, 0);
@@ -157,12 +162,41 @@ function FormularioPublico() {
 
   //para enviar respuestas
   const handleEnviarRespuestas = () => {
+    /*if (validarPreguntas()) {
+      enviarRespuestas(JSON.parse(localStorage.getItem("respuestas"))).then(
+        (response) => {
+          navigate("/encuestas/endpage");
+          console.log(response);
+        }
+      );
+    }*/
     enviarRespuestas(JSON.parse(localStorage.getItem("respuestas"))).then(
       (response) => {
         navigate("/encuestas/endpage");
         console.log(response);
       }
     );
+  };
+
+  //para validar
+  const validarPreguntas = (seccion) => {
+    const respondidas = JSON.parse(localStorage.getItem("respuestas"));
+    const preguntasSinResponder = [];
+
+    (seccion ? data : preguntas_completo).forEach((pregunta) => {
+      const enOtros = respondidas["otros"].findIndex(
+        (otro) => otro.pregunta_id == pregunta.id
+      );
+      if (!(respondidas[pregunta.pre_alias] || enOtros !== -1)) {
+        preguntasSinResponder.push(pregunta);
+      }
+    });
+
+    if (preguntasSinResponder.length === 0) {
+      return true; // All questions have been answered
+    } else {
+      return false; // There are unanswered questions
+    }
   };
 
   return (
