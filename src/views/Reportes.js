@@ -64,6 +64,7 @@ function Reportes() {
         {formularios?.map((form) => (
           <Nav.Item key={form.for_id}>
             <Nav.Link
+              eventKey={form.for_id}
               onClick={() => {
                 handleObtenerDatosFormulario(form.for_id);
               }}
@@ -82,7 +83,6 @@ function Reportes() {
             <p>Cantidad de respuestas: {item.cantidad_respuestas}</p>
           </div>
         ))}
-        <p>data</p>
         {preguntasId.map((valor) => (
           <div key={valor}>
             <StatisticsQuestionCard
@@ -92,8 +92,6 @@ function Reportes() {
             />
           </div>
         ))}
-
-        <p>{data.length}</p>
       </div>
     </div>
   );
