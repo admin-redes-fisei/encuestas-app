@@ -129,8 +129,11 @@ function OptionsQuestionCard({
 
   //para almacenar secciones
   const seleccionarSecciones = (opciones) => {
+    const opcionesOrdenadas = opciones.sort(
+      (a, b) => a.question_option - b.question_option
+    );
     const seccionesSet = new Set();
-    opciones.forEach((item) => {
+    opcionesOrdenadas.forEach((item) => {
       seccionesSet.add(item.padre);
     });
 
@@ -146,35 +149,45 @@ function OptionsQuestionCard({
         marginBottom: "20px",
         marginLeft: "auto",
         marginRight: "auto",
-        padding: "20px",
         overflow: "hidden",
       }}
     >
-      <Card.Body>
-        <Card.Title>
-          {question.title}{" "}
-          {question.pre_tooltip_texto && (
-            <OverlayTrigger
-              placement="bottom"
-              overlay={
-                <Tooltip id={7}>
-                  <Image
-                    src={question.pre_tooltip_imagen}
-                    style={{ height: "auto", width: "100%" }}
-                  />
-                  {question.pre_tooltip_texto}
-                </Tooltip>
-              }
+      <Card.Header
+        as="h5"
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        {question.requerida === 1 ? <p style={{ color: "red" }}>*</p> : <p></p>}
+        {question.title}{" "}
+        {question.pre_tooltip_texto ? (
+          <OverlayTrigger
+            placement="bottom"
+            overlay={
+              <Tooltip id={7}>
+                <Image
+                  src={question.pre_tooltip_imagen}
+                  style={{ height: "auto", width: "100%" }}
+                />
+                {question.pre_tooltip_texto}
+              </Tooltip>
+            }
+          >
+            <Button
+              variant="light"
+              className="d-inline-flex align-items-center"
             >
-              <Button
-                variant="light"
-                className="d-inline-flex align-items-center"
-              >
-                <IdeaIcon />
-              </Button>
-            </OverlayTrigger>
-          )}
-        </Card.Title>
+              <IdeaIcon />
+            </Button>
+          </OverlayTrigger>
+        ) : (
+          <p></p>
+        )}
+      </Card.Header>
+      <Card.Body style={{ padding: "20px" }}>
         <Card.Text>{question.question}</Card.Text>
         <div
           style={{
@@ -189,83 +202,88 @@ function OptionsQuestionCard({
           {(question.questionType === "radio" ||
             question.questionType === "checkbox") && (
             <div>
-              {question.options?.map((option, index) => (
-                <Form.Group
-                  className="mb-3"
-                  key={option.id}
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Form.Check
-                    label={option.label}
-                    type={question.questionType}
-                    name={option.name}
-                    value={option.id}
+              {question.options
+                ?.sort((a, b) => a.question_option - b.question_option)
+                .map((option) => (
+                  <Form.Group
+                    className="mb-3"
+                    key={option.id}
                     style={{
-                      minHeight: "30px",
-                      marginTop: "5px",
-                      whiteSpace: "normal",
-                      marginRight: "5px",
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
                     }}
-                    onChange={(e) => {
-                      handleCheckChange(
-                        e,
-                        question.id,
-                        option.label,
-                        question.questionType
-                      );
-                      setRespondida(e.target.checked);
-                    }}
-                    checked={
-                      question.questionType === "radio"
-                        ? respuestas[option.name]?.respuesta_texto ===
-                          option.label
-                        : respuestas[option.name]?.some(
-                            (item) => item.respuesta_texto === option.label
-                          )
-                    }
-                  />
-                  {option.tooltip_texto && (
-                    <>
-                      <Button
-                        variant="outline-light"
-                        ref={(ref) =>
-                          (buttonRefs.current[`${question.id}${option.id}`] =
-                            ref)
-                        } // Asigna un ref al botón
-                        onClick={() =>
-                          handleButtonClick(`${question.id}${option.id}`)
-                        }
-                      >
-                        <InfoIcon width="20px" />
-                      </Button>
-                      <Overlay
-                        target={
-                          buttonRefs.current[`${question.id}${option.id}`]
-                        }
-                        show={tooltipStates[`${question.id}${option.id}`]} //
-                        placement="bottom"
-                        key={`${question.id}${option.id}`}
-                      >
-                        {(props) => (
-                          <Tooltip id={`${question.id}${option.id}`} {...props}>
-                            {option.tooltip_img && (
-                              <Image
-                                src={option.tooltip_img}
-                                style={{ height: "auto", width: "100%" }}
-                              />
-                            )}
-                            {option.tooltip_texto}
-                          </Tooltip>
-                        )}
-                      </Overlay>
-                    </>
-                  )}
-                </Form.Group>
-              ))}
+                  >
+                    <Form.Check
+                      label={option.label}
+                      type={question.questionType}
+                      name={option.name}
+                      value={option.id}
+                      style={{
+                        minHeight: "30px",
+                        marginTop: "5px",
+                        whiteSpace: "normal",
+                        marginRight: "5px",
+                      }}
+                      onChange={(e) => {
+                        handleCheckChange(
+                          e,
+                          question.id,
+                          option.label,
+                          question.questionType
+                        );
+                        setRespondida(e.target.checked);
+                      }}
+                      checked={
+                        question.questionType === "radio"
+                          ? respuestas[option.name]?.respuesta_texto ===
+                            option.label
+                          : respuestas[option.name]?.some(
+                              (item) => item.respuesta_texto === option.label
+                            )
+                      }
+                    />
+                    {option.tooltip_texto && (
+                      <>
+                        <Button
+                          variant="outline-light"
+                          ref={(ref) =>
+                            (buttonRefs.current[`${question.id}${option.id}`] =
+                              ref)
+                          } // Asigna un ref al botón
+                          onClick={() =>
+                            handleButtonClick(`${question.id}${option.id}`)
+                          }
+                        >
+                          <InfoIcon width="20px" />
+                        </Button>
+                        <Overlay
+                          target={
+                            buttonRefs.current[`${question.id}${option.id}`]
+                          }
+                          show={tooltipStates[`${question.id}${option.id}`]} //
+                          placement="bottom"
+                          key={`${question.id}${option.id}`}
+                        >
+                          {(props) => (
+                            <Tooltip
+                              id={`${question.id}${option.id}`}
+                              {...props}
+                            >
+                              {option.tooltip_img && (
+                                <Image
+                                  src={option.tooltip_img}
+                                  style={{ height: "auto", width: "100%" }}
+                                />
+                              )}
+                              {option.tooltip_texto}
+                            </Tooltip>
+                          )}
+                        </Overlay>
+                      </>
+                    )}
+                  </Form.Group>
+                ))}
             </div>
           )}
           {question.questionType === "accordeon" && (
@@ -277,7 +295,8 @@ function OptionsQuestionCard({
                     <Accordion.Body>
                       {question.options
                         ?.filter((option) => option.padre === subseccion)
-                        ?.map((option, index) => (
+                        ?.sort((a, b) => b.question_option - a.question_option)
+                        .map((option) => (
                           <Form.Group
                             className="mb-3"
                             key={option.id}

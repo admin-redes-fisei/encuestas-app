@@ -16,10 +16,7 @@ function App() {
             path="/encuestas/:for_alias/:seccion"
             element={<FormularioPublico />}
           />
-          <Route
-            path="/reportes"
-            element={<Reportes />}
-          />
+          <Route path="/reportes" element={<Reportes />} />
         </Routes>
       </Router>
     </div>
