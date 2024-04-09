@@ -82,7 +82,7 @@ function FormularioPublico() {
             [name]: [
               ...(prevRespuestas[name] || []),
               {
-                formulario_id: 1,
+                formulario_id: data[0].for_id,
                 pregunta_id: questionId,
                 opcion_id: value,
                 respuesta_texto: optionLabel,

@@ -129,8 +129,11 @@ function OptionsQuestionCard({
 
   //para almacenar secciones
   const seleccionarSecciones = (opciones) => {
+    const opcionesOrdenadas = opciones.sort(
+      (a, b) => a.question_option - b.question_option
+    );
     const seccionesSet = new Set();
-    opciones.forEach((item) => {
+    opcionesOrdenadas.forEach((item) => {
       seccionesSet.add(item.padre);
     });
 
@@ -186,19 +189,19 @@ function OptionsQuestionCard({
       </Card.Header>
       <Card.Body style={{ padding: "20px" }}>
         <Card.Text>{question.question}</Card.Text>
-        <div>
+        <div
+          style={{
+            width: "fit-content",
+            maxWidth: "60%",
+            padding: "10px",
+            textAlign: "left",
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
           {(question.questionType === "radio" ||
             question.questionType === "checkbox") && (
-            <div
-              style={{
-                width: "fit-content",
-                maxWidth: "60%",
-                padding: "10px",
-                textAlign: "left",
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}
-            >
+            <div>
               {question.options?.map((option, index) => (
                 <Form.Group
                   className="mb-3"
@@ -364,7 +367,8 @@ function OptionsQuestionCard({
                     <Accordion.Body>
                       {question.options
                         ?.filter((option) => option.padre === subseccion)
-                        ?.map((option, index) => (
+                        ?.sort((a, b) => b.question_option - a.question_option)
+                        .map((option) => (
                           <Form.Group
                             className="mb-3"
                             key={option.id}
