@@ -136,7 +136,7 @@ function FormularioPublico() {
       const rutaDestino = `${rutaRaiz}/${index}`;
       navigate(rutaDestino);
       window.scrollTo(0, 0);
-    }else{
+    } else {
       toast.error("Complete las preguntas obligatorias", {
         position: "top-right",
         autoClose: 5000,
@@ -173,10 +173,9 @@ function FormularioPublico() {
       enviarRespuestas(JSON.parse(localStorage.getItem("respuestas"))).then(
         (response) => {
           navigate("/encuestas/endpage");
-          console.log(response);
         }
       );
-    }else{
+    } else {
       toast.error("Complete las preguntas obligatorias", {
         position: "top-right",
         autoClose: 5000,
@@ -195,18 +194,16 @@ function FormularioPublico() {
 
     (seccion ? data : preguntas_completo).forEach((pregunta) => {
       if (pregunta.requerida === 1) {
-        const enOtros = ["otros"]?.findIndex(
-          (otro) => otro.pregunta_id == pregunta.id
+        const enOtros = respondidas["otros"]?.findIndex(
+          (otro) => otro.pregunta_id === pregunta.id
         );
         if (!(respondidas[pregunta.pre_alias] || enOtros !== -1)) {
           preguntasSinResponder.push(pregunta);
         }
       }
     });
-    console.log(preguntasSinResponder.length);
-
     if (preguntasSinResponder.length > 0) {
-      return false; 
+      return false;
     } else {
       return true;
     }

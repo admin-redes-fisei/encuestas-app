@@ -461,8 +461,8 @@ function OptionsQuestionCard({
           {question.questionType === "text" && (
             <div
               style={{
-                width: "fit-content",
-                maxWidth: "60%",
+                width: "100%",
+                maxWidth: "100%",
                 padding: "10px",
                 textAlign: "left",
                 marginLeft: "auto",
@@ -486,8 +486,8 @@ function OptionsQuestionCard({
           {question.questionType === "provincia" && (
             <div
               style={{
-                width: "fit-content",
-                maxWidth: "60%",
+                width: "100%",
+                maxWidth: "100%",
                 padding: "10px",
                 textAlign: "left",
                 marginLeft: "auto",
