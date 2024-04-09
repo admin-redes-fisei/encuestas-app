@@ -6,6 +6,7 @@ import { Button, ProgressBar } from "react-bootstrap";
 import OptionsQuestionCard from "../components/OptionsQuestionCard";
 import { useNavigate } from "react-router-dom";
 import { enviarRespuestas } from "../services/FormulariosService";
+import { toast } from "react-toastify";
 
 function FormularioPublico() {
   //para redirigir
@@ -131,14 +132,20 @@ function FormularioPublico() {
 
   //para redirigir
   const handleRedirect = (index) => {
-    /*if (validarPreguntas(seccionIndex) === true) {
+    if (validarPreguntas(seccionIndex) === true) {
       const rutaDestino = `${rutaRaiz}/${index}`;
       navigate(rutaDestino);
       window.scrollTo(0, 0);
-    }*/
-    const rutaDestino = `${rutaRaiz}/${index}`;
-    navigate(rutaDestino);
-    window.scrollTo(0, 0);
+    } else {
+      toast.error("Complete las preguntas obligatorias", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
   };
 
   //para progresbar
@@ -162,20 +169,22 @@ function FormularioPublico() {
 
   //para enviar respuestas
   const handleEnviarRespuestas = () => {
-    /*if (validarPreguntas()) {
+    if (validarPreguntas()) {
       enviarRespuestas(JSON.parse(localStorage.getItem("respuestas"))).then(
         (response) => {
           navigate("/encuestas/endpage");
-          console.log(response);
         }
       );
-    }*/
-    enviarRespuestas(JSON.parse(localStorage.getItem("respuestas"))).then(
-      (response) => {
-        navigate("/encuestas/endpage");
-        console.log(response);
-      }
-    );
+    } else {
+      toast.error("Complete las preguntas obligatorias", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
   };
 
   //para validar
@@ -184,18 +193,19 @@ function FormularioPublico() {
     const preguntasSinResponder = [];
 
     (seccion ? data : preguntas_completo).forEach((pregunta) => {
-      const enOtros = respondidas["otros"].findIndex(
-        (otro) => otro.pregunta_id == pregunta.id
-      );
-      if (!(respondidas[pregunta.pre_alias] || enOtros !== -1)) {
-        preguntasSinResponder.push(pregunta);
+      if (pregunta.requerida === 1) {
+        const enOtros = respondidas["otros"]?.findIndex(
+          (otro) => otro.pregunta_id === pregunta.id
+        );
+        if (!(respondidas[pregunta.pre_alias] || enOtros !== -1)) {
+          preguntasSinResponder.push(pregunta);
+        }
       }
     });
-
-    if (preguntasSinResponder.length === 0) {
-      return true; // All questions have been answered
+    if (preguntasSinResponder.length > 0) {
+      return false;
     } else {
-      return false; // There are unanswered questions
+      return true;
     }
   };
 
