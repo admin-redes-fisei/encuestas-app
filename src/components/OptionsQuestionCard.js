@@ -476,7 +476,7 @@ function OptionsQuestionCard({
               >
                 <Form.Control
                   type="text"
-                  placeholder="Nombre del Colegio"
+                  placeholder="Escriba aquí"
                   value={inputValue}
                   onChange={(e) => handleTextChange(e, question.id)}
                 />
