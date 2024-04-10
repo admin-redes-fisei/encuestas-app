@@ -191,13 +191,13 @@ function FormularioPublico() {
   const validarPreguntas = (seccion) => {
     const respondidas = JSON.parse(localStorage.getItem("respuestas"));
     const preguntasSinResponder = [];
-
     (seccion ? data : preguntas_completo).forEach((pregunta) => {
-      if (pregunta.requerida === 1) {
-        const enOtros = respondidas["otros"]?.findIndex(
-          (otro) => otro.pregunta_id === pregunta.id
-        );
-        if (!(respondidas[pregunta.pre_alias] || enOtros !== -1)) {
+      if (parseInt(pregunta.requerida) === 1) {
+        const enOtros = respondidas["otros"] ? respondidas["otros"].findIndex(
+          (otro) => parseInt(otro.pregunta_id) === parseInt(pregunta.id)
+        ) : -1;
+        console.log(enOtros);
+        if (!(respondidas[pregunta.pre_alias] || parseInt(enOtros) !== -1)) {
           preguntasSinResponder.push(pregunta);
         }
       }
