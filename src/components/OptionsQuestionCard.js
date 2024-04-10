@@ -189,19 +189,19 @@ function OptionsQuestionCard({
       </Card.Header>
       <Card.Body style={{ padding: "20px" }}>
         <Card.Text>{question.question}</Card.Text>
-        <div
-          style={{
-            width: "fit-content",
-            maxWidth: "60%",
-            padding: "10px",
-            textAlign: "left",
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
+        <div>
           {(question.questionType === "radio" ||
             question.questionType === "checkbox") && (
-            <div>
+            <div
+              style={{
+                width: "fit-content",
+                maxWidth: "60%",
+                padding: "10px",
+                textAlign: "left",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
               {question.options?.map((option, index) => (
                 <Form.Group
                   className="mb-3"
@@ -476,7 +476,7 @@ function OptionsQuestionCard({
               >
                 <Form.Control
                   type="text"
-                  placeholder="Nombre del Colegio"
+                  placeholder="Escriba aquí"
                   value={inputValue}
                   onChange={(e) => handleTextChange(e, question.id)}
                 />
