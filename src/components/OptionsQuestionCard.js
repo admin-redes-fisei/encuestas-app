@@ -293,7 +293,7 @@ function OptionsQuestionCard({
                 <Form.Group className="mb-3" key={option.id}>
                   <Form.Check
                     label={option.label}
-                    type={"radio"}
+                    type="radio"
                     name={option.name}
                     value={option.id}
                     onChange={(e) => {
@@ -301,7 +301,7 @@ function OptionsQuestionCard({
                         e,
                         question.id,
                         option.label,
-                        question.questionType
+                        "radio"
                       );
                       setRespondida(e.target.checked);
                     }}
