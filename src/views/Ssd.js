@@ -17,6 +17,7 @@ import {
   obtenerFormularios,
 } from "../services/ReportesService";
 import { enviarReglas } from "../services/PythonService";
+import { toast } from "react-toastify";
 
 function SSD() {
   const [formularios, setformularios] = useState([]);
@@ -144,6 +145,16 @@ function SSD() {
   const handleEnviarClick = (reglas) => {
     try {
       enviarReglas(reglas).then((data) => {
+        if (data.error) {
+          toast.warning("No se ha encontrado la regla en los registros", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
         setResultados(data);
         console.log(data);
       });
