@@ -5,7 +5,8 @@ import StartPage from "./views/StartScreen";
 import FormularioPublico from "./views/FormularioPublico";
 import Reportes from "./views/Reportes";
 import { ToastContainer } from "react-toastify";
- import "react-toastify/dist/ReactToastify.css";
+import "react-toastify/dist/ReactToastify.css";
+import SSD from "./views/Ssd";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             element={<FormularioPublico />}
           />
           <Route path="/reportes" element={<Reportes />} />
+          <Route path="/ssd" element={<SSD />} />
         </Routes>
       </Router>
       <ToastContainer position="top-right" autoClose={5000} />
