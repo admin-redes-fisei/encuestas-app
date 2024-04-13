@@ -18,6 +18,9 @@ import {
 } from "../services/ReportesService";
 import { enviarReglas } from "../services/PythonService";
 import { toast } from "react-toastify";
+import ApexRadialChart from "../components/ApexRadialChart";
+import PlusIcon from "../assets/addIcon";
+import CloseIcon from "../assets/closeIcon";
 
 function SSD() {
   const [formularios, setformularios] = useState([]);
@@ -33,6 +36,7 @@ function SSD() {
   const [resultados, setResultados] = useState(["-", "-", "-"]);
   //para carga
   const [isLoading, setIsLoading] = useState(true);
+  const [isResultadosLoading, setIsResultadosLoading] = useState(false);
   //para modal
   const [show1, setShow1] = useState(false);
 
@@ -84,7 +88,7 @@ function SSD() {
       setconsecuentesSeleccionados([]);
       setIsLoading(false);
       setformularioSeleccionado(id);
-      setResultados(["-", "-", "-"]);
+      setResultados([]);
     });
   };
 
@@ -112,7 +116,6 @@ function SSD() {
         pregunta,
       ]);
     }
-    console.log(antecedentesSeleccionados);
   };
 
   const handleCheckConsChange = (e, pregunta) => {
@@ -142,6 +145,29 @@ function SSD() {
     console.log(antecedentesSeleccionados);
   };
 
+  const handleRemoveCons = (pregunta) => {
+    // Remover la pregunta de antecedentesSeleccion si se desmarca
+    setconsecuentesSeleccionados((prevAntecedentes) =>
+      prevAntecedentes.filter((item) => item.id !== pregunta.id)
+    );
+    // Agregar la pregunta de nuevo a consecuentesOpciones
+    setantecedentesOpciones((prevConsecuentes) => [
+      ...prevConsecuentes,
+      pregunta,
+    ]);
+  };
+
+  const handleRemoveAnt = (pregunta) => {
+    // Remover la pregunta de antecedentesSeleccion si se desmarca
+    setantecedentesSeleccionados((prevAntecedentes) =>
+      prevAntecedentes.filter((item) => item.id !== pregunta.id)
+    );
+    // Agregar la pregunta de nuevo a consecuentesOpciones
+    setconsecuentesOpciones((prevConsecuentes) => [
+      ...prevConsecuentes,
+      pregunta,
+    ]);
+  };
   const handleEnviarClick = (reglas) => {
     try {
       enviarReglas(reglas).then((data) => {
@@ -157,6 +183,7 @@ function SSD() {
         }
         setResultados(data);
         console.log(data);
+        setIsResultadosLoading(false);
       });
     } catch (error) {
       console.error("Error al enviar los datos:", error);
@@ -166,6 +193,7 @@ function SSD() {
   const handleCalcular = () => {
     const antecedentesSeleccionadosTemp = [];
     const consecuentesSeleccionadosTemp = [];
+    setResultados([]);
     console.log(formularioSeleccionado);
 
     antecedentesSeleccionados?.forEach((pregunta) => {
@@ -188,16 +216,34 @@ function SSD() {
       }
     });
 
-    const jsonData = {
-      antecedente: antecedentesSeleccionadosTemp,
-      consecuente: consecuentesSeleccionadosTemp,
-      archivo:
-        formularioSeleccionado === 1
-          ? "resultado_empresas.csv"
-          : "resultado_estudiantes.csv",
-    };
-    handleEnviarClick(jsonData);
-    console.log(jsonData);
+    setIsResultadosLoading(
+      antecedentesSeleccionadosTemp.length > 0 &&
+        consecuentesSeleccionadosTemp.length > 0
+    );
+
+    if (
+      antecedentesSeleccionadosTemp.length > 0 &&
+      consecuentesSeleccionadosTemp.length > 0
+    ) {
+      const jsonData = {
+        antecedente: antecedentesSeleccionadosTemp,
+        consecuente: consecuentesSeleccionadosTemp,
+        archivo:
+          formularioSeleccionado === 1
+            ? "resultado_empresas.csv"
+            : "resultado_estudiantes.csv",
+      };
+      handleEnviarClick(jsonData);
+    } else {
+      toast.error("Valores faltantes", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
   };
 
   return (
@@ -217,37 +263,120 @@ function SSD() {
         ))}
       </Nav>
       {isLoading ? (
-        <Spinner animation="border" variant="danger" />
+        <Spinner animation="border" variant="secondary" />
       ) : (
-        <div className="contenido_preguntas">
+        <div
+          className="contenido_preguntas"
+          style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
+        >
+          <br />
           <CardGroup>
             <Card>
+              <Card.Header>
+                <strong>CONFIANZA</strong>
+              </Card.Header>
               <Card.Body>
-                <Card.Title>Confianza</Card.Title>
-                <Card.Text>{resultados["confianza"]}</Card.Text>
+                {isResultadosLoading ? (
+                  <Spinner animation="border" variant="secondary" />
+                ) : (
+                  <div>
+                    <ApexRadialChart
+                      series={
+                        resultados["confianza"] ? resultados["confianza"] : 0
+                      }
+                    />
+                    <Card.Text>{resultados["confianza"]}</Card.Text>
+                  </div>
+                )}
               </Card.Body>
             </Card>
             <Card>
+              <Card.Header>
+                <strong>SOPORTE</strong>
+              </Card.Header>
               <Card.Body>
-                <Card.Title>Soporte</Card.Title>
-                <Card.Text>{resultados["soporte"]}</Card.Text>
+                {isResultadosLoading ? (
+                  <Spinner animation="border" variant="secondary" />
+                ) : (
+                  <div>
+                    <ApexRadialChart
+                      series={resultados["soporte"] ? resultados["soporte"] : 0}
+                    />
+                    <Card.Text>{resultados["soporte"]}</Card.Text>
+                  </div>
+                )}
               </Card.Body>
             </Card>
             <Card>
+              <Card.Header>
+                <strong>LIFT</strong>
+              </Card.Header>
               <Card.Body>
-                <Card.Title>Lift</Card.Title>
-                <Card.Text>{resultados["lift"]}</Card.Text>
+                {isResultadosLoading ? (
+                  <Spinner animation="border" variant="secondary" />
+                ) : (
+                  <div>
+                    <ApexRadialChart
+                      series={resultados["lift"] ? resultados["lift"] / 2 : 0}
+                    />
+                    <Card.Text>{resultados["lift"]}</Card.Text>
+                  </div>
+                )}
               </Card.Body>
             </Card>
           </CardGroup>
           <br />
+          <br />
+          <div
+            className="d-grid gap-2"
+            style={{
+              width: "40%",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            <Button
+              variant="primary"
+              onClick={() => {
+                handleCalcular();
+              }}
+              disabled={isResultadosLoading}
+            >
+              CALCULAR
+            </Button>
+          </div>
+          <br />
+          <br />
           <Container>
             <Row>
               <Col style={{ alignItems: "start" }}>
-                <h1>Antecedentes</h1>
-                <Button variant="primary" onClick={handleShow1}>
-                  Seleccionar
-                </Button>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                    width: "60%",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                  }}
+                >
+                  <h3>Antecedentes</h3>
+                  <Button
+                    style={{
+                      height: "30px",
+                      width: "40px",
+                      backgroundColor: "#000",
+                      border: "none",
+                      marginLeft: "30px",
+                      display: "flex",
+                      justifyContent: "space-evenly",
+                      alignItems: "center",
+                    }}
+                    onClick={handleShow1}
+                  >
+                    <PlusIcon />
+                  </Button>
+                </div>
                 <br />
                 <br />
                 <Modal show={show1} onHide={handleClose1}>
@@ -275,16 +404,40 @@ function SSD() {
                   </Modal.Body>
                   <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose1}>
-                      Close
+                      Cerrar
                     </Button>
                     <Button variant="primary" onClick={handleClose1}>
-                      Save Changes
+                      Guardar
                     </Button>
                   </Modal.Footer>
                 </Modal>
                 {antecedentesSeleccionados?.map((pregunta) => (
-                  <div key={pregunta.id}>
-                    <Form.Group className="mb-3" key={pregunta.id}>
+                  <div
+                    key={pregunta.id}
+                    style={{
+                      width: "85%",
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "start",
+                    }}
+                  >
+                    <Button
+                      variant="outline-light"
+                      onClick={() => handleRemoveAnt(pregunta)}
+                    >
+                      <CloseIcon />
+                    </Button>
+                    <Form.Group
+                      className="mb-3"
+                      key={pregunta.id}
+                      style={{
+                        width: "90%",
+                        marginRight: "auto",
+                        marginLeft: "auto",
+                      }}
+                    >
                       <FloatingLabel
                         controlId="floatingSelectGrid"
                         label={pregunta.title}
@@ -292,7 +445,6 @@ function SSD() {
                         <Form.Select
                           id={`select-antecedente-${pregunta.id}`}
                           aria-label="Selección"
-                          style={{ width: "60%" }}
                         >
                           <option>Seleccione</option>
                           {pregunta.options.map((opcion) => (
@@ -308,10 +460,33 @@ function SSD() {
                 ))}
               </Col>
               <Col style={{ alignItems: "start" }}>
-                <h1>Concecuentes</h1>
-                <Button variant="primary" onClick={handleShow2}>
-                  Seleccionar
-                </Button>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                    width: "60%",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                  }}
+                >
+                  <h3>Concecuentes</h3>
+                  <Button
+                    style={{
+                      height: "30px",
+                      width: "40px",
+                      backgroundColor: "#000",
+                      border: "none",
+                      marginLeft: "30px",
+                      display: "flex",
+                      justifyContent: "space-evenly",
+                      alignItems: "center",
+                    }}
+                    onClick={handleShow2}
+                  >
+                    <PlusIcon />
+                  </Button>
+                </div>
                 <br />
                 <br />
                 <Modal show={show2} onHide={handleClose2}>
@@ -347,8 +522,32 @@ function SSD() {
                   </Modal.Footer>
                 </Modal>
                 {consecuentesSeleccionados?.map((pregunta) => (
-                  <div key={pregunta.id}>
-                    <Form.Group className="mb-3" key={pregunta.id}>
+                  <div
+                    key={pregunta.id}
+                    style={{
+                      width: "85%",
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "start",
+                    }}
+                  >
+                    <Button
+                      variant="outline-light"
+                      onClick={() => handleRemoveCons(pregunta)}
+                    >
+                      <CloseIcon />
+                    </Button>
+                    <Form.Group
+                      className="mb-3"
+                      key={pregunta.id}
+                      style={{
+                        width: "90%",
+                        marginRight: "auto",
+                        marginLeft: "auto",
+                      }}
+                    >
                       <FloatingLabel
                         controlId="floatingSelectGrid"
                         label={pregunta.title}
@@ -356,7 +555,6 @@ function SSD() {
                         <Form.Select
                           id={`select-consecuente-${pregunta.id}`}
                           aria-label="Selección"
-                          style={{ width: "60%" }}
                         >
                           <option>Seleccione</option>
                           {pregunta.options.map((opcion) => (
@@ -373,9 +571,6 @@ function SSD() {
               </Col>
             </Row>
           </Container>
-          <Button variant="primary" onClick={handleCalcular}>
-            Calcular
-          </Button>
         </div>
       )}
     </div>
