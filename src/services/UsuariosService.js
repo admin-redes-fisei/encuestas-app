@@ -33,3 +33,24 @@ export async function iniciarSesion(username, password, aud) {
     console.error("Error:", error.message);
   }
 }
+
+export async function listarUsuarios() {
+  try {
+    const respuesta = await fetch(`${URL_acceso}listarUsuarios.php`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!respuesta.ok) {
+      throw new Error("Error al obtener los usuarios");
+    }
+
+    const resultado = await respuesta.json();
+
+    return resultado;
+  } catch (error) {
+    console.error("Error al obtener los usuarios:", error);
+  }
+}
