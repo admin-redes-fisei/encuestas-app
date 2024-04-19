@@ -53,37 +53,8 @@ const Login = () => {
           parseInt(resultado.user.usu_estado) === 1
         ) {
           localStorage.setItem("token", JSON.stringify(resultado.token));
+          localStorage.setItem("userdata", JSON.stringify(resultado.user));
           navigate("/home");
-          /*localStorage.setItem(
-            "listaCarreras",
-            JSON.stringify(resultado.lista_carrera)
-          );
-          localStorage.setItem(
-            "facultad",
-            JSON.stringify(resultado.listar_facultad)
-          );
-          localStorage.setItem(
-            "userType",
-            JSON.stringify(resultado.user.nivel.toString())
-          );
-          localStorage.setItem(
-            "userId",
-            JSON.stringify(resultado.user.idusuario)
-          );*/
-          /*
-          switch (resultado.user.nivel.toString()) {
-            case "1":
-              navigate("/superadmin/facultades");
-              break;
-            case "2":
-              navigate("/admin/carreras");
-              break;
-            case "3":
-              navigate("/secre/estudiantes");
-              break;
-            default:
-              break;
-          }*/
         } else {
           toast.error("Usuario o contraseña incorrectos", {
             position: "top-right",
