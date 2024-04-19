@@ -6,6 +6,8 @@ import FormularioPublico from "./views/FormularioPublico";
 import Reportes from "./views/Reportes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Login from "./views/Login";
+import Home from "./views/Home";
 //import SSD from "./views/Ssd";
 
 function App() {
@@ -13,6 +15,8 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/encuestas/endpage" element={<EndPage />} />
           <Route path="/encuestas/:for_alias" element={<StartPage />} />
           <Route
