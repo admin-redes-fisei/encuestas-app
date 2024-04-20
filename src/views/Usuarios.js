@@ -17,7 +17,14 @@ import {
   Row,
 } from "react-bootstrap";
 import DownloadIcon from "../assets/downloadIcon";
-import { listarUsuarios } from "../services/UsuariosService";
+import {
+  agregarUsuario,
+  editarUsuario,
+  eliminarUsuario,
+  listarUsuarios,
+} from "../services/UsuariosService";
+import OpenEyeIcon from "../assets/openEyeIcon";
+import CloseEyeIcon from "../assets/closeEyeIcon";
 
 const Usuarios = () => {
   //data de encabezados
@@ -82,14 +89,15 @@ const Usuarios = () => {
     usu_correo: "",
     usu_usuario: "",
     usu_clave: "",
+    usu_tipo: "",
     usu_permisos: "",
     usu_estado: "",
   });
   //para tipos
   const dataTipos = [
-    { id: 1, nombre: "Líder de Investigación" },
-    { id: 2, nombre: "Investigador" },
-    { id: 3, nombre: "Autoridad" },
+    { id: 1, nombre: "Líder de Investigación", permisos: "TRFCU" },
+    { id: 2, nombre: "Investigador", permisos: "FRC" },
+    { id: 3, nombre: "Autoridad", permisos: "TR" },
   ];
   //para permisos
   const dataPermisos = [
@@ -111,9 +119,13 @@ const Usuarios = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = Math.ceil(data?.length / itemsPerPage);
   //para el modal
   const [show, setShow] = useState(false);
+  //para modo de vista
+  const [isView, setIsView] = useState(false);
+  //para contraseña visible
+  const [viewPassword, setViewPassword] = useState(false);
 
   //para el buscador
   useEffect(() => {
@@ -139,9 +151,13 @@ const Usuarios = () => {
       usu_correo: "",
       usu_usuario: "",
       usu_clave: "",
+      usu_tipo: "",
       usu_permisos: "",
       usu_estado: "",
     });
+    setPermisosSeleccionados([]);
+    setIsView(false);
+    setViewPassword(false);
   };
 
   //para data del formulario
@@ -155,7 +171,7 @@ const Usuarios = () => {
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
-      idfacultad: value,
+      usu_tipo: value,
     }));
   };
 
@@ -175,8 +191,22 @@ const Usuarios = () => {
     console.log(permisosSeleccionados);
   };
 
+  //para cambio de estado
+  const handleEstadoModalChange = (e) => {
+    const isChecked = e.target.checked;
+    const { name } = e.target;
+
+    if (isChecked) {
+      setFormData({ ...formData, [name]: 1 });
+    } else {
+      setFormData({ ...formData, [name]: 0 });
+    }
+    console.log(permisosSeleccionados);
+  };
+
   //para validar
   const handleValidate = () => {
+    console.log();
     if (
       formData.usu_cedula !== "" &&
       formData.usu_nombres !== "" &&
@@ -184,12 +214,12 @@ const Usuarios = () => {
       formData.usu_correo !== "" &&
       formData.usu_usuario !== "" &&
       formData.usu_clave !== "" &&
-      formData.usu_permisos !== "" &&
+      formData.usu_tipo !== "" &&
       formData.usu_estado !== ""
     ) {
       handleSave();
     } else {
-      toast.error("Complete los campos requeridos", {
+      toast.error("Complete los campos", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -215,20 +245,37 @@ const Usuarios = () => {
 
   //Para editar
   const handleEdit = (idusuario) => {
-    const selectedData = data.find((item) => item.usu_id === idusuario);
-    setFormData(selectedData);
+    const newSelectedData = data.find((item) => item.usu_id === idusuario);
+    const actualPermisos = Array.from(newSelectedData.usu_permisos);
+
+    const actualPermisosSeleccionados = [];
+
+    actualPermisos.forEach((permiso) => {
+      const permisoEncontrado = dataPermisos.find((p) => p.id === permiso);
+      if (permisoEncontrado) {
+        actualPermisosSeleccionados.push(permisoEncontrado);
+      }
+    });
+
+    setPermisosSeleccionados((prevPermisos) => [
+      ...prevPermisos,
+      ...actualPermisosSeleccionados,
+    ]);
+
+    //console.log(actualPermisos);
+    setFormData(newSelectedData);
     setShow(true);
   };
 
   //para eliminar
   const handleDelete = (idusuario) => {
     const confirmDelete = window.confirm(
-      "¿Está seguro de eliminar al administrador?"
+      "¿Está seguro de eliminar al usuario?"
     );
 
     if (confirmDelete) {
-      /*eliminarAdministrador({ token, idusuario }).then((respuesta) => {
-        if (respuesta.req === "OK") {
+      eliminarUsuario({ usu_id: idusuario }).then((respuesta) => {
+        if (respuesta.mensaje === "OK") {
           setRefresh(refresh + 1);
         } else {
           toast.error("Error al intentar eliminar", {
@@ -240,34 +287,39 @@ const Usuarios = () => {
             draggable: true,
           });
         }
-      });*/
+      });
     }
   };
 
   //para guardar
   const handleSave = () => {
-    const token = JSON.parse(localStorage.getItem("token"));
-    const usu_cedula = formData.usu_cedula;
-    const usu_nombres = formData.usu_nombres;
-    const usu_apellidos = formData.usu_apellidos;
-    const usu_correo = formData.usu_correo;
-    const usu_usuario = formData.sobrenombre;
-    const usu_clave = formData.usu_clave;
-    const usu_permisos = formData.usu_permisos;
-    const usu_estado = formData.usu_estado;
+    const usu_cedula = formData.usu_cedula.toString();
+    const usu_nombres = formData.usu_nombres.toString();
+    const usu_apellidos = formData.usu_apellidos.toString();
+    const usu_correo = formData.usu_correo.toString();
+    const usu_usuario = formData.usu_usuario.toString();
+    const usu_clave = formData.usu_clave.toString();
+    const usu_tipo = formData.usu_tipo.toString();
+    const usu_permisos = permisosSeleccionados
+      .map((permiso) => permiso.id)
+      .join("");
+    const usu_estado = formData.usu_estado.toString();
 
     if (formData.usu_id) {
-      const idusuario = formData.usu_id;
-      /*editarAdministrador({
-        token,
-        idusuario,
-        nombres,
-        apellidos,
-        correo,
-        usuario,
-        contrasenia,
+      const usu_id = formData.usu_id;
+      editarUsuario({
+        usu_cedula: usu_cedula,
+        usu_nombres: usu_nombres,
+        usu_apellidos: usu_apellidos,
+        usu_correo: usu_correo,
+        usu_usuario: usu_usuario,
+        usu_clave: usu_clave,
+        usu_tipo: usu_tipo,
+        usu_permisos: usu_permisos,
+        usu_estado: usu_estado,
+        usu_id: usu_id,
       }).then((resultado) => {
-        if (resultado.req === "OK") {
+        if (resultado.mensaje === "OK") {
           handleClose();
           setRefresh(refresh + 1);
         } else {
@@ -280,18 +332,20 @@ const Usuarios = () => {
             draggable: true,
           });
         }
-      });*/
+      });
     } else {
-      /*agregarAdministrador({
-        token,
-        nombres,
-        apellidos,
-        correo,
-        usuario,
-        idfacultad,
-        contrasenia,
+      agregarUsuario({
+        usu_cedula: usu_cedula,
+        usu_nombres: usu_nombres,
+        usu_apellidos: usu_apellidos,
+        usu_correo: usu_correo,
+        usu_usuario: usu_usuario,
+        usu_clave: usu_clave,
+        usu_tipo: usu_tipo,
+        usu_permisos: usu_permisos,
+        usu_estado: usu_estado,
       }).then((resultado) => {
-        if (resultado.req === "OK") {
+        if (resultado.mensaje === "OK") {
           handleClose();
           setRefresh(refresh + 1);
         } else {
@@ -304,7 +358,7 @@ const Usuarios = () => {
             draggable: true,
           });
         }
-      });*/
+      });
     }
   };
 
@@ -467,7 +521,7 @@ const Usuarios = () => {
           marginBottom: "35px",
         }}
       >
-        {data.length > 0 ? (
+        {data?.length > 0 ? (
           <Table
             style={{
               width: "100%",
@@ -504,11 +558,11 @@ const Usuarios = () => {
                       paddingTop: "15px",
                     }}
                   >
-                    {parseInt(item.usu_tipo) === 1
-                      ? "Líder de Investigación"
-                      : parseInt(item.usu_tipo) === 2
-                      ? "Autoridad"
-                      : "Investigador"}
+                    {
+                      dataTipos.find(
+                        (tipo) => tipo.id === parseInt(item.usu_tipo)
+                      ).nombre
+                    }
                   </td>
                   <th
                     style={{
@@ -526,7 +580,15 @@ const Usuarios = () => {
                       paddingTop: "15px",
                     }}
                   >
-                    Estado
+                    <Form.Check
+                      type="switch"
+                      id="custom-switch"
+                      label={
+                        parseInt(item.usu_estado) === 1 ? "Activo" : "Inactivo"
+                      }
+                      checked={parseInt(item.usu_estado) === 1 ? true : false}
+                      inline
+                    />
                   </td>
                   <td
                     style={{
@@ -535,6 +597,15 @@ const Usuarios = () => {
                       flex: 3,
                     }}
                   >
+                    <Button
+                      variant="outline-light"
+                      onClick={() => {
+                        setIsView(true);
+                        handleEdit(item.usu_id);
+                      }}
+                    >
+                      <OpenEyeIcon />
+                    </Button>
                     <Button
                       variant="outline-light"
                       onClick={() => handleEdit(item.usu_id)}
@@ -592,10 +663,36 @@ const Usuarios = () => {
                       name="usu_cedula"
                       value={formData.usu_cedula}
                       onChange={handleChange}
+                      disabled={isView}
                     />
                   </Form.Group>
                 </Col>
-                <Col>Estado</Col>
+                <Col>
+                  <Form.Group
+                    className="mb-3"
+                    controlId="exampleForm.ControlInput1"
+                  >
+                    <Form.Label>
+                      <b>Estado</b>
+                    </Form.Label>
+                    <br />
+                    <Form.Check
+                      type="switch"
+                      name="usu_estado"
+                      label={
+                        parseInt(formData.usu_estado) === 1
+                          ? "Activo"
+                          : "Inactivo"
+                      }
+                      checked={
+                        parseInt(formData.usu_estado) === 1 ? true : false
+                      }
+                      onChange={(e) => handleEstadoModalChange(e)}
+                      disabled={isView}
+                      inline
+                    />
+                  </Form.Group>
+                </Col>
               </Row>
               <Row>
                 <Col>
@@ -612,6 +709,7 @@ const Usuarios = () => {
                       name="usu_nombres"
                       value={formData.usu_nombres}
                       onChange={handleChange}
+                      disabled={isView}
                     />
                   </Form.Group>
                 </Col>
@@ -629,6 +727,7 @@ const Usuarios = () => {
                       name="usu_apellidos"
                       value={formData.usu_apellidos}
                       onChange={handleChange}
+                      disabled={isView}
                     />
                   </Form.Group>
                 </Col>
@@ -648,6 +747,7 @@ const Usuarios = () => {
                       name="usu_correo"
                       value={formData.usu_correo}
                       onChange={handleChange}
+                      disabled={isView}
                     />
                   </Form.Group>
                 </Col>
@@ -667,6 +767,7 @@ const Usuarios = () => {
                       name="usu_usuario"
                       value={formData.usu_usuario}
                       onChange={handleChange}
+                      disabled={isView}
                     />
                   </Form.Group>
                 </Col>
@@ -678,13 +779,23 @@ const Usuarios = () => {
                     <Form.Label>
                       <b>Contraseña</b>
                     </Form.Label>
-                    <Form.Control
-                      type="password"
-                      autoFocus
-                      name="usu_clave"
-                      value={formData.usu_clave}
-                      onChange={handleChange}
-                    />
+                    <InputGroup className="mb-3">
+                      <Form.Control
+                        type={viewPassword ? "text" : "password"}
+                        autoFocus
+                        name="usu_clave"
+                        value={formData.usu_clave}
+                        onChange={handleChange}
+                        disabled={isView}
+                      />
+                      <Button
+                        variant="outline-secondary"
+                        id="button-addon2"
+                        onClick={() => setViewPassword(!viewPassword)}
+                      >
+                        {viewPassword ? <OpenEyeIcon /> : <CloseEyeIcon />}
+                      </Button>
+                    </InputGroup>
                   </Form.Group>
                 </Col>
               </Row>
@@ -702,6 +813,7 @@ const Usuarios = () => {
                       name="usu_tipo"
                       value={formData.usu_tipo}
                       onChange={handleChangeTipoUsuario}
+                      disabled={isView}
                     >
                       <option value="">Seleccionar tipo</option>
                       {dataTipos.map((tipo, index) => (
@@ -714,23 +826,28 @@ const Usuarios = () => {
                 </Col>
                 <Col>
                   Permisos:
-                  {dataPermisos?.map((seccion) => (
-                    <div key={seccion.id}>
-                      <Form.Group className="mb-3" key={seccion.id}>
-                        <Form.Check
-                          inline
-                          label={seccion.nombre}
-                          name="permisos"
-                          type="checkbox"
-                          id={seccion.id}
-                          onChange={(e) => handleCheckPermisoChange(e, seccion)}
-                          checked={permisosSeleccionados?.find(
-                            (item) => item.id === seccion.id
-                          )}
-                        />
-                      </Form.Group>
-                    </div>
-                  ))}
+                  {(isView ? permisosSeleccionados : dataPermisos)?.map(
+                    (seccion) => (
+                      <div key={seccion.id}>
+                        <Form.Group className="mb-3" key={seccion.id}>
+                          <Form.Check
+                            inline
+                            label={seccion.nombre}
+                            name="permisos"
+                            type="checkbox"
+                            id={seccion.id}
+                            onChange={(e) =>
+                              handleCheckPermisoChange(e, seccion)
+                            }
+                            checked={permisosSeleccionados?.find(
+                              (item) => item.id === seccion.id
+                            )}
+                            disabled={isView}
+                          />
+                        </Form.Group>
+                      </div>
+                    )
+                  )}
                 </Col>
               </Row>
             </Container>
@@ -738,7 +855,7 @@ const Usuarios = () => {
         </Modal.Body>
         <Modal.Footer
           style={{
-            display: "flex",
+            display: isView ? "none" : "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
           }}
