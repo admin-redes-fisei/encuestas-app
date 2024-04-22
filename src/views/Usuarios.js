@@ -25,6 +25,7 @@ import {
 } from "../services/UsuariosService";
 import OpenEyeIcon from "../assets/openEyeIcon";
 import CloseEyeIcon from "../assets/closeEyeIcon";
+import CryptoJS from "crypto-js";
 
 const Usuarios = () => {
   //data de encabezados
@@ -112,13 +113,16 @@ const Usuarios = () => {
   const [refresh, setRefresh] = useState(0);
   //Para el buscador
   const [searchValue, setSearchValue] = useState("");
+  const [searchedData, setSearchedData] = useState([]);
+  //para filtros
   const [filteredData, setFilteredData] = useState([]);
+  const [filteredInfo, setFilteredInfo] = useState([]);
   //Para la paginacion
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = searchedData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(data?.length / itemsPerPage);
   //para el modal
   const [show, setShow] = useState(false);
@@ -126,17 +130,95 @@ const Usuarios = () => {
   const [isView, setIsView] = useState(false);
   //para contraseña visible
   const [viewPassword, setViewPassword] = useState(false);
+  //para encriptado de datos
+  const clave = "HatunSoft@2023";
+
+  //para los filtros
+  const handleCheckFiltrosChange = (e, filtro, padre) => {
+    const isChecked = e.target.checked;
+
+    if (isChecked) {
+      setFilteredInfo((prevFiltros) => {
+        return {
+          ...prevFiltros,
+          [padre]: [...(prevFiltros[padre] || []), filtro],
+        };
+      });
+    } else {
+      setFilteredInfo((prevFiltros) => {
+        return {
+          ...prevFiltros,
+          [padre]: (prevFiltros[padre] || []).filter(
+            (item) => item.nombre !== filtro.nombre
+          ),
+        };
+      });
+    }
+  };
+  useEffect(() => {
+    const filterData = () => {
+      var paseEstado = null;
+      var paseTipo = null;
+      var pasePermisos = null;
+
+      const filtered = data.filter((item) => {
+        // Filtrar por usu_estado
+        if (filteredInfo["usu_estado"]?.length > 0) {
+          const estadoFilter = filteredInfo["usu_estado"].find(
+            (e) => e.id === parseInt(item.usu_estado)
+          );
+          paseEstado = estadoFilter ? true : false;
+        } else {
+          paseEstado = true;
+        }
+
+        // Filtrar por usu_tipo
+        if (filteredInfo["usu_tipo"]?.length > 0) {
+          const tipoFilter = filteredInfo["usu_tipo"]?.find(
+            (t) => t.id === parseInt(item.usu_tipo)
+          );
+          paseTipo = tipoFilter ? true : false;
+        } else {
+          paseTipo = true;
+        }
+
+        // Filtrar por usu_permisos
+        if (filteredInfo["usu_permisos"]?.length > 0) {
+          const permisosFilter = filteredInfo["usu_permisos"]?.some((p) =>
+            item.usu_permisos.includes(p.id)
+          );
+          pasePermisos = permisosFilter ? true : false;
+        } else {
+          pasePermisos = true;
+        }
+        return paseEstado && pasePermisos && paseTipo; // Todos los filtros coinciden
+      });
+
+      setFilteredData(filtered);
+    };
+
+    if (
+      (filteredInfo["usu_estado"] && filteredInfo["usu_estado"].length > 0) ||
+      (filteredInfo["usu_tipo"] && filteredInfo["usu_tipo"].length > 0) ||
+      (filteredInfo["usu_permisos"] && filteredInfo["usu_permisos"].length > 0)
+    ) {
+      filterData();
+    } else {
+      setFilteredData(data);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, filteredInfo]);
 
   //para el buscador
   useEffect(() => {
-    setFilteredData(
-      data.filter(
+    setSearchedData(
+      filteredData.filter(
         (item) =>
           item.usu_nombres?.toLowerCase().includes(searchValue.toLowerCase()) ||
           item.usu_apellidos?.toLowerCase().includes(searchValue.toLowerCase())
       )
     );
-  }, [data, searchValue]);
+  }, [filteredData, searchValue]);
 
   //para el modal
   const handleShow = () => setShow(true);
@@ -188,7 +270,6 @@ const Usuarios = () => {
         prevPermisos.filter((item) => item.id !== permiso.id)
       );
     }
-    console.log(permisosSeleccionados);
   };
 
   //para cambio de estado
@@ -201,12 +282,10 @@ const Usuarios = () => {
     } else {
       setFormData({ ...formData, [name]: 0 });
     }
-    console.log(permisosSeleccionados);
   };
 
   //para validar
   const handleValidate = () => {
-    console.log();
     if (
       formData.usu_cedula !== "" &&
       formData.usu_nombres !== "" &&
@@ -230,15 +309,37 @@ const Usuarios = () => {
     }
   };
 
+  // Función para encriptar
+  function encriptar(texto) {
+    const cifrado = CryptoJS.AES.encrypt(texto, clave);
+    return cifrado.toString();
+  }
+
+  // Función para desencriptar
+  function desencriptar(cifrado) {
+    const bytes = CryptoJS.AES.decrypt(cifrado, clave);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  }
+
   //para listar
   useEffect(() => {
     //const token = JSON.parse(localStorage.getItem("token"));
     listarUsuarios().then((datos) => {
-      console.log(datos);
       if (datos?.error) {
         setData([]);
       } else {
-        setData(datos);
+        const datosDesencriptados = datos.map((dato) => {
+          return {
+            ...dato,
+            usu_cedula: desencriptar(dato.usu_cedula),
+            usu_nombres: desencriptar(dato.usu_nombres),
+            usu_apellidos: desencriptar(dato.usu_apellidos),
+            usu_correo: desencriptar(dato.usu_correo),
+            usu_usuario: desencriptar(dato.usu_usuario),
+            usu_clave: desencriptar(dato.usu_clave),
+          };
+        });
+        setData(datosDesencriptados);
       }
     });
   }, [refresh]);
@@ -262,7 +363,6 @@ const Usuarios = () => {
       ...actualPermisosSeleccionados,
     ]);
 
-    //console.log(actualPermisos);
     setFormData(newSelectedData);
     setShow(true);
   };
@@ -293,12 +393,12 @@ const Usuarios = () => {
 
   //para guardar
   const handleSave = () => {
-    const usu_cedula = formData.usu_cedula.toString();
-    const usu_nombres = formData.usu_nombres.toString();
-    const usu_apellidos = formData.usu_apellidos.toString();
-    const usu_correo = formData.usu_correo.toString();
-    const usu_usuario = formData.usu_usuario.toString();
-    const usu_clave = formData.usu_clave.toString();
+    const usu_cedula = encriptar(formData.usu_cedula.toString());
+    const usu_nombres = encriptar(formData.usu_nombres.toString());
+    const usu_apellidos = encriptar(formData.usu_apellidos.toString());
+    const usu_correo = encriptar(formData.usu_correo.toString());
+    const usu_usuario = encriptar(formData.usu_usuario.toString());
+    const usu_clave = encriptar(formData.usu_clave.toString());
     const usu_tipo = formData.usu_tipo.toString();
     const usu_permisos = permisosSeleccionados
       .map((permiso) => permiso.id)
@@ -362,6 +462,55 @@ const Usuarios = () => {
     }
   };
 
+  //para cambio directo de estado
+
+  const handleCambiarEstado = (e, usuario) => {
+    const isChecked = e.target.checked;
+    const usu_id = usuario.usu_id.toString();
+    const usu_cedula = usuario.usu_cedula.toString();
+    const usu_nombres = usuario.usu_nombres.toString();
+    const usu_apellidos = usuario.usu_apellidos.toString();
+    const usu_correo = usuario.usu_correo.toString();
+    const usu_usuario = usuario.usu_usuario.toString();
+    const usu_clave = usuario.usu_clave.toString();
+    const usu_tipo = usuario.usu_tipo.toString();
+    const usu_permisos = usuario.usu_permisos;
+    const usu_estado = (isChecked ? 1 : 0).toString();
+
+    const confirmChange = window.confirm(
+      "Está a punto de cambiar el estado del usuario ¿Desea continuar?"
+    );
+
+    if (confirmChange) {
+      editarUsuario({
+        usu_cedula: usu_cedula,
+        usu_nombres: usu_nombres,
+        usu_apellidos: usu_apellidos,
+        usu_correo: usu_correo,
+        usu_usuario: usu_usuario,
+        usu_clave: usu_clave,
+        usu_tipo: usu_tipo,
+        usu_permisos: usu_permisos,
+        usu_estado: usu_estado,
+        usu_id: usu_id,
+      }).then((resultado) => {
+        if (resultado.mensaje === "OK") {
+          handleClose();
+          setRefresh(refresh + 1);
+        } else {
+          toast.error("No se pudo reaizar el cambio", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
+      });
+    }
+  };
+
   return (
     <div
       style={{
@@ -400,17 +549,37 @@ const Usuarios = () => {
             <Dropdown.Header href="#">Estado</Dropdown.Header>
             <Form.Check
               type="checkbox"
-              id={`default-radio`}
+              id={`1`}
               name="filtros"
               label={`Activo`}
               style={{ marginLeft: "15px", paddingRight: "15px" }}
+              onChange={(e) =>
+                handleCheckFiltrosChange(
+                  e,
+                  { id: 1, nombre: "Activo" },
+                  "usu_estado"
+                )
+              }
+              checked={filteredInfo["usu_estado"]?.find(
+                (item) => item.nombre === "Activo"
+              )}
             />
             <Form.Check
               type="checkbox"
-              id={`default-radio`}
+              id={`0`}
               name="filtros"
               label={`Inactivo`}
               style={{ marginLeft: "15px", paddingRight: "15px" }}
+              onChange={(e) =>
+                handleCheckFiltrosChange(
+                  e,
+                  { id: 0, nombre: "Inactivo" },
+                  "usu_estado"
+                )
+              }
+              checked={filteredInfo["usu_estado"]?.find(
+                (item) => item.nombre === "Inactivo"
+              )}
             />
             <Dropdown.Divider />
             <Dropdown.Header href="#">Tipo de Usuario</Dropdown.Header>
@@ -422,6 +591,10 @@ const Usuarios = () => {
                 name="filtros"
                 label={tipo.nombre}
                 style={{ marginLeft: "15px", paddingRight: "15px" }}
+                onChange={(e) => handleCheckFiltrosChange(e, tipo, "usu_tipo")}
+                checked={filteredInfo["usu_tipo"]?.find(
+                  (item) => item.nombre === tipo.nombre
+                )}
               />
             ))}
             <Dropdown.Divider />
@@ -434,6 +607,12 @@ const Usuarios = () => {
                 name="filtros"
                 label={permiso.nombre}
                 style={{ marginLeft: "15px", paddingRight: "15px" }}
+                onChange={(e) =>
+                  handleCheckFiltrosChange(e, permiso, "usu_permisos")
+                }
+                checked={filteredInfo["usu_permisos"]?.find(
+                  (item) => item.nombre === permiso.nombre
+                )}
               />
             ))}
           </DropdownButton>
@@ -521,7 +700,7 @@ const Usuarios = () => {
           marginBottom: "35px",
         }}
       >
-        {data?.length > 0 ? (
+        {searchedData?.length > 0 ? (
           <Table
             style={{
               width: "100%",
@@ -588,6 +767,7 @@ const Usuarios = () => {
                       }
                       checked={parseInt(item.usu_estado) === 1 ? true : false}
                       inline
+                      onChange={(e) => handleCambiarEstado(e, item)}
                     />
                   </td>
                   <td
