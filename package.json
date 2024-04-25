@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@red-unica/libreria-cifrado": "^1.0.31",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "apexcharts": "^3.48.0",
+    "bcryptjs": "^2.4.3",
+    "bcryptjs-react": "^2.4.6",
     "body-parser": "^1.20.2",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.2",

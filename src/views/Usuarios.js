@@ -184,7 +184,7 @@ const Usuarios = () => {
 
         // Filtrar por usu_permisos
         if (filteredInfo["usu_permisos"]?.length > 0) {
-          const permisosFilter = filteredInfo["usu_permisos"]?.some((p) =>
+          const permisosFilter = filteredInfo["usu_permisos"]?.find((p) =>
             item.usu_permisos.includes(p.id)
           );
           pasePermisos = permisosFilter ? true : false;
@@ -328,7 +328,7 @@ const Usuarios = () => {
       if (datos?.error) {
         setData([]);
       } else {
-        const datosDesencriptados = datos.map((dato) => {
+        /*const datosDesencriptados = datos.map((dato) => {
           return {
             ...dato,
             usu_cedula: desencriptar(dato.usu_cedula),
@@ -339,7 +339,8 @@ const Usuarios = () => {
             usu_clave: desencriptar(dato.usu_clave),
           };
         });
-        setData(datosDesencriptados);
+        setData(datosDesencriptados);*/
+        setData(datos);
       }
     });
   }, [refresh]);
@@ -393,12 +394,20 @@ const Usuarios = () => {
 
   //para guardar
   const handleSave = () => {
-    const usu_cedula = encriptar(formData.usu_cedula.toString());
+    /*const usu_cedula = encriptar(formData.usu_cedula.toString());
     const usu_nombres = encriptar(formData.usu_nombres.toString());
     const usu_apellidos = encriptar(formData.usu_apellidos.toString());
     const usu_correo = encriptar(formData.usu_correo.toString());
     const usu_usuario = encriptar(formData.usu_usuario.toString());
-    const usu_clave = encriptar(formData.usu_clave.toString());
+    const usu_clave = encriptar(formData.usu_clave.toString());*/
+
+    const usu_cedula = formData.usu_cedula.toString();
+    const usu_nombres = formData.usu_nombres.toString();
+    const usu_apellidos = formData.usu_apellidos.toString();
+    const usu_correo = formData.usu_correo.toString();
+    const usu_usuario = formData.usu_usuario.toString();
+    const usu_clave = formData.usu_clave.toString();
+
     const usu_tipo = formData.usu_tipo.toString();
     const usu_permisos = permisosSeleccionados
       .map((permiso) => permiso.id)
@@ -467,12 +476,20 @@ const Usuarios = () => {
   const handleCambiarEstado = (e, usuario) => {
     const isChecked = e.target.checked;
     const usu_id = usuario.usu_id.toString();
-    const usu_cedula = encriptar(usuario.usu_cedula.toString());
+    /*const usu_cedula = encriptar(usuario.usu_cedula.toString());
     const usu_nombres = encriptar(usuario.usu_nombres.toString());
     const usu_apellidos = encriptar(usuario.usu_apellidos.toString());
     const usu_correo = encriptar(usuario.usu_correo.toString());
     const usu_usuario = encriptar(usuario.usu_usuario.toString());
-    const usu_clave = encriptar(usuario.usu_clave.toString());
+    const usu_clave = encriptar(usuario.usu_clave.toString());*/
+
+    const usu_cedula = usuario.usu_cedula.toString();
+    const usu_nombres = usuario.usu_nombres.toString();
+    const usu_apellidos = usuario.usu_apellidos.toString();
+    const usu_correo = usuario.usu_correo.toString();
+    const usu_usuario = usuario.usu_usuario.toString();
+    const usu_clave = usuario.usu_clave.toString();
+
     const usu_tipo = usuario.usu_tipo.toString();
     const usu_permisos = usuario.usu_permisos;
     const usu_estado = (isChecked ? 1 : 0).toString();
@@ -663,8 +680,8 @@ const Usuarios = () => {
       </div>
       <div
         style={{
-          marginTop: "20px",
-          marginBottom: "15px",
+          marginTop: "25px",
+          marginBottom: "10px",
           width: "95vw",
           marginLeft: "auto",
           marginRight: "auto",
@@ -695,6 +712,7 @@ const Usuarios = () => {
           justifyContent: "center",
           alignItems: "center",
           padding: "20px",
+          paddingTop:"0px",
           paddingLeft: "45px",
           paddingRight: "45px",
           marginBottom: "35px",
@@ -702,6 +720,7 @@ const Usuarios = () => {
       >
         {searchedData?.length > 0 ? (
           <Table
+            hover
             style={{
               width: "100%",
               borderRadius: "20px",
@@ -795,7 +814,6 @@ const Usuarios = () => {
                     <Button
                       variant="outline-light"
                       onClick={() => handleDelete(item.usu_id)}
-                      style={{ marginLeft: " 18px" }}
                     >
                       <DeleteIcon />
                     </Button>
