@@ -1,79 +1,38 @@
-import { useEffect, useState } from "react";
-import Header from "../components/Header";
+import { useEffect } from "react";
 import Spinner from "react-bootstrap/Spinner";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
-  //para carga
-  const [isLoading, setIsLoading] = useState(false);
-  //para responsividad
-  const [ampliarElemento, setAmpliarElemento] = useState(true);
+  const tabs = [
+    { id: 1, label: "Tableros", link: "/tablero" },
+    { id: 2, label: "Formularios", link: "/formularios" },
+    { id: 3, label: "Reportes", link: "/reportes" },
+    { id: 4, label: "Carreras", link: "/carreras" },
+    { id: 5, label: "Usuarios", link: "/usuarios" },
+  ];
+
+  //Para volver
+  let navigate = useNavigate();
 
   //para responsividad
   useEffect(() => {
-    const handleResize = () => {
-      const anchoVentana = window.innerWidth;
-      if (anchoVentana <= 644) {
-        setAmpliarElemento(false);
-      } else {
-        setAmpliarElemento(true);
+    const userPermisos = JSON.parse(localStorage.getItem("userpermisos"));
+    if (userPermisos && userPermisos.length > 0) {
+      const primerPermiso = userPermisos[0];
+
+      // Filtrar el tab cuyo label comience con la primera letra del primer permiso
+      const tabFiltrado = tabs.find(
+        (tab) => tab.label.charAt(0).toUpperCase() === primerPermiso
+      );
+
+      if (tabFiltrado) {
+        navigate(tabFiltrado.link);
       }
-    };
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "center",
-      }}
-    >
-      <Header />
-      <div
-        style={{
-          width: ampliarElemento ? "100%" : "100%",
-          height: "100vh",
-          float: "right",
-          padding: "20px",
-          justifyContent: "center",
-          backgroundColor: "#F5F5F5",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <br />
-        {isLoading ? (
-          <Spinner animation="border" variant="danger" />
-        ) : (
-          <div>
-            <div
-              className="titles"
-              style={{
-                textAlign: "center",
-                marginTop: "100px",
-                width: "60%",
-                marginRight: "auto",
-                marginLeft: "auto",
-              }}
-            >
-              <h2>
-                <strong>¡BIENVENIDO/A!</strong>
-              </h2>
-              <p>
-                a home
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  return <Spinner animation="border" variant="danger" />;
 }
 
 export default Home;

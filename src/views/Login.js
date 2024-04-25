@@ -54,6 +54,7 @@ const Login = () => {
         ) {
           localStorage.setItem("token", JSON.stringify(resultado.token));
           localStorage.setItem("userdata", JSON.stringify(resultado.user));
+          localStorage.setItem("userpermisos", JSON.stringify(resultado.user.usu_permisos));
           navigate("/home");
         } else {
           toast.error("Usuario o contraseña incorrectos", {
@@ -133,9 +134,9 @@ const Login = () => {
               alt="Logo UTA"
               style={{ width: "100px" }}
             />
-            <h2 style={{ margin: "0", textAlign: "center" }}>
-              Universidad Técnica de Ambato
-            </h2>
+            <h3 style={{ margin: "0", textAlign: "center" }}>
+              Facultad de Ingeniería en Sistemas Electrónica e Industrial
+            </h3>
             <div className="formulario">
               <Form
                 className="formLogin"

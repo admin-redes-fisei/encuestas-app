@@ -18,6 +18,7 @@ function Reportes() {
   useEffect(() => {
     obtenerFormularios().then((response) => {
       setformularios(response);
+      console.log(response);
     });
   }, []);
 
@@ -38,7 +39,7 @@ function Reportes() {
 
   return (
     <div>
-      <Nav variant="tabs" defaultActiveKey="/home">
+      <Nav variant="tabs">
         {formularios?.map((form) => (
           <Nav.Item key={form.for_id}>
             <Nav.Link

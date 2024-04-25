@@ -1,4 +1,9 @@
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
 import "./App.css";
 import EndPage from "./views/EndScreen";
 import StartPage from "./views/StartScreen";
@@ -9,23 +14,107 @@ import "react-toastify/dist/ReactToastify.css";
 import Login from "./views/Login";
 import Home from "./views/Home";
 import Usuarios from "./views/Usuarios";
+import Carreras from "./views/Carreras";
+import Tablero from "./views/Tablero";
+import Formularios from "./views/Formularios";
+import SystemNavbar from "./components/Navbar";
 //import SSD from "./views/Ssd";
 
 function App() {
+  //const location = useLocation();
+  const path = window.location.pathname;
+
+  const PrivateRouteTableros = ({ children }) => {
+    const userIsAuthenticated =
+      JSON.parse(localStorage.getItem("token")) &&
+      JSON.parse(localStorage.getItem("userpermisos")).includes("T");
+
+    console.log(JSON.parse(localStorage.getItem("userpermisos")));
+
+    return userIsAuthenticated ? children : <Navigate to="/" />;
+  };
+  const PrivateRouteCarreras = ({ children }) => {
+    const userIsAuthenticated =
+      JSON.parse(localStorage.getItem("token")) &&
+      JSON.parse(localStorage.getItem("userpermisos")).includes("C");
+
+    return userIsAuthenticated ? children : <Navigate to="/" />;
+  };
+  const PrivateRouteFormularios = ({ children }) => {
+    const userIsAuthenticated =
+      JSON.parse(localStorage.getItem("token")) &&
+      JSON.parse(localStorage.getItem("userpermisos")).includes("F");
+
+    return userIsAuthenticated ? children : <Navigate to="/" />;
+  };
+  const PrivateRouteUsuarios = ({ children }) => {
+    const userIsAuthenticated =
+      JSON.parse(localStorage.getItem("token")) &&
+      JSON.parse(localStorage.getItem("userpermisos")).includes("U");
+
+    return userIsAuthenticated ? children : <Navigate to="/" />;
+  };
+  const PrivateRouteReportes = ({ children }) => {
+    const userIsAuthenticated =
+      JSON.parse(localStorage.getItem("token")) &&
+      JSON.parse(localStorage.getItem("userpermisos")).includes("R");
+
+    return userIsAuthenticated ? children : <Navigate to="/" />;
+  };
+
   return (
     <div className="App">
       <Router>
+        {path.includes("/encuestas") ? <></> : <SystemNavbar />}
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/usuarios" element={<Usuarios />} />
+          <Route
+            path="/usuarios"
+            element={
+              <PrivateRouteUsuarios>
+                <Usuarios />
+              </PrivateRouteUsuarios>
+            }
+          />
+          <Route
+            path="/carreras"
+            element={
+              <PrivateRouteCarreras>
+                <Carreras />
+              </PrivateRouteCarreras>
+            }
+          />
+          <Route
+            path="/tablero"
+            element={
+              <PrivateRouteTableros>
+                <Tablero />
+              </PrivateRouteTableros>
+            }
+          />
+          <Route
+            path="/formularios"
+            element={
+              <PrivateRouteFormularios>
+                <Formularios />
+              </PrivateRouteFormularios>
+            }
+          />
+          <Route
+            path="/reportes"
+            element={
+              <PrivateRouteReportes>
+                <Reportes />
+              </PrivateRouteReportes>
+            }
+          />
           <Route path="/encuestas/endpage" element={<EndPage />} />
           <Route path="/encuestas/:for_alias" element={<StartPage />} />
           <Route
             path="/encuestas/:for_alias/:seccion"
             element={<FormularioPublico />}
           />
-          <Route path="/reportes" element={<Reportes />} />
           {/*<Route path="/ssd" element={<SSD />} />*/}
         </Routes>
       </Router>
