@@ -472,7 +472,6 @@ const Usuarios = () => {
   };
 
   //para cambio directo de estado
-
   const handleCambiarEstado = (e, usuario) => {
     const isChecked = e.target.checked;
     const usu_id = usuario.usu_id.toString();
