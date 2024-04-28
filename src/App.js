@@ -18,6 +18,7 @@ import Carreras from "./views/Carreras";
 import Tablero from "./views/Tablero";
 import Formularios from "./views/Formularios";
 import SystemNavbar from "./components/Navbar";
+import SystemNavbarRojo from "./components/NavbarRojo";
 //import SSD from "./views/Ssd";
 
 function App() {
@@ -64,8 +65,28 @@ function App() {
 
   return (
     <div className="App">
+      <div
+        style={{
+          background: "#9C1819",
+          position: "fixed",
+          height: "50vh",
+          width: "100vw",
+          zIndex: "-1",
+          top: 0,
+        }}
+      ></div>
+      <div
+        style={{
+          background: "#F8F9FA",
+          position: "fixed",
+          height: "50vh",
+          width: "100vw",
+          zIndex: "-1",
+          bottom: 0,
+        }}
+      ></div>
       <Router>
-        {path.includes("/encuestas") ? <></> : <SystemNavbar />}
+        {path.includes("/encuestas") ? <></> : <SystemNavbarRojo />}
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />

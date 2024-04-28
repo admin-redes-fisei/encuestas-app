@@ -35,7 +35,7 @@ const Usuarios = () => {
       nombre: "",
       style: {
         width: "5%",
-        color: "#000",
+        color: "#fff",
       },
     },
     {
@@ -43,7 +43,7 @@ const Usuarios = () => {
       nombre: "Nombre Completo",
       style: {
         width: "25%",
-        color: "#000",
+        color: "#fff",
       },
     },
     {
@@ -51,7 +51,7 @@ const Usuarios = () => {
       nombre: "Tipo de Usuario",
       style: {
         width: "15%",
-        color: "#000",
+        color: "#fff",
       },
     },
     {
@@ -59,7 +59,7 @@ const Usuarios = () => {
       nombre: "Permisos",
       style: {
         width: "15%",
-        color: "#000",
+        color: "#fff",
       },
     },
     {
@@ -67,7 +67,7 @@ const Usuarios = () => {
       nombre: "Estado",
       style: {
         width: "15%",
-        color: "#000",
+        color: "#fff",
       },
     },
     {
@@ -75,7 +75,7 @@ const Usuarios = () => {
       nombre: "Acciones",
       style: {
         width: "20%",
-        color: "#000",
+        color: "#fff",
         flex: 3,
       },
     },
@@ -532,33 +532,34 @@ const Usuarios = () => {
       style={{
         display: "flex",
         flexDirection: "column",
+        paddingTop: "20px",
       }}
     >
       <h3
         style={{
-          color: "#000",
+          color: "#fff",
           textAlign: "left",
-          width: "80vw",
+          width: "83vw",
           marginLeft: "auto",
           marginRight: "auto",
         }}
       >
         <b>Usuarios</b>
       </h3>
-      <br />
       <div
         style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          width: "80vw",
+          width: "83vw",
           marginLeft: "auto",
           marginRight: "auto",
+          marginTop: "5px",
         }}
       >
         <InputGroup className="mb-2" style={{ width: "50%" }}>
           <DropdownButton
-            variant="outline-secondary"
+            variant="light"
             title="Filtrar"
             id="input-group-dropdown-1"
           >
@@ -651,8 +652,7 @@ const Usuarios = () => {
           <Button
             variant="dark"
             style={{
-              height: "37px",
-              width: "155px",
+              height: "40px",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
@@ -663,10 +663,9 @@ const Usuarios = () => {
             Nuevo Usuario
           </Button>
           <Button
-            variant="outline-dark"
+            variant="light"
             style={{
-              height: "37px",
-              width: "110px",
+              height: "40px",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
@@ -679,9 +678,9 @@ const Usuarios = () => {
       </div>
       <div
         style={{
-          marginTop: "25px",
+          marginTop: "40px",
           marginBottom: "10px",
-          width: "95vw",
+          width: "83vw",
           marginLeft: "auto",
           marginRight: "auto",
           paddingLeft: "45px",
@@ -702,7 +701,7 @@ const Usuarios = () => {
       </div>
       <div
         style={{
-          width: "95vw",
+          width: "83vw",
           marginLeft: "auto",
           marginRight: "auto",
           borderRadius: "20px",
@@ -711,10 +710,12 @@ const Usuarios = () => {
           justifyContent: "center",
           alignItems: "center",
           padding: "20px",
-          paddingTop:"0px",
+          paddingTop: "10px",
           paddingLeft: "45px",
           paddingRight: "45px",
           marginBottom: "35px",
+          backgroundColor: "white",
+          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1);",
         }}
       >
         {searchedData?.length > 0 ? (

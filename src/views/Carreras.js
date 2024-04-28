@@ -32,7 +32,7 @@ const Carreras = () => {
       nombre: "",
       style: {
         width: "5%",
-        color: "#000",
+        color: "#fff",
       },
     },
     {
@@ -40,7 +40,7 @@ const Carreras = () => {
       nombre: "Carrera",
       style: {
         width: "45%",
-        color: "#000",
+        color: "#fff",
       },
     },
     {
@@ -48,7 +48,7 @@ const Carreras = () => {
       nombre: "Estado",
       style: {
         width: "25%",
-        color: "#000",
+        color: "#fff",
       },
     },
     {
@@ -56,7 +56,7 @@ const Carreras = () => {
       nombre: "Acciones",
       style: {
         width: "25%",
-        color: "#000",
+        color: "#fff",
         flex: 3,
       },
     },
@@ -323,33 +323,34 @@ const Carreras = () => {
       style={{
         display: "flex",
         flexDirection: "column",
+        paddingTop: "20px",
       }}
     >
       <h3
         style={{
-          color: "#000",
+          color: "#fff",
           textAlign: "left",
-          width: "80vw",
+          width: "83vw",
           marginLeft: "auto",
           marginRight: "auto",
         }}
       >
         <b>Carreras</b>
       </h3>
-      <br />
       <div
         style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          width: "80vw",
+          width: "83vw",
           marginLeft: "auto",
           marginRight: "auto",
+          marginTop: "5px",
         }}
       >
         <InputGroup className="mb-2" style={{ width: "50%" }}>
           <DropdownButton
-            variant="outline-secondary"
+            variant="light"
             title="Filtrar"
             id="input-group-dropdown-1"
           >
@@ -420,7 +421,7 @@ const Carreras = () => {
             Nueva Carrera
           </Button>
           <Button
-            variant="outline-dark"
+            variant="light"
             style={{
               height: "37px",
               width: "110px",
@@ -436,9 +437,9 @@ const Carreras = () => {
       </div>
       <div
         style={{
-          marginTop: "25px",
+          marginTop: "40px",
           marginBottom: "10px",
-          width: "95vw",
+          width: "83vw",
           marginLeft: "auto",
           marginRight: "auto",
           paddingLeft: "45px",
@@ -459,7 +460,7 @@ const Carreras = () => {
       </div>
       <div
         style={{
-          width: "95vw",
+          width: "83vw",
           marginLeft: "auto",
           marginRight: "auto",
           borderRadius: "20px",
@@ -468,10 +469,12 @@ const Carreras = () => {
           justifyContent: "center",
           alignItems: "center",
           padding: "20px",
-          paddingTop: "0px",
+          paddingTop: "10px",
           paddingLeft: "45px",
           paddingRight: "45px",
           marginBottom: "35px",
+          backgroundColor: "white",
+          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1);",
         }}
       >
         {searchedData?.length > 0 ? (

@@ -73,7 +73,7 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div style={{backgroundColor:"white"}}>
       <div
         className="backgraund-container"
         style={{

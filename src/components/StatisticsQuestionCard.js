@@ -6,7 +6,7 @@ function StatisticsQuestionCard({ questionData }) {
     <>
       <Card
         style={{
-          width: "70%",
+          width: "85%",
           marginRight: "auto",
           marginLeft: "auto",
           marginTop: "10px",
@@ -15,7 +15,11 @@ function StatisticsQuestionCard({ questionData }) {
       >
         <Card.Body>
           <Card.Title>{questionData[0]?.pre_titulo}</Card.Title>
-          <Card.Text>{questionData[0]?.pre_texto}</Card.Text>
+          <Card.Text
+            style={{ width: "75%", marginLeft: "auto", marginRight: "auto" }}
+          >
+            {questionData[0]?.pre_texto}
+          </Card.Text>
           <div
             style={{
               width: "100%",
