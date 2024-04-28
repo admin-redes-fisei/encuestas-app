@@ -6,7 +6,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogoutIcon from "../assets/logoutIcon";
 
-function SystemNavbar() {
+function SystemNavbarRojo() {
   const tabs = [
     { id: 1, label: "Tableros", link: "/tablero" },
     { id: 2, label: "Formularios", link: "/formularios" },
@@ -19,7 +19,6 @@ function SystemNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const hideinfo = location.pathname === "/";
-
 
   useEffect(() => {
     const filtrados = tabs.filter((tab) => {
@@ -46,7 +45,10 @@ function SystemNavbar() {
     <Navbar
       collapseOnSelect
       expand="lg"
-      className="bg-body-tertiary"
+      className="bg-body-tertiary justify-content-between"
+      bg="dark"
+      data-bs-theme="dark"
+      style={{ backgroundColor: "#9C1819" }}
     >
       <Container>
         <Navbar.Brand
@@ -56,6 +58,7 @@ function SystemNavbar() {
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
+            marginRight:"40px"
           }}
         >
           <img
@@ -63,7 +66,7 @@ function SystemNavbar() {
             alt="Logo UTA"
             style={{ width: "50px" }}
           />
-          <h6 style={{ color: "black", marginLeft: "15px", marginTop: "5px" }}>
+          <h6 style={{ color: "white", marginLeft: "15px", marginTop: "5px" }}>
             UNIVERSIDAD TÉCNICA DE AMBATO
           </h6>
         </Navbar.Brand>
@@ -77,16 +80,11 @@ function SystemNavbar() {
                 width: "100%",
                 display: "flex",
                 justifyContent: "space-between",
-                marginLeft: "10%",
               }}
             >
               <div style={{ display: "flex", flexDirection: "row" }}>
                 {permisos?.map((tab) => (
-                  <Nav.Link
-                    as={Link}
-                    to={tab.link}
-                    id={tab.id}
-                  >
+                  <Nav.Link as={Link} to={tab.link} id={tab.id}>
                     {tab.label}
                   </Nav.Link>
                 ))}
@@ -113,4 +111,4 @@ function SystemNavbar() {
   );
 }
 
-export default SystemNavbar;
+export default SystemNavbarRojo;
