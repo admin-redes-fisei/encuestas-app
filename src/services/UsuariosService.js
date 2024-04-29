@@ -93,6 +93,25 @@ export async function editarUsuario(data) {
   }
 }
 
+export async function cambiarClave(data) {
+  try {
+    const respuesta = await fetch(`${URL_acceso}editarClaveUsuario.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!respuesta.ok) {
+      throw new Error(`Error al editar el usuario: ${respuesta.statusText}`);
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
 export async function eliminarUsuario(data) {
   try {
     const respuesta = await fetch(`${URL_acceso}eliminarUsuario.php`, {

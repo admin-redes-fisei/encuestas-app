@@ -45,8 +45,6 @@ function SystemNavbarRojo() {
     <Navbar
       collapseOnSelect
       expand="lg"
-      className="bg-body-tertiary justify-content-between"
-      bg="dark"
       data-bs-theme="dark"
       style={{ backgroundColor: "#9C1819" }}
     >
