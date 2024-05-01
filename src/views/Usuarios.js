@@ -26,9 +26,6 @@ import {
 import OpenEyeIcon from "../assets/openEyeIcon";
 import CloseEyeIcon from "../assets/closeEyeIcon";
 import CryptoJS from "crypto-js";
-//import { CSVLink } from "react-csv";
-//import jsPDF from "jspdf";
-//import autoTable from "jspdf-autotable";
 import UserPasswordIcon from "../assets/userPasswordIcon";
 
 const Usuarios = () => {
@@ -222,7 +219,6 @@ const Usuarios = () => {
     } else {
       setFilteredData(data);
     }
-    console.log(currentItems);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, filteredInfo]);
 
@@ -377,7 +373,6 @@ const Usuarios = () => {
 
   //para listar
   useEffect(() => {
-    //const token = JSON.parse(localStorage.getItem("token"));
     listarUsuarios().then((datos) => {
       if (datos?.error) {
         setData([]);
@@ -395,7 +390,6 @@ const Usuarios = () => {
           };
         });
         setData(datosDesencriptados);
-        //setData(datos);
       }
     });
   }, [refresh]);
@@ -596,41 +590,6 @@ const Usuarios = () => {
     });
   };
 
-  //para exportar csv
-  /*const csvData = currentItems?.map((item, index) => ({
-    Index: index,
-    Nombre: item.usu_nombres,
-    Apellido: item.usu_apellidos,
-    Tipo: dataTipos.find((tipo) => tipo.id === parseInt(item.usu_tipo)).nombre,
-    Permisos: item.usu_permisos,
-    Estado: parseInt(item.usu_estado) === 1 ? "Activo" : "Inactivo",
-  }));
-
-  //para exportar en pdf
-  const tableData = currentItems?.map((item, index) => [
-    index + 1 + 5 * (currentPage - 1),
-    item.usu_nombres,
-    item.usu_apellidos,
-    dataTipos.find((tipo) => tipo.id === parseInt(item.usu_tipo)).nombre,
-    item.usu_permisos,
-    parseInt(item.usu_estado) === 1 ? "Activo" : "Inactivo",
-  ]);
-
-  const tableColumns = [
-    "Index",
-    "Nombre",
-    "Apellido",
-    "Tipo",
-    "Permisos",
-    "Estado",
-  ];
-
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    autoTable(doc, { head: [tableColumns], body: tableData });
-    doc.save("mi-tabla.pdf");
-  };*/
-
   return (
     <div
       style={{
@@ -766,33 +725,6 @@ const Usuarios = () => {
             <PlusIcon />
             Nuevo Usuario
           </Button>
-          {/*<DropdownButton
-            as={ButtonGroup}
-            align={{ lg: "end" }}
-            variant="outline-secondary"
-            style={{
-              height: "40px",
-            }}
-            title={
-              <>
-                <DownloadIcon color="#333F49" />
-                Exportar
-              </>
-            }
-          >
-            <Dropdown.Item onClick={exportPDF}>Exportar a PDF</Dropdown.Item>
-            <CSVLink
-              data={csvData}
-              filename={"usuariosdata.csv"}
-              style={{
-                textDecoration: "none",
-                color: "black",
-                marginLeft: "16px",
-              }}
-            >
-              Exportar a CSV
-            </CSVLink>
-          </DropdownButton>*/}
         </div>
       </div>
       <div
