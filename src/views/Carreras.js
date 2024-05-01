@@ -474,7 +474,7 @@ const Carreras = () => {
           paddingRight: "45px",
           marginBottom: "35px",
           backgroundColor: "white",
-          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1);",
+          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
         {searchedData?.length > 0 ? (

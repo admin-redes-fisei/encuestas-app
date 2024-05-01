@@ -9,7 +9,6 @@ import PlusIcon from "../assets/addIcon";
 import EditIcon from "../assets/editIcon";
 import DeleteIcon from "../assets/deleteIcon";
 import {
-  ButtonGroup,
   Col,
   Container,
   Dropdown,
@@ -17,7 +16,6 @@ import {
   InputGroup,
   Row,
 } from "react-bootstrap";
-import DownloadIcon from "../assets/downloadIcon";
 import {
   agregarUsuario,
   cambiarClave,
@@ -28,9 +26,9 @@ import {
 import OpenEyeIcon from "../assets/openEyeIcon";
 import CloseEyeIcon from "../assets/closeEyeIcon";
 import CryptoJS from "crypto-js";
-import { CSVLink } from "react-csv";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+//import { CSVLink } from "react-csv";
+//import jsPDF from "jspdf";
+//import autoTable from "jspdf-autotable";
 import UserPasswordIcon from "../assets/userPasswordIcon";
 
 const Usuarios = () => {
@@ -41,47 +39,55 @@ const Usuarios = () => {
       nombre: "",
       style: {
         width: "5%",
-        color: "#000",
+        color: "#fff",
       },
     },
     {
       id: 2,
-      nombre: "Nombre Completo",
+      nombre: "Cédula",
       style: {
-        width: "25%",
-        color: "#000",
+        width: "10%",
+        color: "#fff",
       },
     },
     {
       id: 3,
-      nombre: "Tipo de Usuario",
+      nombre: "Nombre Completo",
       style: {
-        width: "15%",
-        color: "#000",
+        width: "30%",
+        color: "#fff",
       },
     },
     {
       id: 4,
-      nombre: "Permisos",
+      nombre: "Tipo de Usuario",
       style: {
         width: "15%",
-        color: "#000",
+        color: "#fff",
       },
     },
     {
       id: 5,
-      nombre: "Estado",
+      nombre: "Permisos",
       style: {
-        width: "15%",
-        color: "#000",
+        width: "10%",
+        color: "#fff",
       },
     },
     {
       id: 6,
+      nombre: "Estado",
+      style: {
+        width: "10%",
+        color: "#fff",
+      },
+    },
+    {
+      id: 7,
       nombre: "Acciones",
       style: {
         width: "20%",
-        color: "#000",
+        color: "#fff",
         flex: 3,
       },
     },
@@ -130,7 +136,7 @@ const Usuarios = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = searchedData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(data?.length / itemsPerPage);
+  const totalPages = Math.ceil(searchedData?.length / itemsPerPage);
   //para el modal
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
@@ -165,6 +171,7 @@ const Usuarios = () => {
     }
   };
   useEffect(() => {
+    setCurrentPage(1);
     const filterData = () => {
       var paseEstado = null;
       var paseTipo = null;
@@ -207,9 +214,9 @@ const Usuarios = () => {
     };
 
     if (
-      (filteredInfo["usu_estado"] && filteredInfo["usu_estado"].length > 0) ||
-      (filteredInfo["usu_tipo"] && filteredInfo["usu_tipo"].length > 0) ||
-      (filteredInfo["usu_permisos"] && filteredInfo["usu_permisos"].length > 0)
+      (filteredInfo["usu_estado"] && filteredInfo["usu_estado"]?.length > 0) ||
+      (filteredInfo["usu_tipo"] && filteredInfo["usu_tipo"]?.length > 0) ||
+      (filteredInfo["usu_permisos"] && filteredInfo["usu_permisos"]?.length > 0)
     ) {
       filterData();
     } else {
@@ -221,11 +228,15 @@ const Usuarios = () => {
 
   //para el buscador
   useEffect(() => {
+    setCurrentPage(1);
     setSearchedData(
       filteredData.filter(
         (item) =>
           item.usu_nombres?.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.usu_apellidos?.toLowerCase().includes(searchValue.toLowerCase())
+          item.usu_apellidos
+            ?.toLowerCase()
+            .includes(searchValue.toLowerCase()) ||
+          item.usu_cedula?.toLowerCase().includes(searchValue.toLowerCase())
       )
     );
   }, [filteredData, searchValue]);
@@ -321,7 +332,17 @@ const Usuarios = () => {
       formData.usu_nombres !== "" &&
       formData.usu_apellidos !== "" &&
       formData.usu_correo !== "" &&
+      !data?.some(
+        (usuario) =>
+          usuario.usu_correo === formData.usu_correo &&
+          usuario.usu_id !== formData.usu_id
+      ) &&
       formData.usu_usuario !== "" &&
+      !data?.some(
+        (usuario) =>
+          usuario.usu_usuario === formData.usu_usuario &&
+          usuario.usu_id !== formData.usu_id
+      ) &&
       formData.usu_clave === formData.usu_clave2 &&
       formData.usu_tipo !== ""
     ) {
@@ -361,7 +382,7 @@ const Usuarios = () => {
       if (datos?.error) {
         setData([]);
       } else {
-        const datosDesencriptados = datos.map((dato) => {
+        const datosDesencriptados = datos?.map((dato) => {
           return {
             ...dato,
             usu_cedula: desencriptar(dato.usu_cedula),
@@ -417,7 +438,7 @@ const Usuarios = () => {
 
     if (confirmDelete) {
       eliminarUsuario({ usu_id: idusuario }).then((respuesta) => {
-        if (respuesta.mensaje === "OK") {
+        if (respuesta?.mensaje === "OK") {
           setRefresh(refresh + 1);
         } else {
           toast.error("Error al intentar eliminar", {
@@ -576,7 +597,7 @@ const Usuarios = () => {
   };
 
   //para exportar csv
-  const csvData = currentItems.map((item, index) => ({
+  /*const csvData = currentItems?.map((item, index) => ({
     Index: index,
     Nombre: item.usu_nombres,
     Apellido: item.usu_apellidos,
@@ -586,7 +607,7 @@ const Usuarios = () => {
   }));
 
   //para exportar en pdf
-  const tableData = currentItems.map((item, index) => [
+  const tableData = currentItems?.map((item, index) => [
     index + 1 + 5 * (currentPage - 1),
     item.usu_nombres,
     item.usu_apellidos,
@@ -608,7 +629,7 @@ const Usuarios = () => {
     const doc = new jsPDF();
     autoTable(doc, { head: [tableColumns], body: tableData });
     doc.save("mi-tabla.pdf");
-  };
+  };*/
 
   return (
     <div
@@ -616,12 +637,11 @@ const Usuarios = () => {
         display: "flex",
         flexDirection: "column",
         paddingTop: "20px",
-        backgroundColor: "#F8F9FA",
       }}
     >
       <h3
         style={{
-          color: "#000",
+          color: "#fff",
           textAlign: "left",
           width: "83vw",
           marginLeft: "auto",
@@ -643,7 +663,7 @@ const Usuarios = () => {
       >
         <InputGroup className="mb-2" style={{ width: "50%" }}>
           <DropdownButton
-            variant="outline-secondary"
+            variant="light"
             title="Filtrar"
             id="input-group-dropdown-1"
           >
@@ -729,7 +749,7 @@ const Usuarios = () => {
           style={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "space-between",
+            justifyContent: "end",
             width: "25%",
           }}
         >
@@ -746,7 +766,7 @@ const Usuarios = () => {
             <PlusIcon />
             Nuevo Usuario
           </Button>
-          <DropdownButton
+          {/*<DropdownButton
             as={ButtonGroup}
             align={{ lg: "end" }}
             variant="outline-secondary"
@@ -759,7 +779,6 @@ const Usuarios = () => {
                 Exportar
               </>
             }
-            autoClose={false}
           >
             <Dropdown.Item onClick={exportPDF}>Exportar a PDF</Dropdown.Item>
             <CSVLink
@@ -773,7 +792,7 @@ const Usuarios = () => {
             >
               Exportar a CSV
             </CSVLink>
-          </DropdownButton>
+          </DropdownButton>*/}
         </div>
       </div>
       <div
@@ -815,7 +834,7 @@ const Usuarios = () => {
           paddingRight: "45px",
           marginBottom: "35px",
           backgroundColor: "white",
-          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1);",
+          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
         {searchedData?.length > 0 ? (
@@ -828,7 +847,7 @@ const Usuarios = () => {
             }}
           >
             <tbody>
-              {currentItems.map((item, index) => (
+              {currentItems?.map((item, index) => (
                 <tr key={item.usu_id} style={{ marginTop: "50px" }}>
                   <td
                     style={{
@@ -837,11 +856,22 @@ const Usuarios = () => {
                       paddingTop: "15px",
                     }}
                   >
-                    {index + 1 + 6 * (currentPage - 1)}
+                    {index + 1 + 5 * (currentPage - 1)}
                   </td>
                   <td
                     style={{
-                      width: "25%",
+                      width: "10%",
+                      color: "#333F49",
+                      paddingTop: "15px",
+                      textAlign: "left",
+                    }}
+                  >
+                    {"*".repeat(6)}
+                    {item.usu_cedula.slice(-4)}
+                  </td>
+                  <td
+                    style={{
+                      width: "30%",
                       color: "#333F49",
                       paddingTop: "15px",
                       textAlign: "left",
@@ -864,7 +894,7 @@ const Usuarios = () => {
                   </td>
                   <th
                     style={{
-                      width: "15%",
+                      width: "10%",
                       color: "#333F49",
                       paddingTop: "15px",
                     }}
@@ -873,7 +903,7 @@ const Usuarios = () => {
                   </th>
                   <td
                     style={{
-                      width: "15%",
+                      width: "10%",
                       color: "#333F49",
                       paddingTop: "15px",
                     }}
@@ -937,7 +967,7 @@ const Usuarios = () => {
         )}
         <div style={{ alignSelf: "center", marginTop: "10px" }}>
           <Pagination>
-            {[...Array(totalPages)].map((_, i) => (
+            {[...Array(totalPages)]?.map((_, i) => (
               <Pagination.Item
                 key={i}
                 active={i + 1 === currentPage}
@@ -1055,6 +1085,24 @@ const Usuarios = () => {
                       disabled={isView}
                     />
                   </Form.Group>
+                  {data?.some(
+                    (usuario) =>
+                      usuario.usu_correo === formData.usu_correo &&
+                      usuario.usu_id !== formData.usu_id
+                  ) && (
+                    <Row>
+                      <spam
+                        style={{
+                          color: "red",
+                          fontSize: "small",
+                          marginTop: "-5px",
+                          marginBottom: "15px",
+                        }}
+                      >
+                        Ya existe un usuario con este correo
+                      </spam>
+                    </Row>
+                  )}
                 </Col>
                 <Col>
                   <Form.Group
@@ -1072,6 +1120,24 @@ const Usuarios = () => {
                       disabled={isView}
                     />
                   </Form.Group>
+                  {data?.some(
+                    (usuario) =>
+                      usuario.usu_usuario === formData.usu_usuario &&
+                      usuario.usu_id !== formData.usu_id
+                  ) && (
+                    <Row>
+                      <spam
+                        style={{
+                          color: "red",
+                          fontSize: "small",
+                          marginTop: "-5px",
+                          marginBottom: "15px",
+                        }}
+                      >
+                        El usuario ya existe
+                      </spam>
+                    </Row>
+                  )}
                 </Col>
               </Row>
               {formData.usu_id === "" && (

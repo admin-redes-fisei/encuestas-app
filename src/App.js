@@ -67,7 +67,7 @@ function App() {
     <div className="App">
       <div
         style={{
-          background: "#9C1819",
+          background: "#8A1112",
           position: "fixed",
           height: "50vh",
           width: "100vw",

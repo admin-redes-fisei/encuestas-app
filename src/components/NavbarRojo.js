@@ -5,6 +5,8 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogoutIcon from "../assets/logoutIcon";
+import CryptoJS from "crypto-js";
+import UserIcon from "../assets/userIcon";
 
 function SystemNavbarRojo() {
   const tabs = [
@@ -19,6 +21,8 @@ function SystemNavbarRojo() {
   const navigate = useNavigate();
   const location = useLocation();
   const hideinfo = location.pathname === "/";
+  //para encriptado de datos
+  const clave = "HatunSoft@2023";
 
   useEffect(() => {
     const filtrados = tabs.filter((tab) => {
@@ -41,12 +45,18 @@ function SystemNavbarRojo() {
     localStorage.removeItem("userpermisos");
   };
 
+  // Función para desencriptar
+  function desencriptar(cifrado) {
+    const bytes = CryptoJS.AES.decrypt(cifrado, clave);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  }
+
   return (
     <Navbar
       collapseOnSelect
       expand="lg"
       data-bs-theme="dark"
-      style={{ backgroundColor: "#9C1819" }}
+      style={{ backgroundColor: "#8A1112" }}
     >
       <Container>
         <Navbar.Brand
@@ -56,7 +66,7 @@ function SystemNavbarRojo() {
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
-            marginRight:"40px"
+            marginRight: "40px",
           }}
         >
           <img
@@ -88,11 +98,17 @@ function SystemNavbarRojo() {
                 ))}
               </div>
               <NavDropdown
-                className="justify-content-end"
                 title={
-                  usuario
-                    ? `${usuario.usu_nombres} ${usuario.usu_apellidos}`
-                    : ""
+                  <>
+                    <UserIcon />
+                    <spam style={{ marginLeft: "5px" }}>
+                      {usuario
+                        ? `${desencriptar(usuario.usu_nombres)} ${desencriptar(
+                            usuario.usu_apellidos
+                          )}`
+                        : ""}
+                    </spam>
+                  </>
                 }
                 id="basic-nav-dropdown"
               >
