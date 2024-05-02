@@ -13,10 +13,8 @@ import {
   Table,
 } from "react-bootstrap";
 import PlusIcon from "../assets/addIcon";
-import DownloadIcon from "../assets/downloadIcon";
 import DeleteIcon from "../assets/deleteIcon";
 import EditIcon from "../assets/editIcon";
-import OpenEyeIcon from "../assets/openEyeIcon";
 import { toast } from "react-toastify";
 import {
   agregarCarreras,
@@ -66,7 +64,7 @@ const Carreras = () => {
   const [formData, setFormData] = useState({
     car_id: "",
     car_nombre: "",
-    car_estado: "",
+    car_estado: 1,
   });
   //para filtros
   const [filteredData, setFilteredData] = useState([]);
@@ -76,15 +74,13 @@ const Carreras = () => {
   const [searchedData, setSearchedData] = useState([]);
   //para el modal
   const [show, setShow] = useState(false);
-  //para modo de vista
-  const [isView, setIsView] = useState(false);
   //Para la paginacion
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = searchedData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
+  const totalPages = Math.ceil(searchedData?.length / itemsPerPage);
   //para actualizar
   const [refresh, setRefresh] = useState(0);
 
@@ -111,6 +107,7 @@ const Carreras = () => {
     }
   };
   useEffect(() => {
+    setCurrentPage(1);
     const filterData = () => {
       var paseEstado = false;
 
@@ -139,6 +136,7 @@ const Carreras = () => {
 
   //para el buscador
   useEffect(() => {
+    setCurrentPage(1);
     setSearchedData(
       filteredData.filter((item) =>
         item.car_nombre?.toLowerCase().includes(searchValue.toLowerCase())
@@ -154,9 +152,8 @@ const Carreras = () => {
     setFormData({
       car_id: "",
       car_nombre: "",
-      car_estado: "",
+      car_estado: 1,
     });
-    setIsView(false);
   };
 
   //para cambio directo de estado
@@ -402,7 +399,7 @@ const Carreras = () => {
           style={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "space-between",
+            justifyContent: "end",
             width: "25%",
           }}
         >
@@ -419,19 +416,6 @@ const Carreras = () => {
           >
             <PlusIcon />
             Nueva Carrera
-          </Button>
-          <Button
-            variant="light"
-            style={{
-              height: "37px",
-              width: "110px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <DownloadIcon color="#333F49" />
-            Exportar
           </Button>
         </div>
       </div>
@@ -496,7 +480,7 @@ const Carreras = () => {
                       paddingTop: "15px",
                     }}
                   >
-                    {index + 1 + 6 * (currentPage - 1)}
+                    {index + 1 + 5 * (currentPage - 1)}
                   </td>
                   <td
                     style={{
@@ -533,15 +517,6 @@ const Carreras = () => {
                       flex: 3,
                     }}
                   >
-                    <Button
-                      variant="outline-light"
-                      onClick={() => {
-                        setIsView(true);
-                        handleEdit(item.car_id);
-                      }}
-                    >
-                      <OpenEyeIcon />
-                    </Button>
                     <Button
                       variant="outline-light"
                       onClick={() => handleEdit(item.car_id)}
@@ -605,7 +580,6 @@ const Carreras = () => {
                         parseInt(formData.car_estado) === 1 ? true : false
                       }
                       onChange={(e) => handleEstadoModalChange(e)}
-                      disabled={isView}
                       inline
                     />
                   </Form.Group>
@@ -626,7 +600,6 @@ const Carreras = () => {
                       name="car_nombre"
                       value={formData.car_nombre}
                       onChange={handleChange}
-                      disabled={isView}
                     />
                   </Form.Group>
                 </Col>
@@ -636,7 +609,6 @@ const Carreras = () => {
         </Modal.Body>
         <Modal.Footer
           style={{
-            display: isView ? "none" : "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
           }}
