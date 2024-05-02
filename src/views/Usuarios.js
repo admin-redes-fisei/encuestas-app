@@ -383,7 +383,7 @@ const Usuarios = () => {
             usu_cedula: desencriptar(dato.usu_cedula),
             usu_nombres: desencriptar(dato.usu_nombres),
             usu_apellidos: desencriptar(dato.usu_apellidos),
-            usu_correo: desencriptar(dato.usu_correo),
+            usu_correo: dato.usu_correo,
             usu_usuario: dato.usu_usuario,
             usu_clave: "",
             usu_clave2: "",
@@ -453,7 +453,7 @@ const Usuarios = () => {
     const usu_cedula = encriptar(formData.usu_cedula.toString());
     const usu_nombres = encriptar(formData.usu_nombres.toString());
     const usu_apellidos = encriptar(formData.usu_apellidos.toString());
-    const usu_correo = encriptar(formData.usu_correo.toString());
+    const usu_correo = formData.usu_correo.toString();
     const usu_usuario = formData.usu_usuario.toString();
     const usu_clave = formData.usu_clave.toString();
 
@@ -526,8 +526,8 @@ const Usuarios = () => {
     const usu_cedula = encriptar(usuario.usu_cedula.toString());
     const usu_nombres = encriptar(usuario.usu_nombres.toString());
     const usu_apellidos = encriptar(usuario.usu_apellidos.toString());
-    const usu_correo = encriptar(usuario.usu_correo.toString());
-    const usu_usuario = encriptar(usuario.usu_usuario.toString());
+    const usu_correo = usuario.usu_correo.toString();
+    const usu_usuario = usuario.usu_usuario.toString();
     const usu_tipo = usuario.usu_tipo.toString();
     const usu_permisos = usuario.usu_permisos;
     const usu_estado = (isChecked ? 1 : 0).toString();

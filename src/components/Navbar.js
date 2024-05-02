@@ -20,7 +20,7 @@ function SystemNavbar() {
   const [usuario, setUsuario] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const hideinfo = location.pathname === "/";
+  const [hideinfo, setHideinfo] = useState(location.pathname === "/");
   //para encriptado de datos
   const clave = "HatunSoft@2023";
 
@@ -31,11 +31,8 @@ function SystemNavbar() {
       );
     });
     setPermisos(filtrados);
-    setUsuario(
-      JSON.parse(localStorage.getItem("userdata"))
-        ? JSON.parse(localStorage.getItem("userdata"))
-        : []
-    );
+    setUsuario(JSON.parse(localStorage.getItem("userdata")));
+    setHideinfo(location.pathname === "/");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate, location]);
 
@@ -92,7 +89,7 @@ function SystemNavbar() {
             >
               <div style={{ display: "flex", flexDirection: "row" }}>
                 {permisos?.map((tab) => (
-                  <Nav.Link as={Link} to={tab.link} id={tab.id}>
+                  <Nav.Link key={tab.id} as={Link} to={tab.link} id={tab.id}>
                     {tab.label}
                   </Nav.Link>
                 ))}
@@ -101,13 +98,13 @@ function SystemNavbar() {
                 title={
                   <>
                     <UserIcon />
-                    <spam style={{ marginLeft: "5px" }}>
-                      {usuario
-                        ? `${desencriptar(usuario.usu_nombres)} ${desencriptar(
-                            usuario.usu_apellidos
+                    <span style={{ marginLeft: "5px" }}>
+                      {usuario?.usu_nombres && usuario?.usu_apellidos
+                        ? `${desencriptar(usuario?.usu_nombres)} ${desencriptar(
+                            usuario?.usu_apellidos
                           )}`
                         : ""}
-                    </spam>
+                    </span>
                   </>
                 }
                 id="basic-nav-dropdown"
