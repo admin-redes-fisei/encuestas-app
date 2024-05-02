@@ -1,5 +1,5 @@
-const URL_acceso = "http://localhost:8084/pruebaTesis/";
-//const URL_acceso = "https://hatunsoft.uta.edu.ec/back_encuestas/";
+const URL_acceso = "http://localhost:8084/pruebaTesis/encuestas_back/";
+//const URL_acceso = "https://hatunsoft.uta.edu.ec/encuestas/encuestas_back";
 
 export async function iniciarSesion(username, password, aud) {
   const data = {
@@ -77,6 +77,25 @@ export async function agregarUsuario(data) {
 export async function editarUsuario(data) {
   try {
     const respuesta = await fetch(`${URL_acceso}editarUsuario.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!respuesta.ok) {
+      throw new Error(`Error al editar el usuario: ${respuesta.statusText}`);
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
+export async function cambiarClave(data) {
+  try {
+    const respuesta = await fetch(`${URL_acceso}editarClaveUsuario.php`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

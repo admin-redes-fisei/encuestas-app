@@ -5,6 +5,8 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogoutIcon from "../assets/logoutIcon";
+import CryptoJS from "crypto-js";
+import UserIcon from "../assets/userIcon";
 
 function SystemNavbar() {
   const tabs = [
@@ -19,7 +21,8 @@ function SystemNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const hideinfo = location.pathname === "/";
-
+  //para encriptado de datos
+  const clave = "HatunSoft@2023";
 
   useEffect(() => {
     const filtrados = tabs.filter((tab) => {
@@ -42,11 +45,18 @@ function SystemNavbar() {
     localStorage.removeItem("userpermisos");
   };
 
+  // Función para desencriptar
+  function desencriptar(cifrado) {
+    const bytes = CryptoJS.AES.decrypt(cifrado, clave);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  }
+
   return (
     <Navbar
       collapseOnSelect
       expand="lg"
-      className="bg-body-tertiary"
+      data-bs-theme="dark"
+      style={{ backgroundColor: "#8A1112" }}
     >
       <Container>
         <Navbar.Brand
@@ -56,6 +66,7 @@ function SystemNavbar() {
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
+            marginRight: "40px",
           }}
         >
           <img
@@ -63,7 +74,7 @@ function SystemNavbar() {
             alt="Logo UTA"
             style={{ width: "50px" }}
           />
-          <h6 style={{ color: "black", marginLeft: "15px", marginTop: "5px" }}>
+          <h6 style={{ color: "white", marginLeft: "15px", marginTop: "5px" }}>
             UNIVERSIDAD TÉCNICA DE AMBATO
           </h6>
         </Navbar.Brand>
@@ -77,26 +88,27 @@ function SystemNavbar() {
                 width: "100%",
                 display: "flex",
                 justifyContent: "space-between",
-                marginLeft: "10%",
               }}
             >
               <div style={{ display: "flex", flexDirection: "row" }}>
                 {permisos?.map((tab) => (
-                  <Nav.Link
-                    as={Link}
-                    to={tab.link}
-                    id={tab.id}
-                  >
+                  <Nav.Link as={Link} to={tab.link} id={tab.id}>
                     {tab.label}
                   </Nav.Link>
                 ))}
               </div>
               <NavDropdown
-                className="justify-content-end"
                 title={
-                  usuario
-                    ? `${usuario.usu_nombres} ${usuario.usu_apellidos}`
-                    : ""
+                  <>
+                    <UserIcon />
+                    <spam style={{ marginLeft: "5px" }}>
+                      {usuario
+                        ? `${desencriptar(usuario.usu_nombres)} ${desencriptar(
+                            usuario.usu_apellidos
+                          )}`
+                        : ""}
+                    </spam>
+                  </>
                 }
                 id="basic-nav-dropdown"
               >

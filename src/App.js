@@ -18,7 +18,6 @@ import Carreras from "./views/Carreras";
 import Tablero from "./views/Tablero";
 import Formularios from "./views/Formularios";
 import SystemNavbar from "./components/Navbar";
-import SystemNavbarRojo from "./components/NavbarRojo";
 //import SSD from "./views/Ssd";
 
 function App() {
@@ -67,7 +66,7 @@ function App() {
     <div className="App">
       <div
         style={{
-          background: "#9C1819",
+          background: "#8A1112",
           position: "fixed",
           height: "50vh",
           width: "100vw",
@@ -86,7 +85,7 @@ function App() {
         }}
       ></div>
       <Router>
-        {path.includes("/encuestas") ? <></> : <SystemNavbarRojo />}
+        {path.includes("/encuestas") ? <></> : <SystemNavbar />}
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />

@@ -1,9 +1,9 @@
 import * as React from "react";
-const userIcon = (props) => (
+const UserIcon = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={14}
-    height={16}
+    width={25}
+    height={20}
     viewBox="0 0 448 512"
     {...props}
   >
@@ -13,4 +13,4 @@ const userIcon = (props) => (
     />
   </svg>
 );
-export default userIcon;
+export default UserIcon;

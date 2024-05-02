@@ -16,9 +16,9 @@ import {
   InputGroup,
   Row,
 } from "react-bootstrap";
-import DownloadIcon from "../assets/downloadIcon";
 import {
   agregarUsuario,
+  cambiarClave,
   editarUsuario,
   eliminarUsuario,
   listarUsuarios,
@@ -26,6 +26,7 @@ import {
 import OpenEyeIcon from "../assets/openEyeIcon";
 import CloseEyeIcon from "../assets/closeEyeIcon";
 import CryptoJS from "crypto-js";
+import UserPasswordIcon from "../assets/userPasswordIcon";
 
 const Usuarios = () => {
   //data de encabezados
@@ -40,14 +41,22 @@ const Usuarios = () => {
     },
     {
       id: 2,
-      nombre: "Nombre Completo",
+      nombre: "Cédula",
       style: {
-        width: "25%",
+        width: "10%",
         color: "#fff",
       },
     },
     {
       id: 3,
+      nombre: "Nombre Completo",
+      style: {
+        width: "30%",
+        color: "#fff",
+      },
+    },
+    {
+      id: 4,
       nombre: "Tipo de Usuario",
       style: {
         width: "15%",
@@ -55,23 +64,23 @@ const Usuarios = () => {
       },
     },
     {
-      id: 4,
+      id: 5,
       nombre: "Permisos",
       style: {
-        width: "15%",
-        color: "#fff",
-      },
-    },
-    {
-      id: 5,
-      nombre: "Estado",
-      style: {
-        width: "15%",
+        width: "10%",
         color: "#fff",
       },
     },
     {
       id: 6,
+      nombre: "Estado",
+      style: {
+        width: "10%",
+        color: "#fff",
+      },
+    },
+    {
+      id: 7,
       nombre: "Acciones",
       style: {
         width: "20%",
@@ -90,9 +99,10 @@ const Usuarios = () => {
     usu_correo: "",
     usu_usuario: "",
     usu_clave: "",
+    usu_clave2: "",
     usu_tipo: "",
     usu_permisos: "",
-    usu_estado: "",
+    usu_estado: 1,
   });
   //para tipos
   const dataTipos = [
@@ -119,17 +129,19 @@ const Usuarios = () => {
   const [filteredInfo, setFilteredInfo] = useState([]);
   //Para la paginacion
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 5;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = searchedData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(data?.length / itemsPerPage);
+  const totalPages = Math.ceil(searchedData?.length / itemsPerPage);
   //para el modal
   const [show, setShow] = useState(false);
+  const [show2, setShow2] = useState(false);
   //para modo de vista
   const [isView, setIsView] = useState(false);
   //para contraseña visible
   const [viewPassword, setViewPassword] = useState(false);
+  const [viewValidationPass, setViewVlidationPass] = useState(false);
   //para encriptado de datos
   const clave = "HatunSoft@2023";
 
@@ -156,6 +168,7 @@ const Usuarios = () => {
     }
   };
   useEffect(() => {
+    setCurrentPage(1);
     const filterData = () => {
       var paseEstado = null;
       var paseTipo = null;
@@ -198,9 +211,9 @@ const Usuarios = () => {
     };
 
     if (
-      (filteredInfo["usu_estado"] && filteredInfo["usu_estado"].length > 0) ||
-      (filteredInfo["usu_tipo"] && filteredInfo["usu_tipo"].length > 0) ||
-      (filteredInfo["usu_permisos"] && filteredInfo["usu_permisos"].length > 0)
+      (filteredInfo["usu_estado"] && filteredInfo["usu_estado"]?.length > 0) ||
+      (filteredInfo["usu_tipo"] && filteredInfo["usu_tipo"]?.length > 0) ||
+      (filteredInfo["usu_permisos"] && filteredInfo["usu_permisos"]?.length > 0)
     ) {
       filterData();
     } else {
@@ -211,11 +224,15 @@ const Usuarios = () => {
 
   //para el buscador
   useEffect(() => {
+    setCurrentPage(1);
     setSearchedData(
       filteredData.filter(
         (item) =>
           item.usu_nombres?.toLowerCase().includes(searchValue.toLowerCase()) ||
-          item.usu_apellidos?.toLowerCase().includes(searchValue.toLowerCase())
+          item.usu_apellidos
+            ?.toLowerCase()
+            .includes(searchValue.toLowerCase()) ||
+          item.usu_cedula?.toLowerCase().includes(searchValue.toLowerCase())
       )
     );
   }, [filteredData, searchValue]);
@@ -233,13 +250,33 @@ const Usuarios = () => {
       usu_correo: "",
       usu_usuario: "",
       usu_clave: "",
+      usu_clave2: "",
       usu_tipo: "",
       usu_permisos: "",
-      usu_estado: "",
+      usu_estado: 1,
     });
     setPermisosSeleccionados([]);
     setIsView(false);
+  };
+
+  //para el modal2
+  const handleClose2 = () => {
+    setShow2(false);
+    setFormData({
+      usu_id: "",
+      usu_cedula: "",
+      usu_nombres: "",
+      usu_apellidos: "",
+      usu_correo: "",
+      usu_usuario: "",
+      usu_clave: "",
+      usu_clave2: "",
+      usu_tipo: "",
+      usu_permisos: "",
+      usu_estado: 1,
+    });
     setViewPassword(false);
+    setViewVlidationPass(false);
   };
 
   //para data del formulario
@@ -291,14 +328,27 @@ const Usuarios = () => {
       formData.usu_nombres !== "" &&
       formData.usu_apellidos !== "" &&
       formData.usu_correo !== "" &&
+      !data?.some(
+        (usuario) =>
+          usuario.usu_correo === formData.usu_correo &&
+          usuario.usu_id !== formData.usu_id
+      ) &&
       formData.usu_usuario !== "" &&
-      formData.usu_clave !== "" &&
-      formData.usu_tipo !== "" &&
-      formData.usu_estado !== ""
+      !data?.some(
+        (usuario) =>
+          usuario.usu_usuario === formData.usu_usuario &&
+          usuario.usu_id !== formData.usu_id
+      ) &&
+      formData.usu_clave === formData.usu_clave2 &&
+      formData.usu_tipo !== ""
     ) {
-      handleSave();
+      if (formData.usu_clave !== "" && formData.usu_id !== "") {
+        handleSavePassword();
+      } else {
+        handleSave();
+      }
     } else {
-      toast.error("Complete los campos", {
+      toast.error("Campos vacios o incorrectos", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -323,24 +373,23 @@ const Usuarios = () => {
 
   //para listar
   useEffect(() => {
-    //const token = JSON.parse(localStorage.getItem("token"));
     listarUsuarios().then((datos) => {
       if (datos?.error) {
         setData([]);
       } else {
-        /*const datosDesencriptados = datos.map((dato) => {
+        const datosDesencriptados = datos?.map((dato) => {
           return {
             ...dato,
             usu_cedula: desencriptar(dato.usu_cedula),
             usu_nombres: desencriptar(dato.usu_nombres),
             usu_apellidos: desencriptar(dato.usu_apellidos),
             usu_correo: desencriptar(dato.usu_correo),
-            usu_usuario: desencriptar(dato.usu_usuario),
-            usu_clave: desencriptar(dato.usu_clave),
+            usu_usuario: dato.usu_usuario,
+            usu_clave: "",
+            usu_clave2: "",
           };
         });
-        setData(datosDesencriptados);*/
-        setData(datos);
+        setData(datosDesencriptados);
       }
     });
   }, [refresh]);
@@ -368,6 +417,13 @@ const Usuarios = () => {
     setShow(true);
   };
 
+  //Para editar contraseña
+  const handleEditPassword = (idusuario) => {
+    const newSelectedData = data.find((item) => item.usu_id === idusuario);
+    setFormData(newSelectedData);
+    setShow2(true);
+  };
+
   //para eliminar
   const handleDelete = (idusuario) => {
     const confirmDelete = window.confirm(
@@ -376,7 +432,7 @@ const Usuarios = () => {
 
     if (confirmDelete) {
       eliminarUsuario({ usu_id: idusuario }).then((respuesta) => {
-        if (respuesta.mensaje === "OK") {
+        if (respuesta?.mensaje === "OK") {
           setRefresh(refresh + 1);
         } else {
           toast.error("Error al intentar eliminar", {
@@ -394,17 +450,10 @@ const Usuarios = () => {
 
   //para guardar
   const handleSave = () => {
-    /*const usu_cedula = encriptar(formData.usu_cedula.toString());
+    const usu_cedula = encriptar(formData.usu_cedula.toString());
     const usu_nombres = encriptar(formData.usu_nombres.toString());
     const usu_apellidos = encriptar(formData.usu_apellidos.toString());
     const usu_correo = encriptar(formData.usu_correo.toString());
-    const usu_usuario = encriptar(formData.usu_usuario.toString());
-    const usu_clave = encriptar(formData.usu_clave.toString());*/
-
-    const usu_cedula = formData.usu_cedula.toString();
-    const usu_nombres = formData.usu_nombres.toString();
-    const usu_apellidos = formData.usu_apellidos.toString();
-    const usu_correo = formData.usu_correo.toString();
     const usu_usuario = formData.usu_usuario.toString();
     const usu_clave = formData.usu_clave.toString();
 
@@ -422,7 +471,6 @@ const Usuarios = () => {
         usu_apellidos: usu_apellidos,
         usu_correo: usu_correo,
         usu_usuario: usu_usuario,
-        usu_clave: usu_clave,
         usu_tipo: usu_tipo,
         usu_permisos: usu_permisos,
         usu_estado: usu_estado,
@@ -475,20 +523,11 @@ const Usuarios = () => {
   const handleCambiarEstado = (e, usuario) => {
     const isChecked = e.target.checked;
     const usu_id = usuario.usu_id.toString();
-    /*const usu_cedula = encriptar(usuario.usu_cedula.toString());
+    const usu_cedula = encriptar(usuario.usu_cedula.toString());
     const usu_nombres = encriptar(usuario.usu_nombres.toString());
     const usu_apellidos = encriptar(usuario.usu_apellidos.toString());
     const usu_correo = encriptar(usuario.usu_correo.toString());
     const usu_usuario = encriptar(usuario.usu_usuario.toString());
-    const usu_clave = encriptar(usuario.usu_clave.toString());*/
-
-    const usu_cedula = usuario.usu_cedula.toString();
-    const usu_nombres = usuario.usu_nombres.toString();
-    const usu_apellidos = usuario.usu_apellidos.toString();
-    const usu_correo = usuario.usu_correo.toString();
-    const usu_usuario = usuario.usu_usuario.toString();
-    const usu_clave = usuario.usu_clave.toString();
-
     const usu_tipo = usuario.usu_tipo.toString();
     const usu_permisos = usuario.usu_permisos;
     const usu_estado = (isChecked ? 1 : 0).toString();
@@ -504,7 +543,6 @@ const Usuarios = () => {
         usu_apellidos: usu_apellidos,
         usu_correo: usu_correo,
         usu_usuario: usu_usuario,
-        usu_clave: usu_clave,
         usu_tipo: usu_tipo,
         usu_permisos: usu_permisos,
         usu_estado: usu_estado,
@@ -525,6 +563,31 @@ const Usuarios = () => {
         }
       });
     }
+  };
+
+  //para cambiar contraseña
+  const handleSavePassword = () => {
+    const usu_clave = formData.usu_clave.toString();
+    const usu_id = formData.usu_id;
+
+    cambiarClave({
+      usu_clave: usu_clave,
+      usu_id: usu_id,
+    }).then((resultado) => {
+      if (resultado.mensaje === "OK") {
+        handleClose2();
+        setRefresh(refresh + 1);
+      } else {
+        toast.error("Verifique los campos", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+    });
   };
 
   return (
@@ -645,7 +708,7 @@ const Usuarios = () => {
           style={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "space-between",
+            justifyContent: "end",
             width: "25%",
           }}
         >
@@ -661,18 +724,6 @@ const Usuarios = () => {
           >
             <PlusIcon />
             Nuevo Usuario
-          </Button>
-          <Button
-            variant="light"
-            style={{
-              height: "40px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <DownloadIcon color="#333F49" />
-            Exportar
           </Button>
         </div>
       </div>
@@ -715,7 +766,7 @@ const Usuarios = () => {
           paddingRight: "45px",
           marginBottom: "35px",
           backgroundColor: "white",
-          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1);",
+          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
         {searchedData?.length > 0 ? (
@@ -728,7 +779,7 @@ const Usuarios = () => {
             }}
           >
             <tbody>
-              {currentItems.map((item, index) => (
+              {currentItems?.map((item, index) => (
                 <tr key={item.usu_id} style={{ marginTop: "50px" }}>
                   <td
                     style={{
@@ -737,11 +788,22 @@ const Usuarios = () => {
                       paddingTop: "15px",
                     }}
                   >
-                    {index + 1 + 6 * (currentPage - 1)}
+                    {index + 1 + 5 * (currentPage - 1)}
                   </td>
                   <td
                     style={{
-                      width: "25%",
+                      width: "10%",
+                      color: "#333F49",
+                      paddingTop: "15px",
+                      textAlign: "left",
+                    }}
+                  >
+                    {"*".repeat(6)}
+                    {item.usu_cedula.slice(-4)}
+                  </td>
+                  <td
+                    style={{
+                      width: "30%",
                       color: "#333F49",
                       paddingTop: "15px",
                       textAlign: "left",
@@ -764,7 +826,7 @@ const Usuarios = () => {
                   </td>
                   <th
                     style={{
-                      width: "15%",
+                      width: "10%",
                       color: "#333F49",
                       paddingTop: "15px",
                     }}
@@ -773,7 +835,7 @@ const Usuarios = () => {
                   </th>
                   <td
                     style={{
-                      width: "15%",
+                      width: "10%",
                       color: "#333F49",
                       paddingTop: "15px",
                     }}
@@ -802,18 +864,28 @@ const Usuarios = () => {
                         setIsView(true);
                         handleEdit(item.usu_id);
                       }}
+                      title="Ver datos"
                     >
                       <OpenEyeIcon />
                     </Button>
                     <Button
                       variant="outline-light"
                       onClick={() => handleEdit(item.usu_id)}
+                      title="Editar datos"
                     >
                       <EditIcon />
                     </Button>
                     <Button
                       variant="outline-light"
+                      onClick={() => handleEditPassword(item.usu_id)}
+                      title="Editar contraseña"
+                    >
+                      <UserPasswordIcon />
+                    </Button>
+                    <Button
+                      variant="outline-light"
                       onClick={() => handleDelete(item.usu_id)}
+                      title="Eliminar"
                     >
                       <DeleteIcon />
                     </Button>
@@ -827,7 +899,7 @@ const Usuarios = () => {
         )}
         <div style={{ alignSelf: "center", marginTop: "10px" }}>
           <Pagination>
-            {[...Array(totalPages)].map((_, i) => (
+            {[...Array(totalPages)]?.map((_, i) => (
               <Pagination.Item
                 key={i}
                 active={i + 1 === currentPage}
@@ -857,7 +929,6 @@ const Usuarios = () => {
                     </Form.Label>
                     <Form.Control
                       type="text"
-                      autoFocus
                       name="usu_cedula"
                       value={formData.usu_cedula}
                       onChange={handleChange}
@@ -921,7 +992,6 @@ const Usuarios = () => {
                     </Form.Label>
                     <Form.Control
                       type="text"
-                      autoFocus
                       name="usu_apellidos"
                       value={formData.usu_apellidos}
                       onChange={handleChange}
@@ -941,16 +1011,31 @@ const Usuarios = () => {
                     </Form.Label>
                     <Form.Control
                       type="text"
-                      autoFocus
                       name="usu_correo"
                       value={formData.usu_correo}
                       onChange={handleChange}
                       disabled={isView}
                     />
                   </Form.Group>
+                  {data?.some(
+                    (usuario) =>
+                      usuario.usu_correo === formData.usu_correo &&
+                      usuario.usu_id !== formData.usu_id
+                  ) && (
+                    <Row>
+                      <spam
+                        style={{
+                          color: "red",
+                          fontSize: "small",
+                          marginTop: "-5px",
+                          marginBottom: "15px",
+                        }}
+                      >
+                        Ya existe un usuario con este correo
+                      </spam>
+                    </Row>
+                  )}
                 </Col>
-              </Row>
-              <Row>
                 <Col>
                   <Form.Group
                     className="mb-3"
@@ -961,42 +1046,105 @@ const Usuarios = () => {
                     </Form.Label>
                     <Form.Control
                       type="text"
-                      autoFocus
                       name="usu_usuario"
                       value={formData.usu_usuario}
                       onChange={handleChange}
                       disabled={isView}
                     />
                   </Form.Group>
-                </Col>
-                <Col>
-                  <Form.Group
-                    className="mb-3"
-                    controlId="exampleForm.ControlInput1"
-                  >
-                    <Form.Label>
-                      <b>Contraseña</b>
-                    </Form.Label>
-                    <InputGroup className="mb-3">
-                      <Form.Control
-                        type={viewPassword ? "text" : "password"}
-                        autoFocus
-                        name="usu_clave"
-                        value={formData.usu_clave}
-                        onChange={handleChange}
-                        disabled={isView}
-                      />
-                      <Button
-                        variant="outline-secondary"
-                        id="button-addon2"
-                        onClick={() => setViewPassword(!viewPassword)}
+                  {data?.some(
+                    (usuario) =>
+                      usuario.usu_usuario === formData.usu_usuario &&
+                      usuario.usu_id !== formData.usu_id
+                  ) && (
+                    <Row>
+                      <spam
+                        style={{
+                          color: "red",
+                          fontSize: "small",
+                          marginTop: "-5px",
+                          marginBottom: "15px",
+                        }}
                       >
-                        {viewPassword ? <OpenEyeIcon /> : <CloseEyeIcon />}
-                      </Button>
-                    </InputGroup>
-                  </Form.Group>
+                        El usuario ya existe
+                      </spam>
+                    </Row>
+                  )}
                 </Col>
               </Row>
+              {formData.usu_id === "" && (
+                <>
+                  <Row>
+                    <Col>
+                      <Form.Group
+                        className="mb-3"
+                        controlId="exampleForm.ControlInput1"
+                      >
+                        <Form.Label>
+                          <b>Contraseña</b>
+                        </Form.Label>
+                        <InputGroup className="mb-3">
+                          <Form.Control
+                            type={viewPassword ? "text" : "password"}
+                            name="usu_clave"
+                            value={formData.usu_clave}
+                            onChange={handleChange}
+                            disabled={isView}
+                          />
+                          <Button
+                            variant="outline-secondary"
+                            id="button-addon2"
+                            onClick={() => setViewPassword(!viewPassword)}
+                          >
+                            {viewPassword ? <OpenEyeIcon /> : <CloseEyeIcon />}
+                          </Button>
+                        </InputGroup>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <Form.Group
+                        className="mb-3"
+                        controlId="exampleForm.ControlInput1"
+                      >
+                        <Form.Label>
+                          <b>Confirmación de Contraseña</b>
+                        </Form.Label>
+                        <InputGroup className="mb-3">
+                          <Form.Control
+                            type={viewValidationPass ? "text" : "password"}
+                            name="usu_clave2"
+                            value={formData.usu_clave2}
+                            onChange={handleChange}
+                          />
+                          <Button
+                            variant="outline-secondary"
+                            id="ver_confirmacion"
+                            onClick={() =>
+                              setViewVlidationPass(!viewValidationPass)
+                            }
+                          >
+                            {viewValidationPass ? (
+                              <OpenEyeIcon />
+                            ) : (
+                              <CloseEyeIcon />
+                            )}
+                          </Button>
+                        </InputGroup>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  {formData.usu_clave !== formData.usu_clave2 && (
+                    <Row>
+                      <p style={{ color: "red" }}>
+                        Las contraseñas no coinsiden
+                      </p>
+                    </Row>
+                  )}
+                </>
+              )}
+
               <Row>
                 <Col>
                   <Form.Group
@@ -1068,6 +1216,99 @@ const Usuarios = () => {
           <Button
             variant="secondary"
             onClick={handleClose}
+            style={{
+              backgroundColor: "#AA1415",
+              borderColor: "#AA1415",
+              width: "25%",
+            }}
+          >
+            Cancelar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={show2} onHide={handleClose2}>
+        <Modal.Header closeButton>
+          <Modal.Title>Cambio de Contraseña</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ marginLeft: "20px", marginRight: "20px" }}>
+          <Form>
+            <Container>
+              <Row>
+                <Form.Group
+                  className="mb-3"
+                  controlId="exampleForm.ControlInput1"
+                >
+                  <Form.Label>
+                    <b>Contraseña</b>
+                  </Form.Label>
+                  <InputGroup className="mb-3">
+                    <Form.Control
+                      type={viewPassword ? "text" : "password"}
+                      autoFocus
+                      name="usu_clave"
+                      value={formData.usu_clave}
+                      onChange={handleChange}
+                    />
+                    <Button
+                      variant="outline-secondary"
+                      id="ver_clave"
+                      onClick={() => setViewPassword(!viewPassword)}
+                    >
+                      {viewPassword ? <OpenEyeIcon /> : <CloseEyeIcon />}
+                    </Button>
+                  </InputGroup>
+                </Form.Group>
+              </Row>
+              <Row>
+                <Form.Group
+                  className="mb-3"
+                  controlId="exampleForm.ControlInput1"
+                >
+                  <Form.Label>
+                    <b>Confirmación de Contraseña</b>
+                  </Form.Label>
+                  <InputGroup className="mb-3">
+                    <Form.Control
+                      type={viewValidationPass ? "text" : "password"}
+                      name="usu_clave2"
+                      value={formData.usu_clave2}
+                      onChange={handleChange}
+                    />
+                    <Button
+                      variant="outline-secondary"
+                      id="ver_confirmacion"
+                      onClick={() => setViewVlidationPass(!viewValidationPass)}
+                    >
+                      {viewValidationPass ? <OpenEyeIcon /> : <CloseEyeIcon />}
+                    </Button>
+                  </InputGroup>
+                </Form.Group>
+              </Row>
+              {formData.usu_clave !== formData.usu_clave2 && (
+                <Row>
+                  <p style={{ color: "red" }}>Las contraseñas no coinsiden</p>
+                </Row>
+              )}
+            </Container>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer
+          style={{
+            display: isView ? "none" : "flex",
+            justifyContent: "space-evenly",
+            alignItems: "center",
+          }}
+        >
+          <Button
+            variant="dark"
+            style={{ width: "25%" }}
+            onClick={handleValidate}
+          >
+            Guardar
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={handleClose2}
             style={{
               backgroundColor: "#AA1415",
               borderColor: "#AA1415",
