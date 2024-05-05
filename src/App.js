@@ -25,39 +25,67 @@ function App() {
   const path = window.location.pathname;
 
   const PrivateRouteTableros = ({ children }) => {
-    const userIsAuthenticated =
-      JSON.parse(localStorage.getItem("token")) &&
-      JSON.parse(localStorage.getItem("userpermisos")).includes("T");
+    const token = localStorage.getItem("token");
+    const userPermisos = localStorage.getItem("userpermisos");
 
-    console.log(JSON.parse(localStorage.getItem("userpermisos")));
+    if (!token && !userPermisos) {
+      return <Navigate to="/" />;
+    }
+    const userIsAuthenticated = JSON.parse(
+      localStorage.getItem("userpermisos")
+    ).includes("T");
 
     return userIsAuthenticated ? children : <Navigate to="/" />;
   };
   const PrivateRouteCarreras = ({ children }) => {
-    const userIsAuthenticated =
-      JSON.parse(localStorage.getItem("token")) &&
-      JSON.parse(localStorage.getItem("userpermisos")).includes("C");
+    const token = localStorage.getItem("token");
+    const userPermisos = localStorage.getItem("userpermisos");
+
+    if (!token && !userPermisos) {
+      return <Navigate to="/" />;
+    }
+    const userIsAuthenticated = JSON.parse(
+      localStorage.getItem("userpermisos")
+    ).includes("C");
 
     return userIsAuthenticated ? children : <Navigate to="/" />;
   };
   const PrivateRouteFormularios = ({ children }) => {
-    const userIsAuthenticated =
-      JSON.parse(localStorage.getItem("token")) &&
-      JSON.parse(localStorage.getItem("userpermisos")).includes("F");
+    const token = localStorage.getItem("token");
+    const userPermisos = localStorage.getItem("userpermisos");
+
+    if (!token && !userPermisos) {
+      return <Navigate to="/" />;
+    }
+    const userIsAuthenticated = JSON.parse(
+      localStorage.getItem("userpermisos")
+    ).includes("F");
 
     return userIsAuthenticated ? children : <Navigate to="/" />;
   };
   const PrivateRouteUsuarios = ({ children }) => {
-    const userIsAuthenticated =
-      JSON.parse(localStorage.getItem("token")) &&
-      JSON.parse(localStorage.getItem("userpermisos")).includes("U");
+    const token = localStorage.getItem("token");
+    const userPermisos = localStorage.getItem("userpermisos");
+
+    if (!token && !userPermisos) {
+      return <Navigate to="/" />;
+    }
+    const userIsAuthenticated = JSON.parse(
+      localStorage.getItem("userpermisos")
+    ).includes("U");
 
     return userIsAuthenticated ? children : <Navigate to="/" />;
   };
   const PrivateRouteReportes = ({ children }) => {
-    const userIsAuthenticated =
-      JSON.parse(localStorage.getItem("token")) &&
-      JSON.parse(localStorage.getItem("userpermisos")).includes("R");
+    const token = localStorage.getItem("token");
+    const userPermisos = localStorage.getItem("userpermisos");
+
+    if (!token && !userPermisos) {
+      return <Navigate to="/" />;
+    }
+    const userIsAuthenticated = JSON.parse(
+      localStorage.getItem("userpermisos")
+    ).includes("R");
 
     return userIsAuthenticated ? children : <Navigate to="/" />;
   };
