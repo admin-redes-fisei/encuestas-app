@@ -2,11 +2,16 @@ import { useEffect, useState } from "react";
 import Nav from "react-bootstrap/Nav";
 import {
   obtenerConteoRespuestas,
+  obtenerDataset,
   obtenerFormularios,
 } from "../services/ReportesService";
-import { Button, Card, Spinner } from "react-bootstrap";
+import { ButtonGroup, Card, DropdownButton, Spinner } from "react-bootstrap";
 import StatisticsQuestionCard from "../components/StatisticsQuestionCard";
 import DownloadIcon from "../assets/downloadIcon";
+import "jspdf-autotable";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import MyDocument from "../components/DocumentoReportes";
+import { CSVLink } from "react-csv";
 
 function Reportes() {
   const [data, setData] = useState([]);
@@ -19,27 +24,15 @@ function Reportes() {
   const [enlaceSeleccionado, setEnlaceSeleccionado] = useState(1);
   //para carga
   const [isLoading, setIsLoading] = useState(true);
+  //para dataset
+  const [dataset, setDataset] = useState([]);
+  const [datasetHeaders, setDatasetHeaders] = useState([]);
 
   useEffect(() => {
     obtenerFormularios().then((response) => {
       setformularios(response);
     });
   }, []);
-
-  useEffect(() => {
-    obtenerConteoRespuestas(1).then((response) => {
-      setData(response);
-      const valoresUnicos = [
-        ...new Set(response.map((item) => item.res_pregunta_pertenece)),
-      ];
-      setPreguntasId(valoresUnicos);
-    });
-    const seleccion = Array.from(
-      formularios.filter((formulario) => formulario.for_id === 1)
-    );
-    setformularioSeleccionado(seleccion);
-    setIsLoading(false);
-  }, [formularios]);
 
   const handleObtenerDatosFormulario = (id) => {
     setIsLoading(true);
@@ -57,9 +50,32 @@ function Reportes() {
     setformularioSeleccionado(seleccion);
   };
 
+  useEffect(() => {
+    if (formularioSeleccionado) {
+      obtenerDataset(formularioSeleccionado[0]?.for_id).then((response) => {
+        if (response?.error) {
+          setDataset([]);
+          setDatasetHeaders(getHeadersFromData([]));
+        } else {
+          setDataset(response);
+          setDatasetHeaders(getHeadersFromData(response));
+        }
+      });
+    }
+  }, [formularioSeleccionado]);
+
   //para tabs
   const handleClick = (id) => {
     setEnlaceSeleccionado(id);
+  };
+
+  //para exportar csv
+  const getHeadersFromData = (data) => {
+    if (!data || data.length === 0) return [];
+
+    // Obtenemos las keys de la primera fila para los headers
+    const headers = Object.keys(data[0]);
+    return headers.map((header) => ({ label: header, key: header }));
   };
 
   return (
@@ -88,19 +104,6 @@ function Reportes() {
         >
           <b>Reportes</b>
         </h3>
-        <Button
-          variant="light"
-          style={{
-            height: "37px",
-            width: "110px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <DownloadIcon color="#333F49" />
-          Exportar
-        </Button>
       </div>
       <br />
       <div
@@ -111,6 +114,8 @@ function Reportes() {
           marginRight: "auto",
           padding: "20px",
           borderRadius: "25px",
+          minHeight: "70vh",
+          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
         <Nav
@@ -139,9 +144,66 @@ function Reportes() {
           ))}
         </Nav>
         {isLoading ? (
-          <Spinner animation="border" variant="danger" />
+          <>
+            <span>Seleccione una encuesta</span>
+            <br />
+            <br />
+            <Spinner animation="border" variant="danger" />
+          </>
         ) : (
-          <div className="contenido_encuestas">
+          <div className="contenido_encuestas" style={{ position: "relative" }}>
+            <DropdownButton
+              as={ButtonGroup}
+              align={{ lg: "end" }}
+              variant="light"
+              style={{
+                height: "40px",
+                position: "absolute",
+                top: 0,
+                right: "7.5%",
+                zIndex: 100,
+              }}
+              title={
+                <>
+                  <DownloadIcon color="#333F49" />
+                  Exportar
+                </>
+              }
+            >
+              <PDFDownloadLink
+                document={
+                  <MyDocument
+                    data={data}
+                    preguntasId={preguntasId}
+                    formulario={formularioSeleccionado[0]?.for_nombre}
+                    total={parseInt(
+                      formularioSeleccionado[0]?.cantidad_respuestas
+                    )}
+                  />
+                }
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  marginLeft: "16px",
+                }}
+                fileName={`reporte_${formularioSeleccionado[0]?.for_nombre}.pdf`}
+              >
+                Exportar PDF
+              </PDFDownloadLink>
+              <br />
+              <CSVLink
+                data={dataset}
+                headers={datasetHeaders}
+                filename={`data_${formularioSeleccionado[0]?.for_nombre}`}
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  marginLeft: "16px",
+                }}
+              >
+                Exportar CSV
+              </CSVLink>
+            </DropdownButton>
             {formularioSeleccionado.map((item) => (
               <div key={item.for_id}>
                 <Card
@@ -162,11 +224,16 @@ function Reportes() {
                 </Card>
               </div>
             ))}
+
             {preguntasId.map((valor) => (
               <div key={valor}>
                 <StatisticsQuestionCard
                   questionData={Array.from(
-                    data.filter((item) => item.res_pregunta_pertenece === valor)
+                    data.filter(
+                      (item) =>
+                        parseInt(item.res_pregunta_pertenece) ===
+                        parseInt(valor)
+                    )
                   )}
                 />
               </div>

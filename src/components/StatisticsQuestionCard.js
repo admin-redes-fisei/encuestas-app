@@ -1,5 +1,6 @@
 import Card from "react-bootstrap/Card";
 import ApexPieChart from "./ApexPieChart.js";
+import ApexBarChart from "./ApexBarChart.js";
 
 function StatisticsQuestionCard({ questionData }) {
   return (
@@ -23,7 +24,11 @@ function StatisticsQuestionCard({ questionData }) {
           <div
             style={{
               width: "100%",
-              height: "300px",
+              height:
+                questionData[0].opc_padre !== null &&
+                questionData[0].opc_padre !== ""
+                  ? "800px"
+                  : "300px",
               marginRight: "auto",
               marginLeft: "auto",
               justifyContent: "center",
@@ -31,7 +36,12 @@ function StatisticsQuestionCard({ questionData }) {
               display: "flex",
             }}
           >
-            <ApexPieChart data={questionData} />
+            {questionData[0].opc_padre !== null &&
+            questionData[0].opc_padre !== "" ? (
+              <ApexBarChart data={questionData} />
+            ) : (
+              <ApexPieChart data={questionData} />
+            )}
           </div>
         </Card.Body>
       </Card>

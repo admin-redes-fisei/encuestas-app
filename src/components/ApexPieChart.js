@@ -3,7 +3,7 @@ import ReactApexChart from "react-apexcharts";
 function ApexPieChart({ data }) {
   const valores = data
     .sort((a, b) => a.res_opcion_pertenece - b.res_opcion_pertenece)
-    .map((item) => item.count_respuesta);
+    .map((item) => parseInt(item.count_respuesta));
 
   const labels = data
     .sort((a, b) => a.res_opcion_pertenece - b.res_opcion_pertenece)
@@ -14,6 +14,9 @@ function ApexPieChart({ data }) {
     chart: {
       width: 380,
       type: "pie",
+      toolbar: {
+        show: true, // Ocultar la barra de herramientas con opciones de descarga
+      },
     },
     legend: {
       show: true,

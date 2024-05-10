@@ -31,3 +31,20 @@ export async function obtenerConteoRespuestas(for_id) {
     console.error("Error al obtener las preguntas:", error);
   }
 }
+
+export async function obtenerDataset(for_id) {
+  try {
+    const response = await fetch(
+      `${URL_acceso}obtenerDataset.php?formulario_id=${for_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return await response.json();
+  } catch (error) {
+    console.error("Error al obtener las respuestas:", error);
+  }
+}
