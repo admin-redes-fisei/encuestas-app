@@ -1,5 +1,5 @@
-//const URL_acceso = "http://localhost:8084/pruebaTesis/";
-const URL_acceso = "https://hatunsoft.uta.edu.ec/back_encuestas/";
+//const URL_acceso = "http://localhost:8084/pruebaTesis/encuestas_services/";
+const URL_acceso = "https://hatunsoft.uta.edu.ec/encuestas/encuestas_back/";
 
 export async function obtenerFormularios() {
   try {
@@ -29,5 +29,22 @@ export async function obtenerConteoRespuestas(for_id) {
     return await response.json();
   } catch (error) {
     console.error("Error al obtener las preguntas:", error);
+  }
+}
+
+export async function obtenerDataset(for_id) {
+  try {
+    const response = await fetch(
+      `${URL_acceso}obtenerDataset.php?formulario_id=${for_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return await response.json();
+  } catch (error) {
+    console.error("Error al obtener las respuestas:", error);
   }
 }
