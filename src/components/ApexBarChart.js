@@ -5,15 +5,17 @@ function ApexBarChart({ data }) {
 
   const opPadre = (padre) => {
     const filtrado = data.filter((item) => item.opc_padre === padre);
-    const hijos = [...new Set(filtrado.map((item) => item.res_texto))];
+    const hijos = filtrado.map((item) => item.res_texto);
     return hijos;
   };
 
   const opValores = (padre) => {
     const filtrado = data.filter((item) => item.opc_padre === padre);
-    const hijos = [...new Set(filtrado.map((item) => item.count_respuesta))];
+    const hijos = filtrado.map((item) => item.count_respuesta);
+    // Ordenar los hijos por el valor del contador count_respuesta
     return hijos;
   };
+
 
   return (
     <div>
@@ -32,7 +34,7 @@ function ApexBarChart({ data }) {
               options={{
                 chart: {
                   type: "bar",
-                  height: 350,
+                  height: 352,
                   toolbar: {
                     show: true, // Ocultar la barra de herramientas con opciones de descarga
                   },
@@ -42,7 +44,6 @@ function ApexBarChart({ data }) {
                     borderRadius: 4,
                     borderRadiusApplication: "end",
                     horizontal: true,
-                    barHeight: "85%",
                     distributed: true,
                   },
                 },
