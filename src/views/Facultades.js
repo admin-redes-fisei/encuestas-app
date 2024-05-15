@@ -17,13 +17,13 @@ import DeleteIcon from "../assets/deleteIcon";
 import EditIcon from "../assets/editIcon";
 import { toast } from "react-toastify";
 import {
-  agregarCarreras,
-  editarCarreras,
-  eliminarCarreras,
-  listarCarreras,
-} from "../services/CarrerasService";
+  agregarFacultad,
+  editarFacultad,
+  eliminarFacultad,
+  listarFacultades,
+} from "../services/FacultadesService";
 
-const Carreras = () => {
+const Facultades = () => {
   const encabezados = [
     {
       id: 1,
@@ -35,14 +35,22 @@ const Carreras = () => {
     },
     {
       id: 2,
-      nombre: "Carrera",
+      nombre: "Facultad",
       style: {
         width: "45%",
         color: "#fff",
       },
     },
     {
-      id: 5,
+      id: 3,
+      nombre: "Siglas",
+      style: {
+        width: "10%",
+        color: "#fff",
+      },
+    },
+    {
+      id: 4,
       nombre: "Estado",
       style: {
         width: "25%",
@@ -50,10 +58,10 @@ const Carreras = () => {
       },
     },
     {
-      id: 6,
+      id: 5,
       nombre: "Acciones",
       style: {
-        width: "25%",
+        width: "15%",
         color: "#fff",
         flex: 3,
       },
@@ -62,9 +70,10 @@ const Carreras = () => {
   //data de carreras
   const [data, setData] = useState([]);
   const [formData, setFormData] = useState({
-    car_id: "",
-    car_nombre: "",
-    car_estado: 1,
+    fac_id: "",
+    fac_nombre: "",
+    fac_siglas: "",
+    fac_estado: 1,
   });
   //para filtros
   const [filteredData, setFilteredData] = useState([]);
@@ -113,9 +122,9 @@ const Carreras = () => {
 
       const filtered = data.filter((item) => {
         // Filtrar por usu_estado
-        if (filteredInfo["car_estado"]?.length > 0) {
-          const estadoFilter = filteredInfo["car_estado"].find(
-            (e) => e.id === parseInt(item.car_estado)
+        if (filteredInfo["fac_estado"]?.length > 0) {
+          const estadoFilter = filteredInfo["fac_estado"].find(
+            (e) => e.id === parseInt(item.fac_estado)
           );
           paseEstado = estadoFilter ? true : false;
         }
@@ -126,7 +135,7 @@ const Carreras = () => {
       setFilteredData(filtered);
     };
 
-    if (filteredInfo["car_estado"] && filteredInfo["car_estado"].length > 0) {
+    if (filteredInfo["fac_estado"] && filteredInfo["fac_estado"].length > 0) {
       filterData();
     } else {
       setFilteredData(data);
@@ -138,8 +147,10 @@ const Carreras = () => {
   useEffect(() => {
     setCurrentPage(1);
     setSearchedData(
-      filteredData.filter((item) =>
-        item.car_nombre?.toLowerCase().includes(searchValue.toLowerCase())
+      filteredData.filter(
+        (item) =>
+          item.fac_nombre?.toLowerCase().includes(searchValue.toLowerCase()) ||
+          item.fac_siglas?.toLowerCase().includes(searchValue.toLowerCase())
       )
     );
   }, [filteredData, searchValue]);
@@ -150,28 +161,31 @@ const Carreras = () => {
   const handleClose = () => {
     setShow(false);
     setFormData({
-      car_id: "",
-      car_nombre: "",
-      car_estado: 1,
+      fac_id: "",
+      fac_nombre: "",
+      fac_siglas: "",
+      fac_estado: 1,
     });
   };
 
   //para cambio directo de estado
-  const handleCambiarEstado = (e, carrera) => {
+  const handleCambiarEstado = (e, facultad) => {
     const isChecked = e.target.checked;
-    const car_id = carrera.car_id.toString();
-    const car_nombre = carrera.car_nombre.toString();
-    const car_estado = (isChecked ? 1 : 0).toString();
+    const fac_id = facultad.fac_id.toString();
+    const fac_nombre = facultad.fac_nombre.toString();
+    const fac_siglas = facultad.fac_siglas.toString();
+    const fac_estado = (isChecked ? 1 : 0).toString();
 
     const confirmChange = window.confirm(
       "Está a punto de cambiar el estado de la carrera ¿Desea continuar?"
     );
 
     if (confirmChange) {
-      editarCarreras({
-        car_nombre: car_nombre,
-        car_estado: car_estado,
-        car_id: car_id,
+      editarFacultad({
+        fac_nombre: fac_nombre,
+        fac_siglas: fac_siglas,
+        fac_estado: fac_estado,
+        fac_id: fac_id,
       }).then((resultado) => {
         if (resultado.mensaje === "OK") {
           handleClose();
@@ -191,24 +205,24 @@ const Carreras = () => {
   };
 
   //Para editar
-  const handleEdit = (idcarrera) => {
-    const newSelectedData = data.find((item) => item.car_id === idcarrera);
+  const handleEdit = (idFacultad) => {
+    const newSelectedData = data.find((item) => item.fac_id === idFacultad);
     setFormData(newSelectedData);
     setShow(true);
   };
 
   //para eliminar
-  const handleDelete = (idcarrera) => {
+  const handleDelete = (idfacultad) => {
     const confirmDelete = window.confirm(
       "¿Está seguro de eliminar la carrera?"
     );
 
     if (confirmDelete) {
-      eliminarCarreras({ car_id: idcarrera }).then((respuesta) => {
-        if (respuesta.mensaje === "OK") {
+      eliminarFacultad({ fac_id: idfacultad }).then((respuesta) => {
+        if (respuesta?.mensaje === "OK") {
           setRefresh(refresh + 1);
         } else {
-          toast.error("Error al intentar eliminar", {
+          toast.error("Error al eliminar: Facultad con dependencias", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -217,14 +231,14 @@ const Carreras = () => {
             draggable: true,
           });
         }
-      });
+      })
     }
   };
 
   //para listar
   useEffect(() => {
     //const token = JSON.parse(localStorage.getItem("token"));
-    listarCarreras().then((datos) => {
+    listarFacultades().then((datos) => {
       if (datos?.error) {
         setData([]);
       } else {
@@ -253,7 +267,11 @@ const Carreras = () => {
 
   //para validar
   const handleValidate = () => {
-    if (formData.car_nombre !== "" && formData.car_estado !== "") {
+    if (
+      formData.fac_nombre !== "" &&
+      formData.fac_siglas !== "" &&
+      formData.fac_estado !== ""
+    ) {
       handleSave();
     } else {
       toast.error("Complete los campos", {
@@ -269,15 +287,17 @@ const Carreras = () => {
 
   //para guardar
   const handleSave = () => {
-    const car_nombre = formData.car_nombre.toString();
-    const car_estado = formData.car_estado.toString();
+    const fac_nombre = formData.fac_nombre.toString();
+    const fac_siglas = formData.fac_siglas.toString().toLowerCase();
+    const fac_estado = formData.fac_estado.toString();
 
-    if (formData.car_id) {
-      const car_id = formData.car_id;
-      editarCarreras({
-        car_nombre: car_nombre,
-        car_estado: car_estado,
-        car_id: car_id,
+    if (formData.fac_id) {
+      const fac_id = formData.fac_id;
+      editarFacultad({
+        fac_nombre: fac_nombre,
+        fac_siglas: fac_siglas,
+        fac_estado: fac_estado,
+        fac_id: fac_id,
       }).then((resultado) => {
         if (resultado.mensaje === "OK") {
           handleClose();
@@ -294,9 +314,10 @@ const Carreras = () => {
         }
       });
     } else {
-      agregarCarreras({
-        car_nombre: car_nombre,
-        car_estado: car_estado,
+      agregarFacultad({
+        fac_nombre: fac_nombre,
+        fac_siglas: fac_siglas,
+        fac_estado: fac_estado,
       }).then((resultado) => {
         if (resultado.mensaje === "OK") {
           handleClose();
@@ -332,7 +353,7 @@ const Carreras = () => {
           marginRight: "auto",
         }}
       >
-        <b>Carreras</b>
+        <b>Facultades</b>
       </h3>
       <div
         style={{
@@ -362,10 +383,10 @@ const Carreras = () => {
                 handleCheckFiltrosChange(
                   e,
                   { id: 1, nombre: "Activo" },
-                  "car_estado"
+                  "fac_estado"
                 )
               }
-              checked={filteredInfo["car_estado"]?.find(
+              checked={filteredInfo["fac_estado"]?.find(
                 (item) => item.nombre === "Activo"
               )}
             />
@@ -379,10 +400,10 @@ const Carreras = () => {
                 handleCheckFiltrosChange(
                   e,
                   { id: 0, nombre: "Inactivo" },
-                  "car_estado"
+                  "fac_estado"
                 )
               }
-              checked={filteredInfo["car_estado"]?.find(
+              checked={filteredInfo["fac_estado"]?.find(
                 (item) => item.nombre === "Inactivo"
               )}
             />
@@ -415,7 +436,7 @@ const Carreras = () => {
             onClick={handleShow}
           >
             <PlusIcon />
-            Nueva Carrera
+            Nueva Facultad
           </Button>
         </div>
       </div>
@@ -472,7 +493,7 @@ const Carreras = () => {
           >
             <tbody>
               {currentItems.map((item, index) => (
-                <tr key={item.car_id} style={{ marginTop: "50px" }}>
+                <tr key={item.fac_id} style={{ marginTop: "50px" }}>
                   <td
                     style={{
                       width: "5%",
@@ -490,7 +511,17 @@ const Carreras = () => {
                       textAlign: "left",
                     }}
                   >
-                    {item.car_nombre}
+                    {item.fac_nombre}
+                  </td>
+                  <td
+                    style={{
+                      width: "10%",
+                      color: "#333F49",
+                      paddingTop: "15px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {item.fac_siglas.toUpperCase()}
                   </td>
                   <td
                     style={{
@@ -503,30 +534,30 @@ const Carreras = () => {
                       type="switch"
                       id="custom-switch"
                       label={
-                        parseInt(item.car_estado) === 1 ? "Activo" : "Inactivo"
+                        parseInt(item.fac_estado) === 1 ? "Activo" : "Inactivo"
                       }
-                      checked={parseInt(item.car_estado) === 1 ? true : false}
+                      checked={parseInt(item.fac_estado) === 1 ? true : false}
                       inline
                       onChange={(e) => handleCambiarEstado(e, item)}
                     />
                   </td>
                   <td
                     style={{
-                      width: "25%",
+                      width: "15%",
                       color: "333F49",
                       flex: 3,
                     }}
                   >
                     <Button
                       variant="outline-light"
-                      onClick={() => handleEdit(item.car_id)}
+                      onClick={() => handleEdit(item.fac_id)}
                       title="Editar"
                     >
                       <EditIcon />
                     </Button>
                     <Button
                       variant="outline-light"
-                      onClick={() => handleDelete(item.car_id)}
+                      onClick={() => handleDelete(item.fac_id)}
                       title="Eliminar"
                     >
                       <DeleteIcon />
@@ -555,7 +586,7 @@ const Carreras = () => {
       </div>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Datos de la Carrera</Modal.Title>
+          <Modal.Title>Datos de la Facultad</Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ marginLeft: "20px", marginRight: "20px" }}>
           <Form>
@@ -572,14 +603,14 @@ const Carreras = () => {
                     <br />
                     <Form.Check
                       type="switch"
-                      name="car_estado"
+                      name="fac_estado"
                       label={
-                        parseInt(formData.car_estado) === 1
+                        parseInt(formData.fac_estado) === 1
                           ? "Activo"
                           : "Inactivo"
                       }
                       checked={
-                        parseInt(formData.car_estado) === 1 ? true : false
+                        parseInt(formData.fac_estado) === 1 ? true : false
                       }
                       onChange={(e) => handleEstadoModalChange(e)}
                       inline
@@ -599,8 +630,26 @@ const Carreras = () => {
                     <Form.Control
                       type="text"
                       autoFocus
-                      name="car_nombre"
-                      value={formData.car_nombre}
+                      name="fac_nombre"
+                      value={formData.fac_nombre}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Form.Group
+                    className="mb-3"
+                    controlId="exampleForm.ControlInput1"
+                  >
+                    <Form.Label>
+                      <b>Siglas</b>
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="fac_siglas"
+                      value={formData.fac_siglas.toUpperCase()}
                       onChange={handleChange}
                     />
                   </Form.Group>
@@ -639,4 +688,4 @@ const Carreras = () => {
   );
 };
 
-export default Carreras;
+export default Facultades;

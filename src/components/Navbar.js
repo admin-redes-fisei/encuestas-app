@@ -16,6 +16,11 @@ function SystemNavbar() {
     { id: 4, label: "Carreras", link: "/carreras" },
     { id: 5, label: "Usuarios", link: "/usuarios" },
   ];
+
+  const tabSuper = [
+    { id: 6, label: "Facultades", link: "/facultades" },
+    { id: 7, label: "Usuarios", link: "/usuarios" },
+  ];
   const [permisos, setPermisos] = useState([]);
   const [usuario, setUsuario] = useState([]);
   const navigate = useNavigate();
@@ -30,7 +35,11 @@ function SystemNavbar() {
         tab.label[0]
       );
     });
-    setPermisos(filtrados);
+    if (JSON.parse(localStorage.getItem("userpermisos"))?.includes("S")) {
+      setPermisos(tabSuper);
+    } else {
+      setPermisos(filtrados);
+    }
     setUsuario(JSON.parse(localStorage.getItem("userdata")));
     setHideinfo(location.pathname === "/");
     // eslint-disable-next-line react-hooks/exhaustive-deps

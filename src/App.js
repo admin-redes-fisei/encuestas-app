@@ -19,6 +19,7 @@ import Tablero from "./views/Tablero";
 import Formularios from "./views/Formularios";
 import SystemNavbar from "./components/Navbar";
 import TableroEstudiantes from "./views/TableroEstudiantes";
+import Facultades from "./views/Facultades";
 //import SSD from "./views/Ssd";
 
 function App() {
@@ -71,9 +72,9 @@ function App() {
     if (!token && !userPermisos) {
       return <Navigate to="/" />;
     }
-    const userIsAuthenticated = JSON.parse(
-      localStorage.getItem("userpermisos")
-    ).includes("U");
+    const userIsAuthenticated =
+      JSON.parse(localStorage.getItem("userpermisos")).includes("U") ||
+      JSON.parse(localStorage.getItem("userpermisos")).includes("S");
 
     return userIsAuthenticated ? children : <Navigate to="/" />;
   };
@@ -87,6 +88,20 @@ function App() {
     const userIsAuthenticated = JSON.parse(
       localStorage.getItem("userpermisos")
     ).includes("R");
+
+    return userIsAuthenticated ? children : <Navigate to="/" />;
+  };
+
+  const PrivateRouteFacultades = ({ children }) => {
+    const token = localStorage.getItem("token");
+    const userPermisos = localStorage.getItem("userpermisos");
+
+    if (!token && !userPermisos) {
+      return <Navigate to="/" />;
+    }
+    const userIsAuthenticated = JSON.parse(
+      localStorage.getItem("userpermisos")
+    ).includes("S");
 
     return userIsAuthenticated ? children : <Navigate to="/" />;
   };
@@ -132,6 +147,14 @@ function App() {
               <PrivateRouteCarreras>
                 <Carreras />
               </PrivateRouteCarreras>
+            }
+          />
+          <Route
+            path="/facultades"
+            element={
+              <PrivateRouteFacultades>
+                <Facultades />
+              </PrivateRouteFacultades>
             }
           />
           <Route

@@ -20,6 +20,10 @@ function Home() {
     if (userPermisos && userPermisos.length > 0) {
       const primerPermiso = userPermisos[0];
 
+      if (userPermisos === "S") {
+        navigate("/usuarios");
+      }
+
       // Filtrar el tab cuyo label comience con la primera letra del primer permiso
       const tabFiltrado = tabs.find(
         (tab) => tab.label.charAt(0).toUpperCase() === primerPermiso
@@ -29,7 +33,7 @@ function Home() {
         navigate(tabFiltrado.link);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <Spinner animation="border" variant="danger" />;
