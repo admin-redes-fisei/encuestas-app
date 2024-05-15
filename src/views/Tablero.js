@@ -1,5 +1,11 @@
+import AdminSideBar from "../components/SidebarBashboard";
+
 const Tablero = () => {
-  return <div>En TABLERO</div>;
+  return (
+    <div>
+      <AdminSideBar />
+    </div>
+  );
 };
 
 export default Tablero;

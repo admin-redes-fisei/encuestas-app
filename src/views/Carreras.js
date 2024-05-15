@@ -520,12 +520,14 @@ const Carreras = () => {
                     <Button
                       variant="outline-light"
                       onClick={() => handleEdit(item.car_id)}
+                      title="Editar"
                     >
                       <EditIcon />
                     </Button>
                     <Button
                       variant="outline-light"
                       onClick={() => handleDelete(item.car_id)}
+                      title="Eliminar"
                     >
                       <DeleteIcon />
                     </Button>
