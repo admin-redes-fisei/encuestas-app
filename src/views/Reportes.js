@@ -145,7 +145,8 @@ function Reportes() {
         </Nav>
         {isLoading ? (
           <>
-            <span>Seleccione una encuesta</span>
+            {!formularioSeleccionado && <span>Seleccione una encuesta</span>}
+
             <br />
             <br />
             <Spinner animation="border" variant="danger" />
