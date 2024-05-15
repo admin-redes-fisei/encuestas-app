@@ -60,11 +60,13 @@ const Carreras = () => {
     },
   ];
   //data de carreras
+  const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
   const [data, setData] = useState([]);
   const [formData, setFormData] = useState({
     car_id: "",
     car_nombre: "",
     car_estado: 1,
+    car_facultad_pertenece: parseInt(usuario_actual.usu_facultad_pertenece),
   });
   //para filtros
   const [filteredData, setFilteredData] = useState([]);
@@ -153,6 +155,7 @@ const Carreras = () => {
       car_id: "",
       car_nombre: "",
       car_estado: 1,
+      car_facultad_pertenece: parseInt(usuario_actual.usu_facultad_pertenece),
     });
   };
 
@@ -228,10 +231,16 @@ const Carreras = () => {
       if (datos?.error) {
         setData([]);
       } else {
-        setData(datos);
+        setData(
+          datos.filter(
+            (item) =>
+              item.car_facultad_pertenece ===
+              usuario_actual.usu_facultad_pertenece
+          )
+        );
       }
     });
-  }, [refresh]);
+  }, [refresh, usuario_actual.usu_facultad_pertenece]);
 
   //para data del formulario
   const handleChange = (e) => {
@@ -271,6 +280,8 @@ const Carreras = () => {
   const handleSave = () => {
     const car_nombre = formData.car_nombre.toString();
     const car_estado = formData.car_estado.toString();
+    const car_facultad_pertenece =
+      formData.car_facultad_pertenece.toString();
 
     if (formData.car_id) {
       const car_id = formData.car_id;
@@ -297,6 +308,7 @@ const Carreras = () => {
       agregarCarreras({
         car_nombre: car_nombre,
         car_estado: car_estado,
+        car_facultad_pertenece: car_facultad_pertenece,
       }).then((resultado) => {
         if (resultado.mensaje === "OK") {
           handleClose();

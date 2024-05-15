@@ -411,7 +411,7 @@ const Usuarios = () => {
         }
       }
     });
-  }, [refresh]);
+  }, [refresh, usuario_actual.usu_facultad_pertenece, usuario_actual.usu_permisos]);
 
   //Para editar
   const handleEdit = (idusuario) => {
