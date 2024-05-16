@@ -7,8 +7,9 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { ResizableBox } from "react-resizable";
 import ReStackedBarChart from "./ReStackedBarChart";
+import BussinesIcon from "../assets/bussinesIcon";
 
-const AutoDasboard = ({ data, setSelectedOption }) => {
+const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
   const handleOptionClick = (name) => {
     setSelectedOption(name);
   };
@@ -16,7 +17,7 @@ const AutoDasboard = ({ data, setSelectedOption }) => {
   return (
     <div
       style={{
-        width: "95vw",
+        width: "90vw",
         marginRight: "auto",
         marginLeft: "auto",
         minHeight: "70vh",
@@ -42,13 +43,20 @@ const AutoDasboard = ({ data, setSelectedOption }) => {
       >
         <Card style={{ height: "100%", width: "100%" }}>
           <Card.Body>
-            <StudentIcon height={60} width={60} />
+            {tipo === "estudiantes" ? (
+              <StudentIcon height={60} width={60} />
+            ) : (
+              <BussinesIcon height={60} width={60} />
+            )}
+            <br />
             <div>
               <Card.Title style={{ fontSize: "30px" }}>
                 {data.total_encuestados}
               </Card.Title>
               <Card.Subtitle className="mb-2 text-muted">
-                Total Estudiantes
+                {tipo === "estudiantes"
+                  ? "Total Estudiantes"
+                  : "Total Empresas"}
               </Card.Subtitle>
             </div>
           </Card.Body>

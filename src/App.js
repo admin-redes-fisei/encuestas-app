@@ -20,6 +20,7 @@ import Formularios from "./views/Formularios";
 import SystemNavbar from "./components/Navbar";
 import TableroEstudiantes from "./views/TableroEstudiantes";
 import Facultades from "./views/Facultades";
+import TableroEmpresas from "./views/TableroEmpresas";
 //import SSD from "./views/Ssd";
 
 function App() {
@@ -170,6 +171,14 @@ function App() {
             element={
               <PrivateRouteTableros>
                 <TableroEstudiantes />
+              </PrivateRouteTableros>
+            }
+          />
+          <Route
+            path="/tablero/empresas"
+            element={
+              <PrivateRouteTableros>
+                <TableroEmpresas />
               </PrivateRouteTableros>
             }
           />

@@ -21,3 +21,27 @@ export async function listarFormularios() {
     console.error("Error al obtener las carreras:", error);
   }
 }
+
+export async function obtenerFormularioFacultad(facultadId, tipoFormulario) {
+  try {
+    const respuesta = await fetch(
+      `${URL_acceso}obtenerFormularioFacultad.php?facultad_id=${facultadId}&tipo_formulario=${tipoFormulario}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!respuesta.ok) {
+      throw new Error("Error al obtener las carreras");
+    }
+
+    const resultado = await respuesta.json();
+
+    return resultado;
+  } catch (error) {
+    console.error("Error al obtener las carreras:", error);
+  }
+}

@@ -9,7 +9,7 @@ import { Button, Form, Spinner } from "react-bootstrap";
 import ReloadIcon from "../assets/reloadIcon";
 import { obtenerFormularioFacultad } from "../services/FormulariosAppService";
 
-const TableroEstudiantes = () => {
+const TableroEmpresas = () => {
   const dataTipos = [
     { id: 1, nombre: "Tablero Automático" },
     { id: 2, nombre: "Tablero Personalizado" },
@@ -30,7 +30,7 @@ const TableroEstudiantes = () => {
     setIsLoading(true);
     obtenerFormularioFacultad(
       parseInt(usuario_actual.usu_facultad_pertenece),
-      "estudiantes"
+      "empresas"
     ).then((response) => {
       if (filter) {
         obtenerConteoDatosFiltrados({
@@ -97,7 +97,7 @@ const TableroEstudiantes = () => {
               textAlign: "left",
             }}
           >
-            <b>Tablero de Demanda Estudiantil</b>
+            <b>Tablero de Empleabilidad</b>
           </h3>
         </div>
         <Form.Group className="mb-3" controlId="exampleForm.ControlSelect1">
@@ -137,11 +137,11 @@ const TableroEstudiantes = () => {
           >
             <ReloadIcon />
           </Button>
-          <AutoDasboard data={data} setSelectedOption={handlefilterClick} tipo={"estudiantes"} />
+          <AutoDasboard data={data} setSelectedOption={handlefilterClick} tipo={"empresas"} />
         </>
       )}
     </div>
   );
 };
 
-export default TableroEstudiantes;
+export default TableroEmpresas;
