@@ -17,7 +17,7 @@ function Reportes() {
   const [data, setData] = useState([]);
   //const [dataEmpresas, setDataEmpresas] = useState([]);
   const [formularios, setformularios] = useState([]);
-  const [formularioSeleccionado, setformularioSeleccionado] = useState([]);
+  const [formularioSeleccionado, setformularioSeleccionado] = useState(0);
   const [preguntasId, setPreguntasId] = useState([]);
   //const [actualizar, setActualizar] = useState(0);
   //para tabs
@@ -27,12 +27,15 @@ function Reportes() {
   //para dataset
   const [dataset, setDataset] = useState([]);
   const [datasetHeaders, setDatasetHeaders] = useState([]);
+  const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
 
   useEffect(() => {
-    obtenerFormularios().then((response) => {
-      setformularios(response);
-    });
-  }, []);
+    obtenerFormularios(parseInt(usuario_actual.usu_facultad_pertenece)).then(
+      (response) => {
+        setformularios(response);
+      }
+    );
+  }, [usuario_actual.usu_facultad_pertenece]);
 
   const handleObtenerDatosFormulario = (id) => {
     setIsLoading(true);
@@ -51,7 +54,7 @@ function Reportes() {
   };
 
   useEffect(() => {
-    if (formularioSeleccionado) {
+    if (formularioSeleccionado !== 0) {
       obtenerDataset(formularioSeleccionado[0]?.for_id).then((response) => {
         if (response?.error) {
           setDataset([]);
@@ -62,6 +65,7 @@ function Reportes() {
         }
       });
     }
+    console.log(formularioSeleccionado);
   }, [formularioSeleccionado]);
 
   //para tabs
@@ -121,7 +125,7 @@ function Reportes() {
         <Nav
           className="justify-content-center"
           variant="pills"
-          defaultActiveKey="1"
+          defaultActiveKey="0"
           style={{ marginBottom: "50px", marginTop: "20px" }}
         >
           {formularios?.map((form) => (
@@ -145,11 +149,13 @@ function Reportes() {
         </Nav>
         {isLoading ? (
           <>
-            {!formularioSeleccionado && <span>Seleccione una encuesta</span>}
-
             <br />
             <br />
-            <Spinner animation="border" variant="danger" />
+            {formularioSeleccionado === 0 ? (
+              <span>Seleccione una encuesta</span>
+            ) : (
+              <Spinner animation="border" variant="danger" />
+            )}
           </>
         ) : (
           <div className="contenido_encuestas" style={{ position: "relative" }}>
@@ -205,26 +211,27 @@ function Reportes() {
                 Exportar CSV
               </CSVLink>
             </DropdownButton>
-            {formularioSeleccionado.map((item) => (
-              <div key={item.for_id}>
-                <Card
-                  style={{
-                    width: "30%",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    marginTop: "20px",
-                    marginBottom: "20px",
-                  }}
-                >
-                  <Card.Body>
-                    <Card.Title>{item.cantidad_respuestas}</Card.Title>
-                  </Card.Body>
-                  <Card.Footer>
-                    <small className="text-muted">TOTAL ENCUESTADOS</small>
-                  </Card.Footer>
-                </Card>
-              </div>
-            ))}
+            {formularioSeleccionado !== 0 &&
+              formularioSeleccionado?.map((item) => (
+                <div key={item.for_id}>
+                  <Card
+                    style={{
+                      width: "30%",
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                      marginTop: "20px",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    <Card.Body>
+                      <Card.Title>{item.cantidad_respuestas}</Card.Title>
+                    </Card.Body>
+                    <Card.Footer>
+                      <small className="text-muted">TOTAL ENCUESTADOS</small>
+                    </Card.Footer>
+                  </Card>
+                </div>
+              ))}
 
             {preguntasId.map((valor) => (
               <div key={valor}>
