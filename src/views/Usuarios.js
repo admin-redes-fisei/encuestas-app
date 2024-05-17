@@ -15,6 +15,7 @@ import {
   DropdownButton,
   InputGroup,
   Row,
+  Spinner,
 } from "react-bootstrap";
 import {
   agregarUsuario,
@@ -152,6 +153,8 @@ const Usuarios = () => {
   const [viewValidationPass, setViewVlidationPass] = useState(false);
   //para encriptado de datos
   const clave = "HatunSoft@2023";
+  //para carga
+  const [isLoading, setIsLoading] = useState(true);
 
   //para los filtros
   const handleCheckFiltrosChange = (e, filtro, padre) => {
@@ -388,6 +391,7 @@ const Usuarios = () => {
 
   //para listar
   useEffect(() => {
+    setIsLoading(true);
     listarUsuarios().then((datos) => {
       if (datos?.error) {
         setData([]);
@@ -407,11 +411,22 @@ const Usuarios = () => {
         if (usuario_actual.usu_permisos === "S") {
           setData(datosDesencriptados);
         } else {
-          setData(datosDesencriptados.filter((item) => item.usu_facultad_pertenece === usuario_actual.usu_facultad_pertenece));
+          setData(
+            datosDesencriptados.filter(
+              (item) =>
+                item.usu_facultad_pertenece ===
+                usuario_actual.usu_facultad_pertenece
+            )
+          );
         }
       }
+      setIsLoading(false);
     });
-  }, [refresh, usuario_actual.usu_facultad_pertenece, usuario_actual.usu_permisos]);
+  }, [
+    refresh,
+    usuario_actual.usu_facultad_pertenece,
+    usuario_actual.usu_permisos,
+  ]);
 
   //Para editar
   const handleEdit = (idusuario) => {
@@ -816,7 +831,9 @@ const Usuarios = () => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
-        {searchedData?.length > 0 ? (
+        {isLoading ? (
+          <Spinner animation="border" variant="danger" />
+        ) : searchedData?.length > 0 ? (
           <Table
             hover
             style={{

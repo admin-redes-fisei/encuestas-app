@@ -55,7 +55,8 @@ const styles = StyleSheet.create({
 });
 
 // Componente para renderizar el PDF
-const MyDocument = ({ data, preguntasId, formulario, total, facultad }) => {
+const MyDocumentDashboard = ({ data, total, facultad, filtros }) => {
+  console.log(data);
   // Obtener la fecha actual
   const currentDate = new Date();
   const day = currentDate.getDate();
@@ -68,9 +69,10 @@ const MyDocument = ({ data, preguntasId, formulario, total, facultad }) => {
   const formattedDate = `${formattedDay}-${formattedMonth}-${year}`;
 
   const obtenerOpcionesPadreUnicas = (data) => {
-    const opcionesPadre = data.map((item) => item.opc_padre);
+    const opcionesPadre = data?.map((item) => item.padre_opcion);
     return [...new Set(opcionesPadre)];
   };
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -97,7 +99,7 @@ const MyDocument = ({ data, preguntasId, formulario, total, facultad }) => {
               <Text>Nombre de la Encuesta</Text>
             </View>
             <View style={styles.tableCell}>
-              <Text>{formulario}</Text>
+              <Text>{data?.nombre_encuesta}</Text>
             </View>
           </View>
           <View style={styles.tableRow}>
@@ -122,31 +124,30 @@ const MyDocument = ({ data, preguntasId, formulario, total, facultad }) => {
           style={{
             fontSize: 12,
             textAlign: "center",
+            marginBottom: "20px",
           }}
         >
           Resultados por Pregunta
         </Text>
+        {Array.isArray(filtros) && filtros.length > 0 && (
+          <Text
+            style={{
+              fontSize: 12,
+              textAlign: "left",
+              marginBottom: "20px",
+            }}
+          >
+            Filtros aplicados: {filtros.join(", ")}
+          </Text>
+        )}
         <br />
-        {preguntasId.map((valor, index) => (
+        {data?.preguntas?.map((valor, index) => (
           <div key={valor} style={{ marginBottom: "15px" }}>
-            <Text style={styles.text}>
-              {index + 1}.{" "}
-              {
-                data.filter(
-                  (item) =>
-                    parseInt(item.res_pregunta_pertenece) === parseInt(valor)
-                )[0].pre_titulo
-              }
+            <Text style={[styles.text, { marginBottom: "10px" }]}>
+              {index + 1}. {valor.titulo_pregunta}
             </Text>
             <br />
-            <Text style={styles.text}>
-              {
-                data.filter(
-                  (item) =>
-                    parseInt(item.res_pregunta_pertenece) === parseInt(valor)
-                )[0].pre_texto
-              }
-            </Text>
+            <Text style={styles.text}>{valor.texto_pregunta}</Text>
             <br />
             <View
               style={{
@@ -183,51 +184,33 @@ const MyDocument = ({ data, preguntasId, formulario, total, facultad }) => {
                   <Text>Recuento</Text>
                 </View>
               </View>
-              {data.filter(
-                (item) =>
-                  parseInt(item.res_pregunta_pertenece) === parseInt(valor)
-              )[0].opc_padre === null ||
-              data.filter(
-                (item) =>
-                  parseInt(item.res_pregunta_pertenece) === parseInt(valor)
-              )[0].opc_padre === ""
-                ? data
-                    .filter(
-                      (item) =>
-                        parseInt(item.res_pregunta_pertenece) ===
-                        parseInt(valor)
-                    )
-                    .map((pregunta) => (
-                      <View style={styles.tableRow}>
-                        <View
-                          style={{
-                            margin: 5,
-                            fontSize: 10,
-                            width: "80%",
-                          }}
-                        >
-                          <Text>{pregunta.res_texto}</Text>
-                        </View>
-                        <br />
-                        <View
-                          style={{
-                            margin: 5,
-                            fontSize: 10,
-                            width: "20%",
-                            textAlign: "center",
-                          }}
-                        >
-                          <Text>{pregunta.count_respuesta}</Text>
-                        </View>
+              {valor?.opciones[0]?.padre_opcion === null ||
+              valor?.opciones[0]?.padre_opcion === ""
+                ? valor?.opciones?.map((pregunta) => (
+                    <View style={styles.tableRow}>
+                      <View
+                        style={{
+                          margin: 5,
+                          fontSize: 10,
+                          width: "80%",
+                        }}
+                      >
+                        <Text>{pregunta.texto_opcion}</Text>
                       </View>
-                    ))
-                : obtenerOpcionesPadreUnicas(
-                    data.filter(
-                      (item) =>
-                        parseInt(item.res_pregunta_pertenece) ===
-                        parseInt(valor)
-                    )
-                  ).map((padre) => (
+                      <br />
+                      <View
+                        style={{
+                          margin: 5,
+                          fontSize: 10,
+                          width: "20%",
+                          textAlign: "center",
+                        }}
+                      >
+                        <Text>{pregunta.numero_selecciones}</Text>
+                      </View>
+                    </View>
+                  ))
+                : obtenerOpcionesPadreUnicas(valor.opciones)?.map((padre) => (
                     <View key={padre}>
                       <View
                         style={{
@@ -248,18 +231,14 @@ const MyDocument = ({ data, preguntasId, formulario, total, facultad }) => {
                           <Text>{padre}</Text>
                         </View>
                       </View>
-                      {data
-                        .filter(
-                          (item) =>
-                            parseInt(item.res_pregunta_pertenece) ===
-                              parseInt(valor) && item.opc_padre === padre
-                        )
-                        .map((opc) => (
+                      {valor?.opciones
+                        ?.filter((item) => item.padre_opcion === padre)
+                        ?.map((opc) => (
                           <View style={styles.tableRow} key={opc.id}>
                             <View
                               style={{ margin: 5, fontSize: 10, width: "80%" }}
                             >
-                              <Text>{opc.res_texto}</Text>
+                              <Text>{opc.texto_opcion}</Text>
                             </View>
                             <View
                               style={{
@@ -269,7 +248,7 @@ const MyDocument = ({ data, preguntasId, formulario, total, facultad }) => {
                                 textAlign: "center",
                               }}
                             >
-                              <Text>{opc.count_respuesta}</Text>
+                              <Text>{opc.numero_selecciones}</Text>
                             </View>
                           </View>
                         ))}
@@ -283,4 +262,4 @@ const MyDocument = ({ data, preguntasId, formulario, total, facultad }) => {
   );
 };
 
-export default MyDocument;
+export default MyDocumentDashboard;

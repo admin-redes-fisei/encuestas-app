@@ -10,6 +10,7 @@ import {
   Modal,
   Pagination,
   Row,
+  Spinner,
   Table,
 } from "react-bootstrap";
 import PlusIcon from "../assets/addIcon";
@@ -85,6 +86,8 @@ const Carreras = () => {
   const totalPages = Math.ceil(searchedData?.length / itemsPerPage);
   //para actualizar
   const [refresh, setRefresh] = useState(0);
+  //para carga
+  const [isLoading, setIsLoading] = useState(true);
 
   //para los filtros
   const handleCheckFiltrosChange = (e, filtro, padre) => {
@@ -227,6 +230,7 @@ const Carreras = () => {
   //para listar
   useEffect(() => {
     //const token = JSON.parse(localStorage.getItem("token"));
+    setIsLoading(true);
     listarCarreras().then((datos) => {
       if (datos?.error) {
         setData([]);
@@ -239,6 +243,7 @@ const Carreras = () => {
           )
         );
       }
+      setIsLoading(false);
     });
   }, [refresh, usuario_actual.usu_facultad_pertenece]);
 
@@ -280,8 +285,7 @@ const Carreras = () => {
   const handleSave = () => {
     const car_nombre = formData.car_nombre.toString();
     const car_estado = formData.car_estado.toString();
-    const car_facultad_pertenece =
-      formData.car_facultad_pertenece.toString();
+    const car_facultad_pertenece = formData.car_facultad_pertenece.toString();
 
     if (formData.car_id) {
       const car_id = formData.car_id;
@@ -473,7 +477,9 @@ const Carreras = () => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
-        {searchedData?.length > 0 ? (
+        {isLoading ? (
+          <Spinner animation="border" variant="danger" />
+        ) : searchedData?.length > 0 ? (
           <Table
             hover
             style={{

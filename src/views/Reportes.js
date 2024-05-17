@@ -186,6 +186,7 @@ function Reportes() {
                     total={parseInt(
                       formularioSeleccionado[0]?.cantidad_respuestas
                     )}
+                    facultad={usuario_actual.fac_nombre}
                   />
                 }
                 style={{
