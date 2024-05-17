@@ -124,6 +124,7 @@ const TableroEmpresas = () => {
         </Form.Group>
         <DropdownButton
           as={ButtonGroup}
+          disabled={parseInt(formData.tab_tipo) === 2}
           align={{ lg: "end" }}
           variant="light"
           style={{

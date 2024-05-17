@@ -35,7 +35,6 @@ const TableroEstudiantes = () => {
   });
 
   useEffect(() => {
-    //obtener id de tablero por tipo estudiantes y facultad
     setIsLoading(true);
     obtenerFormularioFacultad(
       parseInt(usuario_actual.usu_facultad_pertenece),
@@ -46,14 +45,19 @@ const TableroEstudiantes = () => {
           id: parseInt(response?.for_id),
           valores_filtro: filter,
         }).then((response) => {
-          setData(response);
-          setIsLoading(false);
+          if (parseInt(response) !== 0) {
+            console.log(response);
+            setData(response);
+            setIsLoading(false);
+          }
         });
       } else {
         setIsLoading(true);
         obtenerConteoDatos(parseInt(response?.for_id)).then((response) => {
-          setData(response);
-          setIsLoading(false);
+          if (parseInt(response) !== 0) {
+            setData(response);
+            setIsLoading(false);
+          }
         });
       }
     });
@@ -124,6 +128,7 @@ const TableroEstudiantes = () => {
         </Form.Group>
         <DropdownButton
           as={ButtonGroup}
+          disabled={parseInt(formData.tab_tipo) === 2}
           align={{ lg: "end" }}
           variant="light"
           style={{

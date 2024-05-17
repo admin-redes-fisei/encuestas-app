@@ -151,7 +151,9 @@ function Reportes() {
           <>
             <br />
             <br />
-            {formularioSeleccionado === 0 ? (
+            {formularios?.length === 0 ? (
+              <span>Sin datos</span>
+            ) : formularioSeleccionado === 0 ? (
               <span>Seleccione una encuesta</span>
             ) : (
               <Spinner animation="border" variant="danger" />

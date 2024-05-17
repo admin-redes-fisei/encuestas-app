@@ -30,7 +30,6 @@ export async function obtenerConteoDatosFiltrados(parametros) {
     .map((value) => `valores_filtro[]=${encodeURIComponent(value)}`)
     .join("&")}`;
 
-  console.log(queryString);
   try {
     const response = await fetch(
       `${URL_acceso}conteoDatas.php?${queryString}`,
