@@ -17,6 +17,7 @@ import { obtenerFormularioFacultad } from "../services/FormulariosAppService";
 import DownloadIcon from "../assets/downloadIcon";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import MyDocumentDashboard from "../components/DocumentoDashboard";
+import HtmlEmbedder from "../components/HtmlEmbedder";
 
 const TableroEmpresas = () => {
   const dataTipos = [
@@ -24,7 +25,7 @@ const TableroEmpresas = () => {
     { id: 2, nombre: "Tablero Personalizado" },
   ];
   const [data, setData] = useState([]);
-  //const [idFormulario, setIdFormulario] = useState([]);
+  const [idFormulario, setIdFormulario] = useState(0);
   const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
   const [filter, setFilter] = useState(null);
   //para carga
@@ -41,6 +42,7 @@ const TableroEmpresas = () => {
       parseInt(usuario_actual.usu_facultad_pertenece),
       "empresas"
     ).then((response) => {
+      setIdFormulario(parseInt(response?.for_id));
       if (filter) {
         obtenerConteoDatosFiltrados({
           id: parseInt(response?.for_id),
@@ -163,28 +165,34 @@ const TableroEmpresas = () => {
         <Spinner animation="border" variant="danger" />
       ) : (
         <>
-          <Button
-            variant="outline-secondary"
-            style={{
-              height: "40px",
-              display: "flex",
-              float: "right",
-              alignItems: "center",
-              position: "absolute",
-              right: "5vw",
-              marginTop: "5px",
-              marginRight: "5px",
-            }}
-            onClick={() => setFilter(null)}
-            title="Restaurar"
-          >
-            <ReloadIcon />
-          </Button>
-          <AutoDasboard
-            data={data}
-            setSelectedOption={handlefilterClick}
-            tipo={"empresas"}
-          />
+          {parseInt(formData.tab_tipo) === 1 ? (
+            <>
+              <Button
+                variant="outline-secondary"
+                style={{
+                  height: "40px",
+                  display: "flex",
+                  float: "right",
+                  alignItems: "center",
+                  position: "absolute",
+                  right: "5vw",
+                  marginTop: "5px",
+                  marginRight: "5px",
+                }}
+                onClick={() => setFilter(null)}
+                title="Restaurar"
+              >
+                <ReloadIcon />
+              </Button>
+              <AutoDasboard
+                data={data}
+                setSelectedOption={handlefilterClick}
+                tipo={"empresas"}
+              />
+            </>
+          ) : (
+            <HtmlEmbedder idFormulario={idFormulario} />
+          )}
         </>
       )}
     </div>

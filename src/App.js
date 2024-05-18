@@ -21,6 +21,7 @@ import SystemNavbar from "./components/Navbar";
 import TableroEstudiantes from "./views/TableroEstudiantes";
 import Facultades from "./views/Facultades";
 import TableroEmpresas from "./views/TableroEmpresas";
+import DashboardPersonalizado from "./views/DasboardPersonalizado";
 //import SSD from "./views/Ssd";
 
 function App() {
@@ -181,6 +182,10 @@ function App() {
                 <TableroEmpresas />
               </PrivateRouteTableros>
             }
+          />
+          <Route
+            path="/tablero/personalizado-estudiantes"
+            element={<DashboardPersonalizado />}
           />
           <Route
             path="/formularios"

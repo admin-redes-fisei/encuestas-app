@@ -45,3 +45,39 @@ export async function obtenerConteoDatosFiltrados(parametros) {
     console.error("Error al obtener las preguntas:", error);
   }
 }
+
+export async function obtenerCodeTablero(for_id) {
+  try {
+    const response = await fetch(
+      `${URL_acceso}obtenerCodeTablero.php?formulario_id=${for_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return await response.json();
+  } catch (error) {
+    console.error("Error al obtener las preguntas:", error);
+  }
+}
+
+export async function agregarTablero(data) {
+  try {
+    const respuesta = await fetch(`${URL_acceso}agregarCodeTablero.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!respuesta.ok) {
+      throw new Error(`Error al agregar el tablero: ${respuesta.statusText}`);
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
