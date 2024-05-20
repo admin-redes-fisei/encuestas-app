@@ -10,6 +10,8 @@ const HtmlEmbedder = ({ idFormulario }) => {
   const [htmlCode, setHtmlCode] = useState("");
   const [iframeSrc, setIframeSrc] = useState("");
   const [showModal, setShowModal] = useState(false);
+  //para actualizar
+  //const [refresh, setRefresh] = useState(0);
 
   const handleInputChange = (event) => {
     setHtmlCode(event.target.value);
@@ -19,24 +21,28 @@ const HtmlEmbedder = ({ idFormulario }) => {
     const blob = new Blob([htmlCode], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     setIframeSrc(url);
-    setShowModal(false);
   };
 
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
 
   useEffect(() => {
-    //setIsLoading(true);
+    // Obtener el código HTML del tablero
     obtenerCodeTablero(idFormulario).then((response) => {
-      setHtmlCode(response[0]?.tab_codigo);
-      console.log(response);
-      if (htmlCode) {
-        handleEmbed();
-        console.log("HI");
-      }
+      setHtmlCode(response[0]?.tab_codigo || "");
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idFormulario]);
+
+  useEffect(() => {
+    // Ejecutar handleEmbed después de que htmlCode haya sido actualizado
+    if (htmlCode) {
+      handleEmbed();
+      console.log("HI");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [htmlCode]);
 
   const handleSave = () => {
     agregarTablero({
@@ -45,6 +51,7 @@ const HtmlEmbedder = ({ idFormulario }) => {
     }).then((resultado) => {
       if (resultado?.mensaje === "OK") {
         handleEmbed();
+        setShowModal(false);
       } else {
         toast.error("Error al guardar el tablero", {
           position: "top-right",
@@ -83,7 +90,7 @@ const HtmlEmbedder = ({ idFormulario }) => {
           Insertar Código
         </Button>
 
-        <Modal show={showModal} onHide={handleClose}>
+        <Modal show={showModal} onHide={handleClose} size="lg">
           <Modal.Header closeButton>
             <Modal.Title>Código HTML</Modal.Title>
           </Modal.Header>

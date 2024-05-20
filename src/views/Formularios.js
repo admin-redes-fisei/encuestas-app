@@ -16,8 +16,7 @@ import DownloadIcon from "../assets/downloadIcon";
 import StudentIcon from "../assets/studentIcon";
 import BussinesIcon from "../assets/bussinesIcon";
 import EllipsisIcon from "../assets/ellipsisIcon";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import MyDocument from "../components/DocumentoReportes";
+import { useNavigate } from "react-router-dom";
 
 const Formularios = () => {
   const encabezados = [
@@ -70,8 +69,8 @@ const Formularios = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = searchedData?.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(searchedData?.length / itemsPerPage);
-  //para actualizar
-  const [refresh, setRefresh] = useState(0);
+  //para navegar
+  const navigate = useNavigate();
 
   //para el buscador
   useEffect(() => {
@@ -82,7 +81,6 @@ const Formularios = () => {
           item.fac_nombre?.toLowerCase().includes(searchValue.toLowerCase()) ||
           item.for_nombre?.toLowerCase().includes(searchValue.toLowerCase())
       )
-      //CORREGIIIIIIIIIIIIIIIIRRRRRRRRRRRRRR
     );
   }, [otherData, searchValue]);
 
@@ -110,7 +108,7 @@ const Formularios = () => {
         );
       }
     });
-  }, [refresh, usuario_actual.usu_facultad_pertenece]);
+  }, [usuario_actual.usu_facultad_pertenece]);
 
   return (
     <div
@@ -163,7 +161,12 @@ const Formularios = () => {
                 }
                 style={{ float: "right" }}
               >
-                <Dropdown.Item eventKey="1">Editar</Dropdown.Item>
+                <Dropdown.Item
+                  eventKey="1"
+                  onClick={() => navigate(`/formularios/${item.for_id}`)}
+                >
+                  Editar
+                </Dropdown.Item>
                 <Dropdown.Item eventKey="2">Compartir</Dropdown.Item>
               </DropdownButton>
               <Button variant="outline-light"></Button>

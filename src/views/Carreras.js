@@ -211,7 +211,7 @@ const Carreras = () => {
 
     if (confirmDelete) {
       eliminarCarreras({ car_id: idcarrera }).then((respuesta) => {
-        if (respuesta.mensaje === "OK") {
+        if (respuesta?.mensaje === "OK") {
           setRefresh(refresh + 1);
         } else {
           toast.error("Error al intentar eliminar", {
@@ -236,7 +236,7 @@ const Carreras = () => {
         setData([]);
       } else {
         setData(
-          datos.filter(
+          datos?.filter(
             (item) =>
               item.car_facultad_pertenece ===
               usuario_actual.usu_facultad_pertenece

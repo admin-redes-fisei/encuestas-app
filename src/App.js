@@ -22,6 +22,8 @@ import TableroEstudiantes from "./views/TableroEstudiantes";
 import Facultades from "./views/Facultades";
 import TableroEmpresas from "./views/TableroEmpresas";
 import DashboardPersonalizado from "./views/DasboardPersonalizado";
+import Secciones from "./views/ForSecciones";
+import Preguntas from "./views/ForSecPreguntas";
 //import SSD from "./views/Ssd";
 
 function App() {
@@ -192,6 +194,22 @@ function App() {
             element={
               <PrivateRouteFormularios>
                 <Formularios />
+              </PrivateRouteFormularios>
+            }
+          />
+          <Route
+            path="/formularios/:forID"
+            element={
+              <PrivateRouteFormularios>
+                <Secciones />
+              </PrivateRouteFormularios>
+            }
+          />
+          <Route
+            path="/formularios/:forID/:secID"
+            element={
+              <PrivateRouteFormularios>
+                <Preguntas />
               </PrivateRouteFormularios>
             }
           />
