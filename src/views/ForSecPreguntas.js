@@ -11,7 +11,9 @@ import {
   Table,
 } from "react-bootstrap";
 import {
+  editarPregunta,
   eliminarOpcion,
+  eliminarPregunta,
   obtenerForSecciones,
   restaurarOpcion,
 } from "../services/FormulariosAppService";
@@ -103,6 +105,7 @@ const Preguntas = () => {
   const handleShowPregunta = () => setShowPregunta(true);
 
   const handleClosePregunta = () => {
+    setRefresh(refresh + 1);
     setShowPregunta(false);
     setFormDataPreguntas({
       pre_id: "",
@@ -115,9 +118,10 @@ const Preguntas = () => {
       pre_tipo_imagen: "",
       pre_tooltip_texto: "",
       pre_tooltip_imagen: "",
-      pre_es_abierta: "",
-      pre_es_obligatoria: "",
+      pre_es_abierta: 0,
+      pre_es_obligatoria: 0,
       pre_estado: 1,
+      pre_seccion_pertenece: "",
     });
   };
 
@@ -172,6 +176,29 @@ const Preguntas = () => {
     }
   };
 
+  const handleDeletePregunta = (idPregunta) => {
+    const confirmDelete = window.confirm(
+      "¿Está seguro de eliminar la pregunta?"
+    );
+
+    if (confirmDelete) {
+      eliminarPregunta({ pre_id: idPregunta }).then((respuesta) => {
+        if (respuesta?.mensaje === "OK") {
+          setRefresh(refresh + 1);
+        } else {
+          toast.error("Error: Pregunta con dependencias", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
+      });
+    }
+  };
+
   //para restaurar
   const handleResetOpcion = (idopcion) => {
     restaurarOpcion({ opc_id: idopcion }).then((respuesta) => {
@@ -188,6 +215,127 @@ const Preguntas = () => {
         });
       }
     });
+  };
+
+  //cambio de posicion de preguntas
+  const handleCambiarPoscicion = (pregunta, index, direction) => {
+    const oldPregunta =
+      direction === "d" ? dataPreguntas[index + 1] : dataPreguntas[index - 1];
+    const newPregunta = pregunta;
+
+    editarPregunta({
+      pre_id: oldPregunta.pre_id,
+      pre_numero: newPregunta.pre_numero,
+      pre_alias: oldPregunta.pre_alias,
+      pre_titulo: oldPregunta.pre_titulo,
+      pre_texto: oldPregunta.pre_texto,
+      pre_tipo: oldPregunta.pre_tipo,
+      pre_url_imagen: oldPregunta.pre_url_imagen,
+      pre_tipo_imagen: oldPregunta.pre_tipo_imagen,
+      pre_tooltip_texto: oldPregunta.pre_tooltip_texto,
+      pre_tooltip_imagen: oldPregunta.pre_tooltip_imagen,
+      pre_es_abierta: oldPregunta.pre_es_abierta,
+      pre_es_obligatoria: oldPregunta.pre_es_obligatoria,
+      pre_estado: oldPregunta.pre_estado,
+      pre_seccion_pertenece: oldPregunta.pre_seccion_pertenece,
+    }).then((resultado) => {
+      if (resultado.mensaje === "OK") {
+        editarPregunta({
+          pre_id: newPregunta.pre_id,
+          pre_numero: oldPregunta.pre_numero,
+          pre_alias: newPregunta.pre_alias,
+          pre_titulo: newPregunta.pre_titulo,
+          pre_texto: newPregunta.pre_texto,
+          pre_tipo: newPregunta.pre_tipo,
+          pre_url_imagen: newPregunta.pre_url_imagen,
+          pre_tipo_imagen: newPregunta.pre_tipo_imagen,
+          pre_tooltip_texto: newPregunta.pre_tooltip_texto,
+          pre_tooltip_imagen: newPregunta.pre_tooltip_imagen,
+          pre_es_abierta: newPregunta.pre_es_abierta,
+          pre_es_obligatoria: newPregunta.pre_es_obligatoria,
+          pre_estado: newPregunta.pre_estado,
+          pre_seccion_pertenece: newPregunta.pre_seccion_pertenece,
+        }).then((resultado) => {
+          if (resultado.mensaje === "OK") {
+            setRefresh(refresh + 1);
+          } else {
+            toast.error("Error al cambiar posición", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+            });
+          }
+        });
+      } else {
+        toast.error("Error al cambiar posición", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+    });
+  };
+
+  //para cambio directo de estado
+  const handleCambiarEstado = (e, pregunta) => {
+    const isChecked = e.target.checked;
+    const pre_numero = pregunta.pre_numero.toString();
+    const pre_alias = pregunta.pre_alias.toString();
+    const pre_titulo = pregunta.pre_titulo.toString();
+    const pre_texto = pregunta.pre_texto.toString();
+    const pre_tipo = pregunta.pre_tipo.toString();
+    const pre_url_imagen = pregunta.pre_url_imagen;
+    const pre_tipo_imagen = pregunta.pre_tipo_imagen;
+    const pre_tooltip_texto = pregunta.pre_tooltip_texto;
+    const pre_tooltip_imagen = pregunta.pre_tooltip_imagen;
+    const pre_es_abierta = pregunta.pre_es_abierta;
+    const pre_es_obligatoria = pregunta.pre_es_obligatoria;
+    const pre_estado = (isChecked ? 1 : 0).toString();
+    const pre_seccion_pertenece = secID;
+    const pre_id = pregunta.pre_id;
+
+    const confirmChange = window.confirm(
+      "Está a punto de cambiar el estado de la pregunta ¿Desea continuar?"
+    );
+
+    if (confirmChange) {
+      editarPregunta({
+        pre_id: pre_id,
+        pre_numero: pre_numero,
+        pre_alias: pre_alias,
+        pre_titulo: pre_titulo,
+        pre_texto: pre_texto,
+        pre_tipo: pre_tipo,
+        pre_url_imagen: pre_url_imagen,
+        pre_tipo_imagen: pre_tipo_imagen,
+        pre_tooltip_texto: pre_tooltip_texto,
+        pre_tooltip_imagen: pre_tooltip_imagen,
+        pre_es_abierta: pre_es_abierta,
+        pre_es_obligatoria: pre_es_obligatoria,
+        pre_estado: pre_estado,
+        pre_seccion_pertenece: pre_seccion_pertenece,
+      }).then((resultado) => {
+        console.log(resultado);
+        if (resultado.mensaje === "OK") {
+          setRefresh(refresh + 1);
+        } else {
+          toast.error("Error al cambiar estado", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
+      });
+    }
   };
 
   return (
@@ -272,7 +420,7 @@ const Preguntas = () => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
-        {dataPreguntas?.map((item) => (
+        {dataPreguntas?.map((item, index) => (
           <>
             <Card key={item.pre_id} style={{ width: "95%", marginTop: "20px" }}>
               <Card.Body>
@@ -297,7 +445,7 @@ const Preguntas = () => {
                         }
                         checked={parseInt(item.pre_estado) === 1 ? true : false}
                         inline
-                        //onChange={(e) => handleCambiarEstado(e, item)}
+                        onChange={(e) => handleCambiarEstado(e, item)}
                       />
                     </div>
                   </Col>
@@ -327,10 +475,22 @@ const Preguntas = () => {
                         }
                         style={{ float: "right" }}
                       >
-                        <Dropdown.Item eventKey="2">
+                        <Dropdown.Item
+                          eventKey="2"
+                          disabled={index === 0}
+                          onClick={() =>
+                            handleCambiarPoscicion(item, index, "u")
+                          }
+                        >
                           <UpIcon /> Mover Arriba
                         </Dropdown.Item>
-                        <Dropdown.Item eventKey="2">
+                        <Dropdown.Item
+                          eventKey="2"
+                          disabled={index === dataPreguntas?.length - 1}
+                          onClick={() =>
+                            handleCambiarPoscicion(item, index, "d")
+                          }
+                        >
                           <DownIcon /> Mover Abajo
                         </Dropdown.Item>
 
@@ -342,7 +502,12 @@ const Preguntas = () => {
                         >
                           <EditIcon /> Editar
                         </Dropdown.Item>
-                        <Dropdown.Item eventKey="2">
+                        <Dropdown.Item
+                          eventKey="2"
+                          onClick={() => {
+                            handleDeletePregunta(item.pre_id);
+                          }}
+                        >
                           <DeleteIcon /> Eliminar
                         </Dropdown.Item>
                       </DropdownButton>
@@ -496,13 +661,13 @@ const Preguntas = () => {
             ? preguntaSeleccionada?.opciones[0]?.opc_padre !== null
             : false
         } // Puedes ajustar este valor según sea necesario
-        pregunta_pertenece={preguntaSeleccionada.pre_id} // Ajusta según sea necesario
+        pregunta_pertenece={preguntaSeleccionada.pre_id}
       />
       <ModalPreguntas
         data={formDataPreguntas}
         show={showPregunta}
         handleClose={handleClosePregunta}
-        seccion_pertenece={parseInt(secID)} // Ajusta según sea necesario
+        seccion_pertenece={parseInt(secID)}
       />
     </div>
   );

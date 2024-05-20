@@ -7,6 +7,7 @@ import {
   DropdownButton,
   Form,
   InputGroup,
+  Modal,
   Pagination,
   Table,
 } from "react-bootstrap";
@@ -17,6 +18,9 @@ import StudentIcon from "../assets/studentIcon";
 import BussinesIcon from "../assets/bussinesIcon";
 import EllipsisIcon from "../assets/ellipsisIcon";
 import { useNavigate } from "react-router-dom";
+import QRCode from "react-qr-code";
+import CopyIcon from "../assets/copyIcon";
+import CopiedIcon from "../assets/copiedIcon copy";
 
 const Formularios = () => {
   const encabezados = [
@@ -71,6 +75,10 @@ const Formularios = () => {
   const totalPages = Math.ceil(searchedData?.length / itemsPerPage);
   //para navegar
   const navigate = useNavigate();
+  //para compartir
+  const [show, setShow] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [link, setLink] = useState(false);
 
   //para el buscador
   useEffect(() => {
@@ -109,6 +117,22 @@ const Formularios = () => {
       }
     });
   }, [usuario_actual.usu_facultad_pertenece]);
+
+  //para compartir
+  const handleClose = () => setShow(false);
+  const handleShow = (link) => {
+    setLink(link);
+    setShow(true);
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(link);
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+  };
 
   return (
     <div
@@ -163,11 +187,28 @@ const Formularios = () => {
               >
                 <Dropdown.Item
                   eventKey="1"
+                  onClick={() =>
+                    window.open(`/encuestas/${item.for_alias}`, "_blank")
+                  }
+                >
+                  Ver encuesta
+                </Dropdown.Item>
+                <Dropdown.Item
+                  eventKey="2"
                   onClick={() => navigate(`/formularios/${item.for_id}`)}
                 >
                   Editar
                 </Dropdown.Item>
-                <Dropdown.Item eventKey="2">Compartir</Dropdown.Item>
+                <Dropdown.Item
+                  eventKey="3"
+                  onClick={() =>
+                    handleShow(
+                      `http://hatunsoft.uta.edu.ec:4000/encuestas/${item.for_alias}`
+                    )
+                  }
+                >
+                  Compartir
+                </Dropdown.Item>
               </DropdownButton>
               <Button variant="outline-light"></Button>
               <br />
@@ -238,29 +279,7 @@ const Formularios = () => {
           />
         </InputGroup>
       </div>
-      <div
-        style={{
-          marginTop: "10px",
-          marginBottom: "5px",
-          width: "83vw",
-          marginLeft: "auto",
-          marginRight: "auto",
-          paddingLeft: "45px",
-          paddingRight: "45px",
-        }}
-      >
-        <table style={{ width: "100%" }}>
-          <thead>
-            <tr>
-              {encabezados?.map((columna) => (
-                <th key={columna.id} style={columna.style}>
-                  {columna.nombre}
-                </th>
-              ))}
-            </tr>
-          </thead>
-        </table>
-      </div>
+      <br />
       <div
         style={{
           width: "83vw",
@@ -280,6 +299,17 @@ const Formularios = () => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
+        <table style={{ width: "100%" }}>
+          <thead>
+            <tr>
+              {encabezados?.map((columna) => (
+                <th key={columna.id} style={columna.style}>
+                  {columna.nombre}
+                </th>
+              ))}
+            </tr>
+          </thead>
+        </table>
         {searchedData?.length > 0 ? (
           <Table
             hover
@@ -355,6 +385,42 @@ const Formularios = () => {
           </Pagination>
         </div>
       </div>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Código QR y Enlace</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="text-center">
+            <QRCode value={link} />
+            <p>Escanea este código QR</p>
+          </div>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            <Form.Label>
+              <b>Enlace:</b>
+            </Form.Label>
+            <InputGroup className="mb-3">
+              <Form.Control
+                type="text"
+                value={link}
+                readOnly
+                onClick={(e) => e.target.select()}
+              />
+              <Button
+                variant={copied ? "success" : "light"}
+                id="button-addon2"
+                onClick={copyToClipboard}
+              >
+                {copied ? <CopiedIcon /> : <CopyIcon />}
+              </Button>
+            </InputGroup>
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cerrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

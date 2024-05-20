@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Modal, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { agregarOpcion, editarOpcion } from "../services/FormulariosAppService";
+import {
+  agregarPregunta,
+  editarPregunta,
+} from "../services/FormulariosAppService";
 
 const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
   const tipos_pregunta = [
@@ -28,9 +31,10 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
     pre_tipo_imagen: "",
     pre_tooltip_texto: "",
     pre_tooltip_imagen: "",
-    pre_es_abierta: "",
-    pre_es_obligatoria: "",
+    pre_es_abierta: 0,
+    pre_es_obligatoria: 0,
     pre_estado: 1,
+    pre_seccion_pertenece: "",
   });
 
   useEffect(() => {
@@ -50,7 +54,7 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
       formData.pre_texto !== "" &&
       formData.pre_tipo !== ""
     ) {
-      //handleSave();
+      handleSave();
     } else {
       toast.error("Complete los campos", {
         position: "top-right",
@@ -65,23 +69,37 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
 
   //para guardar
   const handleSave = () => {
-    const opc_label = formData.opc_label.toString();
-    const opc_numero = formData.opc_numero.toString();
-    const opc_padre = formData.opc_padre.toString();
-    const opc_tooltip_texto = formData.opc_tooltip_texto.toString();
-    const opc_tooltip_imagen = formData.opc_tooltip_imagen.toString();
-    const opc_pregunta_pertenece = formData.opc_pregunta_pertenece.toString();
+    const pre_numero = formData.pre_numero.toString();
+    const pre_alias = formData.pre_alias.toString();
+    const pre_titulo = formData.pre_titulo.toString();
+    const pre_texto = formData.pre_texto.toString();
+    const pre_tipo = formData.pre_tipo.toString();
+    const pre_url_imagen = formData.pre_url_imagen.toString();
+    const pre_tipo_imagen = formData.pre_tipo_imagen.toString();
+    const pre_tooltip_texto = formData.pre_tooltip_texto.toString();
+    const pre_tooltip_imagen = formData.pre_tooltip_imagen.toString();
+    const pre_es_abierta = formData.pre_es_abierta.toString();
+    const pre_es_obligatoria = formData.pre_es_obligatoria.toString();
+    const pre_estado = formData.pre_estado.toString();
+    const pre_seccion_pertenece = seccion_pertenece.toString();
 
-    if (formData.opc_id) {
-      const opc_id = formData.opc_id;
-      editarOpcion({
-        opc_id: opc_id,
-        opc_numero: opc_numero,
-        opc_label: opc_label,
-        opc_padre: opc_padre,
-        opc_tooltip_texto: opc_tooltip_texto,
-        opc_tooltip_imagen: opc_tooltip_imagen,
-        opc_pregunta_pertenece: opc_pregunta_pertenece,
+    if (formData.pre_id) {
+      const pre_id = formData.pre_id;
+      editarPregunta({
+        pre_id: pre_id,
+        pre_numero: pre_numero,
+        pre_alias: pre_alias,
+        pre_titulo: pre_titulo,
+        pre_texto: pre_texto,
+        pre_tipo: pre_tipo,
+        pre_url_imagen: pre_url_imagen,
+        pre_tipo_imagen: pre_tipo_imagen,
+        pre_tooltip_texto: pre_tooltip_texto,
+        pre_tooltip_imagen: pre_tooltip_imagen,
+        pre_es_abierta: pre_es_abierta,
+        pre_es_obligatoria: pre_es_obligatoria,
+        pre_estado: pre_estado,
+        pre_seccion_pertenece: pre_seccion_pertenece,
       }).then((resultado) => {
         if (resultado?.mensaje === "OK") {
           handleClose();
@@ -97,12 +115,19 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
         }
       });
     } else {
-      agregarOpcion({
-        opc_label: opc_label,
-        opc_padre: opc_padre,
-        opc_tooltip_texto: opc_tooltip_texto,
-        opc_tooltip_imagen: opc_tooltip_imagen,
-        opc_pregunta_pertenece: seccion_pertenece,
+      agregarPregunta({
+        pre_alias: pre_alias,
+        pre_titulo: pre_titulo,
+        pre_texto: pre_texto,
+        pre_tipo: pre_tipo,
+        pre_url_imagen: pre_url_imagen,
+        pre_tipo_imagen: pre_tipo_imagen,
+        pre_tooltip_texto: pre_tooltip_texto,
+        pre_tooltip_imagen: pre_tooltip_imagen,
+        pre_es_abierta: pre_es_abierta,
+        pre_es_obligatoria: pre_es_obligatoria,
+        pre_estado: pre_estado,
+        pre_seccion_pertenece: pre_seccion_pertenece,
       }).then((resultado) => {
         if (resultado?.mensaje === "OK") {
           handleClose();

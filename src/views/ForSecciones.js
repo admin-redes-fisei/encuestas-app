@@ -26,6 +26,7 @@ import UpIcon from "../assets/UpIcon";
 import DownIcon from "../assets/DownIcon";
 import EditIcon from "../assets/editIcon";
 import DeleteIcon from "../assets/deleteIcon";
+import RedirectIcon from "../assets/renameIcon";
 
 const Secciones = () => {
   const encabezados = [
@@ -89,6 +90,7 @@ const Secciones = () => {
   //para el modal
   const [show, setShow] = useState(false);
   const [nuevaSec, setNuevaSec] = useState("");
+  const [secActualizarId, setSecActualizarId] = useState(null);
   //para navegar
   const navigate = useNavigate();
   //cargando
@@ -260,10 +262,17 @@ const Secciones = () => {
     });
   };
   //para el modal
-  const handleShow = () => setShow(true);
+  const handleShow = (seccion) => {
+    if (seccion) {
+      setNuevaSec(seccion.sec_nombre);
+      setSecActualizarId(seccion);
+    }
+    setShow(true);
+  };
 
   const handleClose = () => {
     setShow(false);
+    setSecActualizarId(null);
     setNuevaSec("");
   };
 
@@ -276,28 +285,52 @@ const Secciones = () => {
     const sec_nombre = nuevaSec;
     const sec_numero = data.length + 1;
     const sec_formulario_pertenece = parseInt(formData.for_id);
-
-    console.log(parseInt(formData.for_id));
+    console.log(nuevaSec);
+    console.log(secActualizarId);
     if (nuevaSec) {
-      agregarSeccion({
-        sec_numero: sec_numero,
-        sec_nombre: sec_nombre,
-        sec_formulario_pertenece: sec_formulario_pertenece,
-      }).then((resultado) => {
-        if (resultado.mensaje === "OK") {
-          setRefresh(refresh + 1);
-          handleClose();
-        } else {
-          toast.error("Verifique los campos", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-          });
-        }
-      });
+      if (secActualizarId) {
+        editarSeccion({
+          sec_id: secActualizarId.sec_id,
+          sec_numero: secActualizarId.sec_numero,
+          sec_nombre: sec_nombre,
+          sec_estado: secActualizarId.sec_estado,
+        }).then((resultado) => {
+          if (resultado.mensaje === "OK") {
+            setRefresh(refresh + 1);
+            handleClose();
+          } else {
+            toast.error("Verifique los campos", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+            });
+          }
+        });
+      } else {
+        console.log("agregar");
+        agregarSeccion({
+          sec_numero: sec_numero,
+          sec_nombre: sec_nombre,
+          sec_formulario_pertenece: sec_formulario_pertenece,
+        }).then((resultado) => {
+          if (resultado.mensaje === "OK") {
+            setRefresh(refresh + 1);
+            handleClose();
+          } else {
+            toast.error("Verifique los campos", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+            });
+          }
+        });
+      }
     }
   };
 
@@ -470,7 +503,7 @@ const Secciones = () => {
               justifyContent: "space-between",
               alignItems: "center",
             }}
-            onClick={handleShow}
+            onClick={() => handleShow()}
           >
             <PlusIcon />
             Nueva Sección
@@ -586,12 +619,19 @@ const Secciones = () => {
                     </Button>
                     <Button
                       variant="outline-light"
+                      onClick={() => handleShow(item)}
+                      title="Cambiar nombre"
+                    >
+                      <EditIcon />
+                    </Button>
+                    <Button
+                      variant="outline-light"
                       onClick={() =>
                         navigate(`/formularios/${forID}/${item.sec_id}`)
                       }
-                      title="Editar"
+                      title="Editar preguntas"
                     >
-                      <EditIcon />
+                      <RedirectIcon />
                     </Button>
                     <Button
                       variant="outline-light"
