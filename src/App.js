@@ -24,6 +24,7 @@ import TableroEmpresas from "./views/TableroEmpresas";
 import DashboardPersonalizado from "./views/DasboardPersonalizado";
 import Secciones from "./views/ForSecciones";
 import Preguntas from "./views/ForSecPreguntas";
+import TableroAnalytics from "./views/TableroAnalytics";
 //import SSD from "./views/Ssd";
 
 function App() {
@@ -182,6 +183,14 @@ function App() {
             element={
               <PrivateRouteTableros>
                 <TableroEmpresas />
+              </PrivateRouteTableros>
+            }
+          />
+          <Route
+            path="/tablero/comportamiento"
+            element={
+              <PrivateRouteTableros>
+                <TableroAnalytics />
               </PrivateRouteTableros>
             }
           />

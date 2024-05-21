@@ -3,15 +3,12 @@ const URL_acceso = "http://localhost:8084/pruebaTesis/encuestas_services/";
 
 export async function obtenerConteoDatos(for_id) {
   try {
-    const response = await fetch(
-      `${URL_acceso}conteoDatas.php?id=${for_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${URL_acceso}conteoDatas.php?id=${for_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return await response.json();
   } catch (error) {
     console.error("Error al obtener las preguntas:", error);
@@ -46,18 +43,33 @@ export async function obtenerConteoDatosFiltrados(parametros) {
   }
 }
 
-export async function obtenerCodeTablero(for_id) {
+export async function obtenerCodeTablero(for_id, fac_id) {
+  console.log(for_id);
+  console.log(fac_id);
   try {
-    const response = await fetch(
-      `${URL_acceso}obtenerCodeTablero.php?formulario_id=${for_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return await response.json();
+    if (for_id !== null) {
+      const response = await fetch(
+        `${URL_acceso}obtenerCodeTablero.php?formulario_id=${for_id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return await response.json();
+    } else if (fac_id !== null) {
+      const response = await fetch(
+        `${URL_acceso}obtenerCodeTablero.php?tab_facultad_pertenece=${fac_id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return await response.json();
+    }
   } catch (error) {
     console.error("Error al obtener las preguntas:", error);
   }

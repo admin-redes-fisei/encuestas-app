@@ -6,7 +6,7 @@ import {
 } from "../services/TablerosService";
 import { toast } from "react-toastify";
 
-const HtmlEmbedder = ({ idFormulario }) => {
+const HtmlEmbedder = ({ idFormulario, idFacultad }) => {
   const [htmlCode, setHtmlCode] = useState("");
   const [iframeSrc, setIframeSrc] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -28,8 +28,12 @@ const HtmlEmbedder = ({ idFormulario }) => {
 
   useEffect(() => {
     // Obtener el código HTML del tablero
-    obtenerCodeTablero(idFormulario).then((response) => {
-      setHtmlCode(response[0]?.tab_codigo || "");
+    obtenerCodeTablero(idFormulario, idFacultad).then((response) => {
+      if (response) {
+        setHtmlCode(response[0]?.tab_codigo);
+      } else {
+        setHtmlCode("");
+      }
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,6 +52,7 @@ const HtmlEmbedder = ({ idFormulario }) => {
     agregarTablero({
       tab_codigo: htmlCode,
       tab_formulario_pertenece: idFormulario.toString(),
+      tab_facultad_pertenece: idFacultad,
     }).then((resultado) => {
       if (resultado?.mensaje === "OK") {
         handleEmbed();

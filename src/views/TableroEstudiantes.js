@@ -195,7 +195,10 @@ const TableroEstudiantes = () => {
               />
             </>
           ) : (
-            <HtmlEmbedder idFormulario={idFormulario} />
+            <HtmlEmbedder
+              idFormulario={idFormulario}
+              idFacultad={usuario_actual?.usu_facultad_pertenece}
+            />
           )}
         </>
       )}
