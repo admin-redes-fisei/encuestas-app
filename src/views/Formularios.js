@@ -21,6 +21,8 @@ import { useNavigate } from "react-router-dom";
 import QRCode from "react-qr-code";
 import CopyIcon from "../assets/copyIcon";
 import CopiedIcon from "../assets/copiedIcon copy";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import MyDocumentEncuesta from "../components/DocumentoEncuesta";
 
 const Formularios = () => {
   const encabezados = [
@@ -94,7 +96,6 @@ const Formularios = () => {
 
   //para listar
   useEffect(() => {
-    //const token = JSON.parse(localStorage.getItem("token"));
     listarFormularios().then((datos) => {
       if (datos?.error) {
         setOtherData([]);
@@ -209,6 +210,17 @@ const Formularios = () => {
                 >
                   Compartir
                 </Dropdown.Item>
+                <PDFDownloadLink
+                  document={<MyDocumentEncuesta formularioId={item.for_id} />}
+                  style={{
+                    textDecoration: "none",
+                    color: "black",
+                    marginLeft: "16px",
+                  }}
+                  fileName={`encuesta_${item.for_alias}.pdf`}
+                >
+                  Exportar PDF
+                </PDFDownloadLink>
               </DropdownButton>
               <Button variant="outline-light"></Button>
               <br />
@@ -357,11 +369,28 @@ const Formularios = () => {
                       flex: 3,
                     }}
                   >
-                    <Button variant="outline-light" title="Abrir">
+                    <Button
+                      variant="outline-light"
+                      title="Ver encuesta"
+                      onClick={() =>
+                        window.open(`/encuestas/${item.for_alias}`, "_blank")
+                      }
+                    >
                       <OpenFIcon />
                     </Button>
                     <Button variant="outline-light" title="Descargar">
-                      <DownloadIcon color={"#000"} />
+                      <PDFDownloadLink
+                        document={
+                          <MyDocumentEncuesta formularioId={item.for_id} />
+                        }
+                        style={{
+                          textDecoration: "none",
+                          color: "black",
+                        }}
+                        fileName={`encuesta_${item.for_alias}.pdf`}
+                      >
+                        <DownloadIcon color={"#000"} />
+                      </PDFDownloadLink>
                     </Button>
                   </td>
                 </tr>

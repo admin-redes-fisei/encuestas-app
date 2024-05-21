@@ -223,6 +223,7 @@ const Preguntas = () => {
       direction === "d" ? dataPreguntas[index + 1] : dataPreguntas[index - 1];
     const newPregunta = pregunta;
 
+    console.log(isLoading);
     editarPregunta({
       pre_id: oldPregunta.pre_id,
       pre_numero: newPregunta.pre_numero,
