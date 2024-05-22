@@ -17,7 +17,6 @@ import {
 import {
   agregarFormulario,
   duplicarFormulario,
-  editarFormulario,
   editarFormularioActivo,
   eliminarFormulario,
   listarFormularios,
