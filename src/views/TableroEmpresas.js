@@ -34,6 +34,9 @@ const TableroEmpresas = () => {
   const [formData, setFormData] = useState({
     tab_tipo: 1,
   });
+  //para dataset
+  const [dataset, setDataset] = useState([]);
+  const [datasetHeaders, setDatasetHeaders] = useState([]);
 
   useEffect(() => {
     //obtener id de tablero por tipo estudiantes y facultad

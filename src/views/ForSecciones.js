@@ -86,6 +86,8 @@ const Secciones = () => {
     for_nombre: "",
     for_alias: "",
     for_descripcion: "",
+    for_tipo: "",
+    for_estado: "",
   });
   //para el modal
   const [show, setShow] = useState(false);
@@ -115,6 +117,8 @@ const Secciones = () => {
         for_nombre: datos.for_nombre,
         for_alias: datos.for_alias,
         for_descripcion: datos.for_descripcion,
+        for_tipo: datos.for_tipo,
+        for_estado: datos.for_estado,
       });
       setDataFormulario(datos?.for_nombre);
       setData(datos?.secciones);
@@ -151,6 +155,7 @@ const Secciones = () => {
     const for_alias = formData.for_alias.toString();
     const for_descripcion = formData.for_descripcion.toString();
     const for_id = formData.for_id;
+    const for_tipo = formData.for_tipo;
 
     if (formData.for_id) {
       editarFormulario({
@@ -158,6 +163,7 @@ const Secciones = () => {
         for_alias: for_alias,
         for_descripcion: for_descripcion,
         for_id: for_id,
+        for_tipo: for_tipo,
       }).then((resultado) => {
         if (resultado.mensaje === "OK") {
           setRefresh(refresh + 1);
@@ -424,7 +430,7 @@ const Secciones = () => {
                 name="for_alias"
                 value={formData.for_alias}
                 onChange={handleChange}
-                disabled={true}
+                disabled={parseInt(formData.for_estado) === 1 ? true : false}
               />
             </Form.Group>
           </Col>
@@ -440,6 +446,26 @@ const Secciones = () => {
                 value={formData.for_descripcion}
                 onChange={handleChange}
               />
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlSelect1">
+              <Form.Label style={{ color: "#fff" }}>
+                <b>Tipo de Formulario</b>
+              </Form.Label>
+              <Form.Select
+                aria-label="Tipo de formulario"
+                name="for_tipo"
+                value={formData.for_tipo}
+                onChange={handleChange}
+                disabled={parseInt(formData.for_estado) === 1 ? true : false}
+              >
+                <option value="">Seleccionar</option>
+                <option value="empresas">Encuesta de empleabilidad</option>
+                <option value="estudiantes">
+                  Encuesta de demanda estudiantil
+                </option>
+              </Form.Select>
             </Form.Group>
           </Col>
           <Col>

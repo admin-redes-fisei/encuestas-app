@@ -70,6 +70,25 @@ export async function obtenerForSecciones(formularioId) {
   }
 }
 
+export async function agregarFormulario(data) {
+  try {
+    const respuesta = await fetch(`${URL_acceso}agregarFormulario.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!respuesta.ok) {
+      throw new Error(`Error al agregar el formulario: ${respuesta.statusText}`);
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
 export async function editarFormulario(data) {
   try {
     const respuesta = await fetch(`${URL_acceso}editarFormulario.php`, {
@@ -88,6 +107,64 @@ export async function editarFormulario(data) {
     console.error("Error:", error.message);
   }
 }
+
+export async function editarFormularioActivo(data) {
+  try {
+    const respuesta = await fetch(`${URL_acceso}editarFormularioActivo.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!respuesta.ok) {
+      throw new Error(`Error al editar el formulario: ${respuesta.statusText}`);
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
+export async function duplicarFormulario(data) {
+  try {
+    const respuesta = await fetch(`${URL_acceso}duplicarFormulario.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!respuesta.ok) {
+      throw new Error(`Error al duplicar el formulario: ${respuesta.statusText}`);
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
+export async function eliminarFormulario(data) {
+  try {
+    const respuesta = await fetch(`${URL_acceso}eliminarFormulario.php`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!respuesta.ok) {
+      throw new Error(`Error al eliminar el formulario: ${respuesta.statusText}`);
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
 export async function editarSeccion(data) {
   try {
     const respuesta = await fetch(`${URL_acceso}editarSeccion.php`, {

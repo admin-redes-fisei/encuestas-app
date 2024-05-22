@@ -14,7 +14,7 @@ const ModalOpciones = ({
   const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
   //para carreras
   const [carreras, setCarreras] = useState([]);
-
+  //para datos
   const [formData, setFormData] = useState({
     opc_id: "",
     opc_numero: "",
@@ -56,19 +56,19 @@ const ModalOpciones = ({
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
   //para validar
   const handleValidate = () => {
     if (
-      formData.opc_label !== "" &&
-      (isAccordeon ? formData.opc_padre !== "" : true)
+      formData.opc_label.trim() !== "" &&
+      (isAccordeon ? formData.opc_padre.trim() !== "" : true)
     ) {
       handleSave();
     } else {
-      toast.error("Complete los campos", {
+      toast.error("Campos inválidos o incorrectos", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,

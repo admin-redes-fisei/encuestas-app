@@ -15,9 +15,9 @@ export async function enviarReglas(reglas) {
     }
     const data = await response.json();
     // Aquí puedes usar los valores recibidos, por ejemplo:
-    console.log("Confianza:", data.confianza);
-    console.log("Lift:", data.lift);
-    console.log("Soporte:", data.soporte);
+    console.log("Confianza:", data?.confianza);
+    console.log("Lift:", data?.lift);
+    console.log("Soporte:", data?.soporte);
     // Puedes realizar otras acciones según lo necesites con estos valores
     return data; // Opcional: puedes retornar los datos si deseas usarlos en otro lugar de tu aplicación
   } catch (error) {
