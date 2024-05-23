@@ -1,20 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { Container, Form, Button, Modal } from "react-bootstrap";
+import {
+  Container,
+  Form,
+  Button,
+  Modal,
+  Spinner,
+  Image,
+  Alert,
+} from "react-bootstrap";
 import {
   agregarTablero,
   obtenerCodeTablero,
 } from "../services/TablerosService";
 import { toast } from "react-toastify";
+import imagenNoTablero from "../assets/noEncontrado.jpg";
 
 const HtmlEmbedder = ({ idFormulario, idFacultad }) => {
   const [htmlCode, setHtmlCode] = useState("");
+  const [temporalCode, setTemporalCode] = useState("");
   const [iframeSrc, setIframeSrc] = useState("");
   const [showModal, setShowModal] = useState(false);
   //para actualizar
   //const [refresh, setRefresh] = useState(0);
+  //para tipo de usuarioa actual
+  const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
+  //para carga
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleInputChange = (event) => {
-    setHtmlCode(event.target.value);
+    setTemporalCode(event.target.value);
   };
 
   const handleEmbed = () => {
@@ -27,13 +41,16 @@ const HtmlEmbedder = ({ idFormulario, idFacultad }) => {
   const handleShow = () => setShowModal(true);
 
   useEffect(() => {
-    // Obtener el código HTML del tablero
+    setIsLoading(true);
     obtenerCodeTablero(idFormulario, idFacultad).then((response) => {
       if (response) {
         setHtmlCode(response[0]?.tab_codigo);
+        setTemporalCode(response[0]?.tab_codigo);
       } else {
         setHtmlCode("");
+        setTemporalCode("");
       }
+      setIsLoading(false);
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,11 +67,12 @@ const HtmlEmbedder = ({ idFormulario, idFacultad }) => {
 
   const handleSave = () => {
     agregarTablero({
-      tab_codigo: htmlCode,
+      tab_codigo: temporalCode,
       tab_formulario_pertenece: idFormulario.toString(),
       tab_facultad_pertenece: idFacultad,
     }).then((resultado) => {
       if (resultado?.mensaje === "OK") {
+        setHtmlCode(temporalCode);
         handleEmbed();
         setShowModal(false);
       } else {
@@ -91,10 +109,11 @@ const HtmlEmbedder = ({ idFormulario, idFacultad }) => {
       }}
     >
       <Container>
-        <Button variant="dark" onClick={handleShow} className="mb-3">
-          Insertar Código
-        </Button>
-
+        {parseInt(usuario_actual.usu_tipo) !== 4 && (
+          <Button variant="dark" onClick={handleShow} className="mb-3">
+            Insertar Código
+          </Button>
+        )}
         <Modal show={showModal} onHide={handleClose} size="lg">
           <Modal.Header closeButton>
             <Modal.Title>Código HTML</Modal.Title>
@@ -106,7 +125,7 @@ const HtmlEmbedder = ({ idFormulario, idFacultad }) => {
                 <Form.Control
                   as="textarea"
                   rows={10}
-                  value={htmlCode}
+                  value={temporalCode}
                   onChange={handleInputChange}
                   placeholder="Pega tu código html aquí"
                 />
@@ -140,7 +159,12 @@ const HtmlEmbedder = ({ idFormulario, idFacultad }) => {
           </Modal.Footer>
         </Modal>
 
-        {iframeSrc && (
+        {isLoading ? (
+          <>
+            <br />
+            <Spinner animation="border" variant="danger" />
+          </>
+        ) : iframeSrc ? (
           <div className="mt-4">
             <iframe
               src={iframeSrc}
@@ -148,6 +172,15 @@ const HtmlEmbedder = ({ idFormulario, idFacultad }) => {
               style={{ width: "100%", height: "600px", border: "none" }}
             />
           </div>
+        ) : (
+          <>
+            <br />
+            <br />
+            <Alert key="secondary" variant="secondary" style={{ width: "fit-content", marginLeft:"auto", marginRight:"auto" }}>
+              Aún no se ha registrado ningún tablero para esta encuesta.
+            </Alert>
+            <Image src={imagenNoTablero} rounded style={{ width: "30%" }} />
+          </>
         )}
       </Container>
     </div>

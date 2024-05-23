@@ -4,8 +4,17 @@ import {
   agregarTablero,
   obtenerCodeTablero,
 } from "../services/TablerosService";
-import { Button, Container, Form, Modal, Spinner } from "react-bootstrap";
+import {
+  Alert,
+  Button,
+  Container,
+  Form,
+  Image,
+  Modal,
+  Spinner,
+} from "react-bootstrap";
 import { toast } from "react-toastify";
+import imagenNoTablero from "../assets/noEncontrado.jpg";
 
 const TableroAnalytics = () => {
   const [htmlCode, setHtmlCode] = useState("");
@@ -131,9 +140,11 @@ const TableroAnalytics = () => {
             }}
           >
             <Container>
-              <Button variant="dark" onClick={handleShow} className="mb-3">
-                Insertar Código
-              </Button>
+              {parseInt(usuario_actual.usu_tipo) !== 4 && (
+                <Button variant="dark" onClick={handleShow} className="mb-3">
+                  Insertar Código
+                </Button>
+              )}
 
               <Modal show={showModal} onHide={handleClose} size="lg">
                 <Modal.Header closeButton>
@@ -180,7 +191,7 @@ const TableroAnalytics = () => {
                 </Modal.Footer>
               </Modal>
 
-              {iframeSrc && (
+              {iframeSrc ? (
                 <div className="mt-4">
                   <iframe
                     src={iframeSrc}
@@ -188,6 +199,27 @@ const TableroAnalytics = () => {
                     style={{ width: "100%", height: "600px", border: "none" }}
                   />
                 </div>
+              ) : (
+                <>
+                  <br />
+                  <br />
+                  <Alert
+                    key="secondary"
+                    variant="secondary"
+                    style={{
+                      width: "fit-content",
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                    }}
+                  >
+                    Aún no se ha registrado ningún tablero para esta encuesta.
+                  </Alert>
+                  <Image
+                    src={imagenNoTablero}
+                    rounded
+                    style={{ width: "30%" }}
+                  />
+                </>
               )}
             </Container>
           </div>

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactApexChart from "react-apexcharts";
 
-function ApexRadialChart({series}) {
+function ApexRadialChart({ series }) {
   const chartOptions = {
     chart: {
       type: "radialBar",
@@ -44,15 +44,17 @@ function ApexRadialChart({series}) {
           },
         },
         dataLabels: {
-          enabled: false,
-          show: false,
+          enabled: true,
+          show: true,
           name: {
             show: false,
           },
           value: {
             offsetY: -2,
-            fontSize: "12px",
-            display: "none",
+            fontSize: "20px",
+            formatter: function (val) {
+              return parseFloat(val / 100).toFixed(5); // Mostrar hasta 5 decimales
+            },
           },
         },
       },
@@ -76,7 +78,7 @@ function ApexRadialChart({series}) {
       },
     },
   };
-  const seriess = [series*100]
+  const seriess = [series * 100];
 
   return (
     <div>

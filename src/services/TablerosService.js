@@ -93,3 +93,23 @@ export async function agregarTablero(data) {
     console.error("Error:", error.message);
   }
 }
+
+export async function obtenerDatasetFiltrado(data) {
+  try {
+    const respuesta = await fetch(`${URL_acceso}obtenerDatasetFiltrado.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!respuesta.ok) {
+      throw new Error(`Error al obtener el dataset: ${respuesta.statusText}`);
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+

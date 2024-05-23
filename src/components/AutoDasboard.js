@@ -1,4 +1,4 @@
-import { Card } from "react-bootstrap";
+import { Alert, Card, Image } from "react-bootstrap";
 import RePieChart from "./RePieChart";
 import StudentIcon from "../assets/studentIcon";
 import OutlineRePieChart from "./OutlineRePieChart";
@@ -8,6 +8,7 @@ import "react-resizable/css/styles.css";
 import { ResizableBox } from "react-resizable";
 import ReStackedBarChart from "./ReStackedBarChart";
 import BussinesIcon from "../assets/bussinesIcon";
+import imagenNoTablero from "../assets/noEncontrado.jpg";
 
 const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
   const handleOptionClick = (name) => {
@@ -126,7 +127,7 @@ const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
           ))}
         </>
       ) : (
-        <p
+        <div
           style={{
             width: "50%",
             marginRight: "auto",
@@ -134,8 +135,12 @@ const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
             textAlign: "center",
           }}
         >
-          Sin datos
-        </p>
+          <br />
+          <Alert key="secondary" variant="secondary">
+            Aún no se ha recibido ninguna respuesta para esta encuesta.
+          </Alert>
+          <Image src={imagenNoTablero} rounded style={{ width: "50%" }} />
+        </div>
       )}
     </div>
   );

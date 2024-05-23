@@ -4,8 +4,11 @@ import AdminSideBar from "../components/SidebarBashboard";
 import {
   obtenerConteoDatos,
   obtenerConteoDatosFiltrados,
+  obtenerDatasetFiltrado,
 } from "../services/TablerosService";
 import {
+  Alert,
+  Badge,
   Button,
   ButtonGroup,
   Card,
@@ -15,6 +18,8 @@ import {
   Form,
   ListGroup,
   Modal,
+  OverlayTrigger,
+  Popover,
   Row,
   Spinner,
 } from "react-bootstrap";
@@ -29,6 +34,9 @@ import RightIcon from "../assets/rightIcon";
 import { enviarReglas } from "../services/PythonService";
 import { toast } from "react-toastify";
 import ApexRadialChart from "../components/ApexRadialChart";
+import { CSVLink } from "react-csv";
+import AlertIcon from "../assets/alertIcon";
+import InfoIcon from "../assets/infoIncon";
 
 const TableroEstudiantes = () => {
   const dataTipos = [
@@ -51,7 +59,11 @@ const TableroEstudiantes = () => {
     tab_tipo: 1,
   });
   //para resultados de regla
-  const [resultados, setResultados] = useState([]);
+  const [resultados, setResultados] = useState(null);
+  //para el dataset
+  const [dataset, setDataset] = useState([]);
+  //para la alerta
+  const [alert, setAlert] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -100,12 +112,17 @@ const TableroEstudiantes = () => {
     }));
   };
 
+  //para modal de apriori
   const handleShowModal = () => {
-    setAntecedentes(filter);
+    if (antecedentes.length + consecuentes.length !== filter.length) {
+      setAntecedentes(filter);
+      setConsecuentes([]);
+    }
     setShowModal(true);
   };
   const handleCloseModal = () => setShowModal(false);
 
+  //para manejor de antecedente y consecuentes
   const handleMoveToConsecuentes = (item) => {
     setAntecedentes((prev) => prev.filter((i) => i !== item));
     setConsecuentes((prev) => [...prev, item]);
@@ -116,12 +133,35 @@ const TableroEstudiantes = () => {
     setAntecedentes((prev) => [...prev, item]);
   };
 
+  //para validar datos llenos
+  const handleValidar = () => {
+    if (antecedentes?.length > 0 && consecuentes?.length > 0) {
+      handleEnviarClick({
+        antecedente: antecedentes,
+        consecuente: consecuentes,
+        formulario_id: idFormulario,
+      });
+    } else {
+      toast.error("Dede existir al menos un antecedente y un consecuente", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  };
+
+  //para calcular valores de regla
   const handleEnviarClick = (reglas) => {
     setIsResultadosLoading(true);
+    handleCloseModal();
+    setResultados([]);
     try {
       enviarReglas(reglas).then((data) => {
         if (data.error) {
-          toast.warning("No se ha encontrado la regla en los registros", {
+          toast.warning("Regla irrelevante", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -129,15 +169,29 @@ const TableroEstudiantes = () => {
             pauseOnHover: true,
             draggable: true,
           });
+          setAlert(true);
         }
         setResultados(data);
         setIsResultadosLoading(false);
-        handleCloseModal();
       });
     } catch (error) {
       console.error("Error al enviar los datos:", error);
     }
   };
+
+  //para el dataset
+  useEffect(() => {
+    obtenerDatasetFiltrado({
+      formulario_id: idFormulario,
+      filtros: filter,
+    }).then((response) => {
+      if (response?.error) {
+        setDataset([]);
+      } else {
+        setDataset(response);
+      }
+    });
+  }, [filter, idFormulario]);
 
   return (
     <div>
@@ -213,7 +267,9 @@ const TableroEstudiantes = () => {
         )}
         <DropdownButton
           as={ButtonGroup}
-          disabled={parseInt(formData.tab_tipo) === 2}
+          disabled={
+            parseInt(formData.tab_tipo) === 2 || !data?.total_encuestados
+          }
           align={{ lg: "end" }}
           variant="light"
           style={{
@@ -245,9 +301,20 @@ const TableroEstudiantes = () => {
             Exportar PDF
           </PDFDownloadLink>
           <br />
+          <CSVLink
+            data={dataset}
+            filename={`${data?.nombre_encuesta}-filtrado`}
+            style={{
+              textDecoration: "none",
+              color: "black",
+              marginLeft: "16px",
+            }}
+          >
+            Exportar CSV
+          </CSVLink>
         </DropdownButton>
       </div>
-      {resultados && (
+      {resultados && parseInt(formData.tab_tipo) === 1 && (
         <div
           style={{
             width: "90vw",
@@ -255,71 +322,229 @@ const TableroEstudiantes = () => {
             marginLeft: "auto",
             borderRadius: "20px",
             display: "flex",
-            flexWrap: "wrap",
+            flexDirection: "column",
             justifyContent: "center",
-            padding: "20px",
-            paddingTop: "20px",
-            paddingLeft: "25px",
-            paddingRight: "25px",
             marginTop: "25px",
             backgroundColor: "white",
             boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
           }}
         >
-          <CardGroup>
-            <Card>
-              <Card.Header>
-                <strong>CONFIANZA</strong>
-              </Card.Header>
-              <Card.Body>
-                {isResultadosLoading ? (
-                  <Spinner animation="border" variant="secondary" />
-                ) : (
-                  <div>
-                    <ApexRadialChart
-                      series={
-                        resultados["confianza"] ? resultados["confianza"] : 0
-                      }
-                    />
-                    <Card.Text>{resultados["confianza"]}</Card.Text>
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-            <Card>
-              <Card.Header>
-                <strong>SOPORTE</strong>
-              </Card.Header>
-              <Card.Body>
-                {isResultadosLoading ? (
-                  <Spinner animation="border" variant="secondary" />
-                ) : (
-                  <div>
-                    <ApexRadialChart
-                      series={resultados["soporte"] ? resultados["soporte"] : 0}
-                    />
-                    <Card.Text>{resultados["soporte"]}</Card.Text>
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-            <Card>
-              <Card.Header>
-                <strong>LIFT</strong>
-              </Card.Header>
-              <Card.Body>
-                {isResultadosLoading ? (
-                  <Spinner animation="border" variant="secondary" />
-                ) : (
-                  <div>
-                    <ApexRadialChart
-                      series={resultados["lift"] ? resultados["lift"] / 2 : 0}
-                    />
-                    <Card.Text>{resultados["lift"]}</Card.Text>
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
+          <div style={{ margin: "10px" }}>
+            <b>Regla: </b> Si{" "}
+            {antecedentes?.map((item) => (
+              <>
+                <Badge pill bg="primary">
+                  {item}
+                </Badge>{" "}
+              </>
+            ))}
+            Entonces{" "}
+            {consecuentes?.map((item) => (
+              <>
+                <Badge
+                  pill
+                  bg={
+                    isResultadosLoading
+                      ? "secondary"
+                      : alert === true
+                      ? "warning"
+                      : parseInt(resultados["lift"]) >= 1
+                      ? "success"
+                      : "warning"
+                  }
+                >
+                  {item}
+                </Badge>{" "}
+              </>
+            ))}
+          </div>
+          {parseInt(resultados["lift"]) < 1 && (
+            <Alert
+              key="secondary"
+              variant="warning"
+              style={{
+                width: "fit-content",
+                margin: "20px",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
+              <AlertIcon /> La regla no es relevante debido a su
+              lift menor a 1.
+            </Alert>
+          )}
+          <CardGroup
+            style={{
+              width: "100%",
+              borderRadius: "20px",
+              backgroundColor: "white",
+            }}
+          >
+            {alert === true ? (
+              <Alert
+                key="secondary"
+                variant="warning"
+                style={{
+                  width: "fit-content",
+                  margin: "20px",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                }}
+              >
+                <AlertIcon /> La regla no se ha tomado en cuenta debido a su
+                bajo soporte y confianza.
+              </Alert>
+            ) : (
+              <>
+                <Card>
+                  <Card.Body>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <strong>CONFIANZA</strong>
+                      <OverlayTrigger
+                        trigger="click"
+                        key="topconfianza"
+                        placement="top"
+                        overlay={
+                          <Popover id={`popoverConfianza`}>
+                            <Popover.Header as="h3">{`Confianza`}</Popover.Header>
+                            <Popover.Body>
+                              Mide el <strong>interés</strong> de la regla.{" "}
+                              <br />
+                              La confianza indica la probabilidad de que el
+                              consecuente ocurra cuando el antecedente está
+                              presente.
+                            </Popover.Body>
+                          </Popover>
+                        }
+                      >
+                        <Button variant="light">
+                          <InfoIcon />
+                        </Button>
+                      </OverlayTrigger>
+                    </div>
+                    {isResultadosLoading ? (
+                      <>
+                        <br />
+                        <Spinner animation="border" variant="secondary" />
+                      </>
+                    ) : (
+                      <div>
+                        <ApexRadialChart
+                          series={
+                            resultados["confianza"]
+                              ? resultados["confianza"]
+                              : 0
+                          }
+                        />
+                      </div>
+                    )}
+                  </Card.Body>
+                </Card>
+                <Card>
+                  <Card.Body>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <strong>SOPORTE</strong>
+                      <OverlayTrigger
+                        trigger="click"
+                        key="topsoporte"
+                        placement="top"
+                        overlay={
+                          <Popover id={`popoverSoporte`}>
+                            <Popover.Header as="h3">{`Soporte`}</Popover.Header>
+                            <Popover.Body>
+                              Mide la <strong>frecuencia</strong> de la regla.{" "}
+                              <br />
+                              El soporte mide cuántas veces ocurre una
+                              combinación de ítems en el conjunto de datos.
+                            </Popover.Body>
+                          </Popover>
+                        }
+                      >
+                        <Button variant="light">
+                          <InfoIcon />
+                        </Button>
+                      </OverlayTrigger>
+                    </div>
+                    {isResultadosLoading ? (
+                      <>
+                        <br />
+                        <Spinner animation="border" variant="secondary" />
+                      </>
+                    ) : (
+                      <div>
+                        <ApexRadialChart
+                          series={
+                            resultados["soporte"] ? resultados["soporte"] : 0
+                          }
+                        />
+                      </div>
+                    )}
+                  </Card.Body>
+                </Card>
+                <Card>
+                  <Card.Body>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <strong>LIFT</strong>
+                      <OverlayTrigger
+                        trigger="click"
+                        key="toplift"
+                        placement="top"
+                        overlay={
+                          <Popover id={`popoverLift`}>
+                            <Popover.Header as="h3">{`Lift`}</Popover.Header>
+                            <Popover.Body>
+                              Mide la <strong>correlación</strong> entre los
+                              items. <br />
+                              El lift define la relevancia de una regla,
+                              comparando la probabilidad observada de los ítems
+                              juntos con la probabilidad de que ocurran por
+                              separado.
+                            </Popover.Body>
+                          </Popover>
+                        }
+                      >
+                        <Button variant="light">
+                          <InfoIcon />
+                        </Button>
+                      </OverlayTrigger>
+                    </div>
+                    {isResultadosLoading ? (
+                      <>
+                        <br />
+                        <Spinner animation="border" variant="secondary" />
+                      </>
+                    ) : (
+                      <div>
+                        <ApexRadialChart
+                          series={resultados["lift"] ? resultados["lift"] : 0}
+                        />
+                      </div>
+                    )}
+                  </Card.Body>
+                </Card>
+              </>
+            )}
           </CardGroup>
         </div>
       )}
@@ -346,9 +571,11 @@ const TableroEstudiantes = () => {
                   setFilter(null);
                   setAntecedentes([]);
                   setConsecuentes([]);
-                  setResultados([]);
+                  setResultados(null);
+                  setAlert(false);
                 }}
                 title="Restaurar"
+                disabled={!data?.total_encuestados}
               >
                 <ReloadIcon />
               </Button>
@@ -421,11 +648,7 @@ const TableroEstudiantes = () => {
           <Button
             variant="dark"
             onClick={() => {
-              handleEnviarClick({
-                antecedente: antecedentes,
-                consecuente: consecuentes,
-                formulario_id: idFormulario,
-              });
+              handleValidar();
             }}
             style={{ width: "25%" }}
           >
