@@ -52,7 +52,6 @@ const HtmlEmbedder = ({ idFormulario, idFacultad }) => {
       }
       setIsLoading(false);
     });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idFormulario]);
 
@@ -60,7 +59,6 @@ const HtmlEmbedder = ({ idFormulario, idFacultad }) => {
     // Ejecutar handleEmbed después de que htmlCode haya sido actualizado
     if (htmlCode) {
       handleEmbed();
-      console.log("HI");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [htmlCode]);

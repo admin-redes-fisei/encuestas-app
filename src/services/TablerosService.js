@@ -44,8 +44,6 @@ export async function obtenerConteoDatosFiltrados(parametros) {
 }
 
 export async function obtenerCodeTablero(for_id, fac_id) {
-  console.log(for_id);
-  console.log(fac_id);
   try {
     if (for_id !== null) {
       const response = await fetch(

@@ -54,6 +54,7 @@ const TableroEmpresas = () => {
   //para carga
   const [isLoading, setIsLoading] = useState(true);
   const [isResultadosLoading, setIsResultadosLoading] = useState(false);
+  const [isDatasetLoading, setIsDatasetLoading] = useState(false);
   //para data
   const [formData, setFormData] = useState({
     tab_tipo: 1,
@@ -154,17 +155,10 @@ const TableroEmpresas = () => {
     setIsResultadosLoading(true);
     handleCloseModal();
     setResultados([]);
+    setAlert(false);
     try {
       enviarReglas(reglas).then((data) => {
         if (data.error) {
-          toast.warning("No se ha encontrado la regla en los registros", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-          });
           setAlert(true);
         }
         setResultados(data);
@@ -177,14 +171,17 @@ const TableroEmpresas = () => {
 
   //para el dataset
   useEffect(() => {
+    setIsDatasetLoading(true);
     obtenerDatasetFiltrado({
       formulario_id: idFormulario,
-      filtros: filter,
+      filtros: filter ? filter : [],
     }).then((response) => {
       if (response?.error) {
         setDataset([]);
+        setIsDatasetLoading(false);
       } else {
         setDataset(response);
+        setIsDatasetLoading(false);
       }
     });
   }, [filter, idFormulario]);
@@ -264,7 +261,9 @@ const TableroEmpresas = () => {
         <DropdownButton
           as={ButtonGroup}
           disabled={
-            parseInt(formData.tab_tipo) === 2 || !data?.total_encuestados
+            parseInt(formData.tab_tipo) === 2 ||
+            !data?.total_encuestados ||
+            isDatasetLoading
           }
           align={{ lg: "end" }}
           variant="light"
@@ -273,10 +272,15 @@ const TableroEmpresas = () => {
           }}
           title={
             <>
-              <DownloadIcon color="#333F49" />
+              {isDatasetLoading ? (
+                <Spinner animation="border" variant="secondary" size="sm" />
+              ) : (
+                <DownloadIcon color="#333F49" />
+              )}
               Exportar
             </>
           }
+          onClick={() => console.log("hoaaa")}
         >
           <PDFDownloadLink
             document={
@@ -329,7 +333,7 @@ const TableroEmpresas = () => {
             <b>Regla: </b> Si{" "}
             {antecedentes?.map((item) => (
               <>
-                <Badge pill bg="primary">
+                <Badge pill bg="primary" key={item}>
                   {item}
                 </Badge>{" "}
               </>
@@ -348,6 +352,7 @@ const TableroEmpresas = () => {
                       ? "success"
                       : "warning"
                   }
+                  key={item}
                 >
                   {item}
                 </Badge>{" "}

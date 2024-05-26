@@ -106,6 +106,7 @@ function AdminSideBar() {
                   borderRadius: "15px",
                   marginTop: "10px",
                   textDecoration: "none",
+                  fontSize:"12px"
                 }}
               >
                 <UsersIcon

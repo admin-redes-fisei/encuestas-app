@@ -18,6 +18,7 @@ import imagenNoTablero from "../assets/noEncontrado.jpg";
 
 const TableroAnalytics = () => {
   const [htmlCode, setHtmlCode] = useState("");
+  const [temporalCode, setTemporalCode] = useState("");
   const [iframeSrc, setIframeSrc] = useState("");
   const [showModal, setShowModal] = useState(false);
   const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
@@ -27,7 +28,7 @@ const TableroAnalytics = () => {
   //const [refresh, setRefresh] = useState(0);
 
   const handleInputChange = (event) => {
-    setHtmlCode(event.target.value);
+    setTemporalCode(event.target.value);
   };
 
   const handleEmbed = () => {
@@ -41,13 +42,14 @@ const TableroAnalytics = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    // Obtener el código HTML del tablero
     obtenerCodeTablero(null, usuario_actual?.usu_facultad_pertenece).then(
       (response) => {
         if (response) {
           setHtmlCode(response[0]?.tab_codigo);
+          setTemporalCode(response[0]?.tab_codigo);
         } else {
           setHtmlCode("");
+          setTemporalCode("");
         }
         setIsLoading(false);
       }
@@ -56,6 +58,7 @@ const TableroAnalytics = () => {
 
   useEffect(() => {
     if (htmlCode) {
+      // Ejecutar handleEmbed después de que htmlCode haya sido actualizado
       handleEmbed();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,11 +66,12 @@ const TableroAnalytics = () => {
 
   const handleSave = () => {
     agregarTablero({
-      tab_codigo: htmlCode,
+      tab_codigo: temporalCode,
       tab_formulario_pertenece: "",
       tab_facultad_pertenece: usuario_actual?.usu_facultad_pertenece,
     }).then((resultado) => {
       if (resultado?.mensaje === "OK") {
+        setHtmlCode(temporalCode);
         handleEmbed();
         setShowModal(false);
       } else {
@@ -157,7 +161,7 @@ const TableroAnalytics = () => {
                       <Form.Control
                         as="textarea"
                         rows={10}
-                        value={htmlCode}
+                        value={temporalCode}
                         onChange={handleInputChange}
                         placeholder="Pega tu código html aquí"
                       />
@@ -191,7 +195,12 @@ const TableroAnalytics = () => {
                 </Modal.Footer>
               </Modal>
 
-              {iframeSrc ? (
+              {isLoading ? (
+                <>
+                  <br />
+                  <Spinner animation="border" variant="danger" />
+                </>
+              ) : iframeSrc ? (
                 <div className="mt-4">
                   <iframe
                     src={iframeSrc}
