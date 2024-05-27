@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import EncuestaSideBar from "../components/FormSidebar";
 import { Button, ProgressBar } from "react-bootstrap";
 import OptionsQuestionCard from "../components/OptionsQuestionCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { enviarRespuestas } from "../services/FormulariosService";
 import { toast } from "react-toastify";
 
@@ -15,6 +15,7 @@ function FormularioPublico() {
   const preguntas_completo = JSON.parse(
     localStorage.getItem("for_pub_preguntas")
   );
+  let { for_alias } = useParams();
   const secciones = JSON.parse(localStorage.getItem("for_pub_secciones"));
   const rutaActual = window.location.pathname;
   const partesRuta = rutaActual.split("/");
@@ -172,7 +173,7 @@ function FormularioPublico() {
     if (validarPreguntas()) {
       enviarRespuestas(JSON.parse(localStorage.getItem("respuestas"))).then(
         (response) => {
-          //navigate("/encuestas/endpage");
+          navigate(`/encuestas/${for_alias}/endpage`);
         }
       );
     } else {

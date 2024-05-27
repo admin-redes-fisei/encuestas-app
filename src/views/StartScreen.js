@@ -25,6 +25,7 @@ function StartPage() {
       const preguntas = JSON.stringify(response);
       localStorage.setItem("for_pub_preguntas", preguntas);
       localStorage.setItem("respuestas", JSON.stringify([]));
+      localStorage.setItem("for_alias", JSON.stringify(""));
       seleccionarSecciones(response);
       setIsLoading(false);
       setFormSize(response?.length);

@@ -3,9 +3,16 @@ import { Card } from "react-bootstrap";
 import FacebookIcon from "../assets/facebookIcon";
 import InstagramIcon from "../assets/instagramIcon";
 import MailIcon from "../assets/mailIcon";
+import { useParams } from "react-router-dom";
 
 function EndPage() {
-  localStorage.setItem("respuestas", JSON.stringify([]));
+  let { for_alias } = useParams();
+  // Eliminar los elementos específicos de localStorage
+  localStorage.removeItem("for_pub_preguntas");
+  localStorage.removeItem("respuestas");
+  localStorage.setItem("for_alias", JSON.stringify(for_alias));
+
+
   const handleRedirect = (url) => {
     window.open(url, "_blank"); // Abre el URL en una nueva ventana del navegador
   };

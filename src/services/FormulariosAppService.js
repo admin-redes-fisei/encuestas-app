@@ -284,6 +284,25 @@ export async function editarPregunta(data) {
   }
 }
 
+export async function duplicarPregunta(data) {
+  try {
+    const respuesta = await fetch(`${URL_acceso}duplicarPregunta.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!respuesta.ok) {
+      throw new Error(`Error al duplicar la pregunta: ${respuesta.statusText}`);
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
 export async function eliminarPregunta(data) {
   try {
     const respuesta = await fetch(`${URL_acceso}eliminarPregunta.php`, {

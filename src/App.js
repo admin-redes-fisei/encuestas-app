@@ -111,6 +111,16 @@ function App() {
     return userIsAuthenticated ? children : <Navigate to="/" />;
   };
 
+  const PrivateRouteFormularioPublico = ({ children }) => {
+    const hasData = localStorage.getItem("for_pub_preguntas");
+    const storedForAlias = JSON.parse(localStorage.getItem("for_alias"));
+    return hasData ? (
+      children
+    ) : (
+      <Navigate to={`/encuestas/${storedForAlias}`} />
+    );
+  };
+
   return (
     <div className="App">
       <div
@@ -230,11 +240,15 @@ function App() {
               </PrivateRouteReportes>
             }
           />
-          <Route path="/encuestas/endpage" element={<EndPage />} />
+          <Route path="/encuestas/:for_alias/endpage" element={<EndPage />} />
           <Route path="/encuestas/:for_alias" element={<StartPage />} />
           <Route
             path="/encuestas/:for_alias/:seccion"
-            element={<FormularioPublico />}
+            element={
+              <PrivateRouteFormularioPublico>
+                <FormularioPublico />
+              </PrivateRouteFormularioPublico>
+            }
           />
           {/*<Route path="/ssd" element={<SSD />} />*/}
         </Routes>

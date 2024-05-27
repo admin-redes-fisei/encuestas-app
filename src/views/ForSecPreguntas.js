@@ -14,6 +14,7 @@ import {
   Table,
 } from "react-bootstrap";
 import {
+  duplicarPregunta,
   editarPregunta,
   eliminarOpcion,
   eliminarPregunta,
@@ -33,6 +34,7 @@ import DownIcon from "../assets/DownIcon";
 import DeleteIcon from "../assets/deleteIcon";
 import ModalPreguntas from "../components/ModalPreguntas";
 import imagenNoData from "../assets/noEncontrado.jpg";
+import DuplicateIcon from "../assets/duplicateIcon";
 
 const Preguntas = () => {
   //para parametros
@@ -155,6 +157,24 @@ const Preguntas = () => {
   const handleEditPregunta = (pregunta) => {
     setFormDataPreguntas(pregunta);
     setShowPregunta(true);
+  };
+
+  //para duplicar
+  const handleDuplicarPregunta = (pregunta_id) => {
+    duplicarPregunta({ pre_id: pregunta_id }).then((respuesta) => {
+      if (respuesta?.mensaje === "OK") {
+        setRefresh(refresh + 1);
+      } else {
+        toast.error("Error al duplicar la pregunta", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+    });
   };
 
   //para eliminar
@@ -497,10 +517,10 @@ const Preguntas = () => {
                           <Dropdown.Item
                             eventKey="1"
                             onClick={() => {
-                              handleEditPregunta(item);
+                              handleDuplicarPregunta(item.pre_id);
                             }}
                           >
-                            <EditIcon /> Duplicar
+                            <DuplicateIcon /> Duplicar
                           </Dropdown.Item>
                           <Dropdown.Item
                             eventKey="1"
