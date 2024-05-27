@@ -172,7 +172,7 @@ function FormularioPublico() {
     if (validarPreguntas()) {
       enviarRespuestas(JSON.parse(localStorage.getItem("respuestas"))).then(
         (response) => {
-          navigate("/encuestas/endpage");
+          //navigate("/encuestas/endpage");
         }
       );
     } else {
@@ -193,11 +193,20 @@ function FormularioPublico() {
     const preguntasSinResponder = [];
     (seccion ? data : preguntas_completo).forEach((pregunta) => {
       if (parseInt(pregunta.requerida) === 1) {
-        const enOtros = respondidas["otros"] ? respondidas["otros"].findIndex(
-          (otro) => parseInt(otro.pregunta_id) === parseInt(pregunta.id)
-        ) : -1;
-        console.log(enOtros);
-        if (!(respondidas[pregunta.pre_alias] || parseInt(enOtros) !== -1)) {
+        const enOtros = respondidas["otros"]
+          ? respondidas["otros"].findIndex(
+              (otro) => parseInt(otro.pregunta_id) === parseInt(pregunta.id)
+            )
+          : -1;
+        if (
+          !(
+            (pregunta.questionType === "radio" ||
+            pregunta.questionType === "scale"
+              ? respondidas[pregunta.pre_alias]
+              : respondidas[pregunta.pre_alias]?.length > 0) ||
+            parseInt(enOtros) !== -1
+          )
+        ) {
           preguntasSinResponder.push(pregunta);
         }
       }
@@ -262,7 +271,7 @@ function FormularioPublico() {
           </Button>
         </div>
         <div style={{ marginTop: "20px" }}>
-          {data.map((question) => (
+          {data?.map((question) => (
             <OptionsQuestionCard
               key={question.id}
               question={question}

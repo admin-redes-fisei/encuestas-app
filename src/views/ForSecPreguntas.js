@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  Alert,
   Button,
   ButtonGroup,
   Card,
@@ -7,6 +8,7 @@ import {
   Dropdown,
   DropdownButton,
   Form,
+  Image,
   Row,
   Spinner,
   Table,
@@ -30,6 +32,7 @@ import UpIcon from "../assets/UpIcon";
 import DownIcon from "../assets/DownIcon";
 import DeleteIcon from "../assets/deleteIcon";
 import ModalPreguntas from "../components/ModalPreguntas";
+import imagenNoData from "../assets/noEncontrado.jpg";
 
 const Preguntas = () => {
   //para parametros
@@ -51,9 +54,9 @@ const Preguntas = () => {
     pre_tipo_imagen: "",
     pre_tooltip_texto: "",
     pre_tooltip_imagen: "",
-    pre_es_abierta: "",
-    pre_es_obligatoria: "",
-    pre_estado: "",
+    pre_es_abierta: 0,
+    pre_es_obligatoria: 0,
+    pre_estado: 1,
   });
   const [formDataOpciones, setFormDataOpciones] = useState({
     opc_id: "",
@@ -345,217 +348,225 @@ const Preguntas = () => {
         paddingTop: "20px",
       }}
     >
-      {isLoading ? (
-        <Spinner animation="border" variant="danger" />
-      ) : (
-        <>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              width: "84vw",
-              marginLeft: "auto",
-              marginRight: "auto",
-              alignItems: "center",
-            }}
-          >
-            <Button variant="link" onClick={() => navigate(-1)}>
-              <BackIcon />
-            </Button>
-            <h3
-              style={{
-                color: "#fff",
-                textAlign: "left",
-              }}
-            >
-              <b>
-                {dataFormulario?.for_nombre} / {dataSeccion[0]?.sec_nombre}
-              </b>
-            </h3>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              width: "83vw",
-              marginLeft: "auto",
-              marginRight: "auto",
-              marginTop: "20px",
-              marginBottom: "10px",
-            }}
-          >
-            <Row>
-              <Col></Col>
-              <Col></Col>
-              <Col>
-                <div className="d-grid gap-2">
-                  <Button
-                    variant="dark"
-                    style={{ width: "auto", marginTop: "30px" }}
-                    onClick={() => {
-                      handleShowPregunta();
-                    }}
-                  >
-                    <PlusIcon />
-                    Nueva Pregunta
-                  </Button>
-                </div>
-              </Col>
-            </Row>
-          </div>
-          <div
-            style={{
-              width: "83vw",
-              marginLeft: "auto",
-              marginRight: "auto",
-              borderRadius: "20px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "20px",
-              paddingTop: "10px",
-              paddingLeft: "45px",
-              paddingRight: "45px",
-              marginBottom: "30px",
-              backgroundColor: "white",
-              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
-            }}
-          >
-            {dataPreguntas?.map((item, index) => (
-              <>
-                <Card
-                  key={item.pre_id}
-                  style={{ width: "95%", marginTop: "20px" }}
-                >
-                  <Card.Body>
-                    <Row>
-                      <Col>
-                        <div
-                          style={{
-                            width: "93%",
-                            display: "flex",
-                            justifyContent: "left",
-                            alignItems: "center",
-                            marginLeft: "auto",
-                          }}
-                        >
-                          <Form.Check
-                            type="switch"
-                            id="custom-switch"
-                            label={
-                              parseInt(item.pre_estado) === 1
-                                ? "Activo"
-                                : "Inactivo"
-                            }
-                            checked={
-                              parseInt(item.pre_estado) === 1 ? true : false
-                            }
-                            inline
-                            onChange={(e) => handleCambiarEstado(e, item)}
-                          />
-                        </div>
-                      </Col>
-                      <Col>
-                        <Card.Subtitle>{item.pre_titulo}</Card.Subtitle>
-                      </Col>
-                      <Col>
-                        <div
-                          style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "right",
-                            alignItems: "center",
-                          }}
-                        >
-                          <DropdownButton
-                            as={ButtonGroup}
-                            variant="outline-light"
-                            title={
-                              <>
-                                <EllipsisIcon
-                                  fill={"#000"}
-                                  height={20}
-                                  width={20}
-                                />
-                              </>
-                            }
-                            style={{ float: "right" }}
-                          >
-                            <Dropdown.Item
-                              eventKey="2"
-                              disabled={index === 0}
-                              onClick={() =>
-                                handleCambiarPoscicion(item, index, "u")
-                              }
-                            >
-                              <UpIcon /> Mover Arriba
-                            </Dropdown.Item>
-                            <Dropdown.Item
-                              eventKey="2"
-                              disabled={index === dataPreguntas?.length - 1}
-                              onClick={() =>
-                                handleCambiarPoscicion(item, index, "d")
-                              }
-                            >
-                              <DownIcon /> Mover Abajo
-                            </Dropdown.Item>
-
-                            <Dropdown.Item
-                              eventKey="1"
-                              onClick={() => {
-                                handleEditPregunta(item);
-                              }}
-                            >
-                              <EditIcon /> Editar
-                            </Dropdown.Item>
-                            <Dropdown.Item
-                              eventKey="2"
-                              onClick={() => {
-                                handleDeletePregunta(item.pre_id);
-                              }}
-                            >
-                              <DeleteIcon /> Eliminar
-                            </Dropdown.Item>
-                          </DropdownButton>
-                        </div>
-                      </Col>
-                    </Row>
-                    <br />
-                    <Card.Text>{item.pre_texto}</Card.Text>
-                    {item?.opciones?.length > 0 ? (
-                      <Table
-                        hover
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          width: "84vw",
+          marginLeft: "auto",
+          marginRight: "auto",
+          alignItems: "center",
+        }}
+      >
+        <Button variant="link" onClick={() => navigate(-1)}>
+          <BackIcon />
+        </Button>
+        <h3
+          style={{
+            color: "#fff",
+            textAlign: "left",
+          }}
+        >
+          <b>
+            {dataFormulario?.for_nombre} / {dataSeccion[0]?.sec_nombre}
+          </b>
+        </h3>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          width: "83vw",
+          marginLeft: "auto",
+          marginRight: "auto",
+          marginBottom: "10px",
+        }}
+      >
+        <Button
+          variant="dark"
+          style={{ width: "auto", float: "right", marginLeft: "auto" }}
+          onClick={() => {
+            handleShowPregunta();
+          }}
+        >
+          <PlusIcon />
+          Nueva Pregunta
+        </Button>
+      </div>
+      <div
+        style={{
+          width: "83vw",
+          marginLeft: "auto",
+          marginRight: "auto",
+          borderRadius: "20px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px",
+          paddingTop: "10px",
+          paddingLeft: "45px",
+          paddingRight: "45px",
+          marginBottom: "30px",
+          backgroundColor: "white",
+          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
+        }}
+      >
+        {isLoading ? (
+          <Spinner animation="border" variant="danger" />
+        ) : dataPreguntas?.length > 0 ? (
+          dataPreguntas?.map((item, index) => (
+            <>
+              <Card
+                key={item.pre_id}
+                style={{ width: "95%", marginTop: "20px" }}
+              >
+                <Card.Body>
+                  <Row>
+                    <Col>
+                      <div
                         style={{
-                          width: "80%",
+                          width: "93%",
+                          display: "flex",
+                          justifyContent: "left",
+                          alignItems: "center",
                           marginLeft: "auto",
-                          marginRight: "auto",
-                          borderRadius: "20px",
-                          marginTop: "5px",
                         }}
                       >
-                        <tbody>
-                          {item?.opciones?.map((opcion, index) => (
-                            <tr
-                              key={opcion.opc_id}
-                              style={{ marginTop: "50px" }}
+                        <Form.Check
+                          type="switch"
+                          id="custom-switch"
+                          label={
+                            parseInt(item.pre_estado) === 1
+                              ? "Activo"
+                              : "Inactivo"
+                          }
+                          checked={
+                            parseInt(item.pre_estado) === 1 ? true : false
+                          }
+                          inline
+                          onChange={(e) => handleCambiarEstado(e, item)}
+                        />
+                      </div>
+                    </Col>
+                    <Col>
+                      <Card.Subtitle>{item.pre_titulo}</Card.Subtitle>
+                    </Col>
+                    <Col>
+                      <div
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "right",
+                          alignItems: "center",
+                        }}
+                      >
+                        <DropdownButton
+                          as={ButtonGroup}
+                          variant="outline-light"
+                          title={
+                            <>
+                              <EllipsisIcon
+                                fill={"#000"}
+                                height={20}
+                                width={20}
+                              />
+                            </>
+                          }
+                          style={{ float: "right" }}
+                        >
+                          <Dropdown.Item
+                            eventKey="2"
+                            disabled={index === 0}
+                            onClick={() =>
+                              handleCambiarPoscicion(item, index, "u")
+                            }
+                          >
+                            <UpIcon /> Mover Arriba
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            eventKey="2"
+                            disabled={index === dataPreguntas?.length - 1}
+                            onClick={() =>
+                              handleCambiarPoscicion(item, index, "d")
+                            }
+                          >
+                            <DownIcon /> Mover Abajo
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            eventKey="1"
+                            onClick={() => {
+                              handleEditPregunta(item);
+                            }}
+                          >
+                            <EditIcon /> Duplicar
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            eventKey="1"
+                            onClick={() => {
+                              handleEditPregunta(item);
+                            }}
+                          >
+                            <EditIcon /> Editar
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            eventKey="2"
+                            onClick={() => {
+                              handleDeletePregunta(item.pre_id);
+                            }}
+                          >
+                            <DeleteIcon /> Eliminar
+                          </Dropdown.Item>
+                        </DropdownButton>
+                      </div>
+                    </Col>
+                  </Row>
+                  <br />
+                  <Card.Text>{item.pre_texto}</Card.Text>
+                  {item?.opciones?.length > 0 ? (
+                    <Table
+                      hover
+                      style={{
+                        width: "80%",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                        borderRadius: "20px",
+                        marginTop: "5px",
+                      }}
+                    >
+                      <tbody>
+                        {item?.opciones?.map((opcion, index) => (
+                          <tr key={opcion.opc_id} style={{ marginTop: "50px" }}>
+                            <td
+                              style={{
+                                width: "5%",
+                                color:
+                                  parseInt(opcion.opc_eliminado) === 1
+                                    ? "#CBCBCB"
+                                    : "#333F49",
+                                paddingTop: "15px",
+                              }}
                             >
+                              {index + 1}
+                            </td>
+                            <td
+                              style={{
+                                width: opcion.opc_padre ? "50%" : "80%",
+                                color:
+                                  parseInt(opcion.opc_eliminado) === 1
+                                    ? "#CBCBCB"
+                                    : "#333F49",
+                                paddingTop: "15px",
+                                textAlign: "left",
+                              }}
+                            >
+                              {opcion.opc_label}
+                            </td>
+                            {opcion.opc_padre && (
                               <td
                                 style={{
-                                  width: "5%",
-                                  color:
-                                    parseInt(opcion.opc_eliminado) === 1
-                                      ? "#CBCBCB"
-                                      : "#333F49",
-                                  paddingTop: "15px",
-                                }}
-                              >
-                                {index + 1}
-                              </td>
-                              <td
-                                style={{
-                                  width: opcion.opc_padre ? "50%" : "80%",
+                                  width: "30%",
                                   color:
                                     parseInt(opcion.opc_eliminado) === 1
                                       ? "#CBCBCB"
@@ -564,132 +575,131 @@ const Preguntas = () => {
                                   textAlign: "left",
                                 }}
                               >
-                                {opcion.opc_label}
+                                {opcion.opc_padre}
                               </td>
-                              {opcion.opc_padre && (
-                                <td
-                                  style={{
-                                    width: "30%",
-                                    color:
-                                      parseInt(opcion.opc_eliminado) === 1
-                                        ? "#CBCBCB"
-                                        : "#333F49",
-                                    paddingTop: "15px",
-                                    textAlign: "left",
-                                  }}
-                                >
-                                  {opcion.opc_padre}
-                                </td>
-                              )}
-                              <td
-                                style={{
-                                  width: "15%",
-                                  color: "333F49",
-                                  flex: 3,
-                                }}
-                              >
-                                {parseInt(opcion.opc_eliminado) === 1 ? (
-                                  <Button
-                                    variant="link"
-                                    title="Editar opción"
-                                    onClick={() =>
-                                      handleResetOpcion(opcion.opc_id)
-                                    }
-                                  >
-                                    Restaurar
-                                  </Button>
-                                ) : (
-                                  <>
-                                    <Button
-                                      variant="outline-light"
-                                      title="Editar opción"
-                                      onClick={() => {
-                                        setPreguntaSeleccionada(item);
-                                        handleEditOpcion(opcion);
-                                      }}
-                                    >
-                                      <EditIcon />
-                                    </Button>
-                                    <Button
-                                      variant="outline-light"
-                                      title="Eliminar opción"
-                                      onClick={() =>
-                                        handleDeleteOpcion(opcion.opc_id)
-                                      }
-                                    >
-                                      <CloseIcon />
-                                    </Button>
-                                  </>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </Table>
-                    ) : (
-                      <div>
-                        {item?.pre_tipo !== "text"
-                          ? "No hay opciones registrados"
-                          : "Las preguntas de texto no contienen opciones"}
-                      </div>
-                    )}
-                    {item?.pre_tipo !== "text" && (
-                      <Row
-                        style={{
-                          width: "80%",
-                          marginLeft: "auto",
-                          marginRight: "auto",
-                        }}
-                      >
-                        <Col>
-                          <div className="d-grid gap-2">
-                            <Button
-                              variant="outline-secondary"
+                            )}
+                            <td
                               style={{
-                                height: "37px",
-                                width: "50%",
-                                marginLeft: "auto",
-                                marginRight: "auto",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                              onClick={() => {
-                                setPreguntaSeleccionada(item);
-                                handleShowOpcion();
+                                width: "15%",
+                                color: "333F49",
+                                flex: 3,
                               }}
                             >
-                              <PlusIcon color={"#000"} />
-                              Nueva opción
-                            </Button>
-                          </div>
-                        </Col>
-                      </Row>
-                    )}
-                  </Card.Body>
-                </Card>
-              </>
-            ))}
-          </div>
-          <ModalOpciones
-            data={formDataOpciones}
-            show={showOpcion}
-            handleClose={handleCloseOpcion}
-            isAccordeon={
-              preguntaSeleccionada?.opciones
-                ? preguntaSeleccionada?.opciones[0]?.opc_padre !== null
-                : false
-            } // Puedes ajustar este valor según sea necesario
-            pregunta_pertenece={preguntaSeleccionada.pre_id}
-          />
-          <ModalPreguntas
-            data={formDataPreguntas}
-            show={showPregunta}
-            handleClose={handleClosePregunta}
-            seccion_pertenece={parseInt(secID)}
-          />
-        </>
-      )}
+                              {parseInt(opcion.opc_eliminado) === 1 ? (
+                                <Button
+                                  variant="link"
+                                  title="Editar opción"
+                                  onClick={() =>
+                                    handleResetOpcion(opcion.opc_id)
+                                  }
+                                >
+                                  Restaurar
+                                </Button>
+                              ) : (
+                                <>
+                                  <Button
+                                    variant="outline-light"
+                                    title="Editar opción"
+                                    onClick={() => {
+                                      setPreguntaSeleccionada(item);
+                                      handleEditOpcion(opcion);
+                                    }}
+                                  >
+                                    <EditIcon />
+                                  </Button>
+                                  <Button
+                                    variant="outline-light"
+                                    title="Eliminar opción"
+                                    onClick={() =>
+                                      handleDeleteOpcion(opcion.opc_id)
+                                    }
+                                  >
+                                    <CloseIcon />
+                                  </Button>
+                                </>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  ) : (
+                    <div>
+                      {item?.pre_tipo !== "text"
+                        ? "No hay opciones registradas"
+                        : "Las preguntas abiertas no contienen opciones"}
+                    </div>
+                  )}
+                  {item?.pre_tipo !== "text" && (
+                    <Row
+                      style={{
+                        width: "80%",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                      }}
+                    >
+                      <Col>
+                        <div className="d-grid gap-2">
+                          <Button
+                            variant="outline-secondary"
+                            style={{
+                              height: "37px",
+                              width: "50%",
+                              marginLeft: "auto",
+                              marginRight: "auto",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                            onClick={() => {
+                              setPreguntaSeleccionada(item);
+                              handleShowOpcion();
+                            }}
+                          >
+                            <PlusIcon color={"#000"} />
+                            Nueva opción
+                          </Button>
+                        </div>
+                      </Col>
+                    </Row>
+                  )}
+                </Card.Body>
+              </Card>
+            </>
+          ))
+        ) : (
+          <>
+            <br />
+            <br />
+            <Alert
+              key="secondary"
+              variant="secondary"
+              style={{
+                width: "fit-content",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
+              Aún no se ha registrado ninguna pregunta para esta sección.
+            </Alert>
+            <Image src={imagenNoData} rounded style={{ width: "30%" }} />
+          </>
+        )}
+      </div>
+      <ModalOpciones
+        data={formDataOpciones}
+        show={showOpcion}
+        handleClose={handleCloseOpcion}
+        isAccordeon={preguntaSeleccionada?.pre_tipo === "accordeon"}
+        isScale={preguntaSeleccionada?.pre_tipo === "scale"}
+        pregunta_pertenece={preguntaSeleccionada.pre_id}
+      />
+      <ModalPreguntas
+        data={formDataPreguntas}
+        show={showPregunta}
+        handleClose={handleClosePregunta}
+        seccion_pertenece={parseInt(secID)}
+      />
     </div>
   );
 };

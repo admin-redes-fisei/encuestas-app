@@ -12,6 +12,7 @@ import {
   Modal,
   Pagination,
   Row,
+  Spinner,
   Table,
 } from "react-bootstrap";
 import {
@@ -103,6 +104,8 @@ const Formularios = () => {
     for_descripcion: "",
     for_tipo: "",
   });
+  //cargando
+  const [isLoading, setIsLoading] = useState(true);
 
   //para el buscador
   useEffect(() => {
@@ -118,10 +121,12 @@ const Formularios = () => {
 
   //para listar
   useEffect(() => {
+    setIsLoading(true);
     listarFormularios().then((datos) => {
       if (datos?.error) {
         setOtherData([]);
         setMyyData([]);
+        setIsLoading(false);
       } else {
         setOtherData(
           datos.filter(
@@ -137,6 +142,7 @@ const Formularios = () => {
               usuario_actual.usu_facultad_pertenece
           )
         );
+        setIsLoading(false);
       }
     });
   }, [refresh, usuario_actual.usu_facultad_pertenece]);
@@ -165,10 +171,15 @@ const Formularios = () => {
 
   //para validar
   const handleValidate = () => {
-    if (formData.for_nombre !== "" && formData.for_descripcion !== "") {
+    if (
+      formData.for_nombre !== "" &&
+      !myData.find((item) => item.for_alias === formData.for_alias) &&
+      !otherData.find((item) => item.for_alias === formData.for_alias) &&
+      formData.for_tipo !== ""
+    ) {
       handleSave();
     } else {
-      toast.error("Campos imcompletos o incorrectos", {
+      toast.error("Campos incompletos o incorrectos", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -237,7 +248,6 @@ const Formularios = () => {
         editarFormularioActivo({
           for_id: formulario,
         }).then((resultado) => {
-          console.log(resultado);
           if (resultado?.mensaje === "OK") {
             setRefresh(refresh + 1);
           } else {
@@ -327,7 +337,7 @@ const Formularios = () => {
           variant="dark"
           style={{
             height: "37px",
-            width: "155px",
+            width: "auto",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -335,7 +345,7 @@ const Formularios = () => {
           onClick={handleShowEncuesta}
         >
           <PlusIcon />
-          Nueva Carrera
+          Nuevo Formulario
         </Button>
       </div>
       <div
@@ -350,283 +360,301 @@ const Formularios = () => {
           marginBottom: "40px",
         }}
       >
-        <Col style={{ width: "50%" }}>
-          <Row
+        {isLoading ? (
+          <div
             style={{
+              width:"100%",
+              display:"flex",
               justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            {myData
-              ?.filter((data) => data.for_tipo === "empresas")
-              ?.map((item) => (
-                <Card
-                  style={{
-                    width: "90%",
-                    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
-                    margin: "10px",
-                  }}
-                >
-                  <Card.Body
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    {parseInt(item.for_estado) === 1 && (
-                      <BussinesIcon fill={"#000"} height={50} width={50} />
-                    )}
-                    <Form.Check
-                      type="switch"
-                      id="custom-switch"
-                      label={
-                        parseInt(item.for_estado) === 1 ? "Activo" : "Inactivo"
-                      }
-                      checked={parseInt(item.for_estado) === 1 ? true : false}
-                      inline
-                      onChange={(e) => handleCambiarEstado(e, item?.for_id)}
-                      disabled={parseInt(item.for_estado) === 1}
-                    />
-                    <span
+            <Spinner animation="border" variant="dark" />
+          </div>
+        ) : (
+          <>
+            <Col style={{ width: "50%" }}>
+              <Row
+                style={{
+                  justifyContent: "center",
+                }}
+              >
+                {myData
+                  ?.filter((data) => data.for_tipo === "empresas")
+                  ?.map((item) => (
+                    <Card
+                      key={item?.for_id}
                       style={{
-                        color: "#000",
-                        textAlign:
-                          parseInt(item.for_estado) === 1 ? "center" : "left",
+                        width: "90%",
+                        boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
+                        margin: "10px",
                       }}
                     >
-                      <b>{item.for_nombre}</b>
-                    </span>
-                    <DropdownButton
-                      as={ButtonGroup}
-                      variant="outline-light"
-                      title={
-                        <>
-                          <EllipsisIcon fill={"#000"} height={20} width={20} />
-                        </>
-                      }
-                      style={{ float: "right" }}
-                    >
-                      <Dropdown.Item
-                        eventKey="2"
-                        onClick={() => navigate(`/formularios/${item.for_id}`)}
-                      >
-                        Editar
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        eventKey="2"
-                        onClick={() => handleDuplicar(item.for_id)}
-                      >
-                        Duplicar
-                      </Dropdown.Item>
-                      {parseInt(item.for_estado) === 1 ? (
-                        <>
-                          <Dropdown.Item
-                            eventKey="1"
-                            onClick={() =>
-                              window.open(
-                                `/encuestas/${item.for_alias}`,
-                                "_blank"
-                              )
-                            }
-                          >
-                            Ver encuesta
-                          </Dropdown.Item>
-                          <Dropdown.Item
-                            eventKey="3"
-                            onClick={() =>
-                              handleShow(
-                                `http://hatunsoft.uta.edu.ec:4000/encuestas/${item.for_alias}`
-                              )
-                            }
-                          >
-                            Compartir
-                          </Dropdown.Item>
-                        </>
-                      ) : (
-                        <Dropdown.Item
-                          eventKey="2"
-                          onClick={() => handleEliminar(item.for_id)}
-                        >
-                          Eliminar
-                        </Dropdown.Item>
-                      )}
-                      <PDFDownloadLink
-                        document={
-                          <MyDocumentEncuesta formularioId={item.for_id} />
-                        }
+                      <Card.Body
                         style={{
-                          textDecoration: "none",
-                          color: "black",
-                          marginLeft: "16px",
+                          width: "100%",
+                          display: "flex",
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
                         }}
-                        fileName={`encuesta_${item.for_alias}.pdf`}
                       >
-                        Exportar PDF
-                      </PDFDownloadLink>
-                    </DropdownButton>
-                  </Card.Body>
-                </Card>
-              ))}
-          </Row>
-        </Col>
-        <Col style={{ width: "50%" }}>
-          <Row
-            style={{
-              justifyContent: "center",
-            }}
-          >
-            {myData
-              ?.filter((data) => data.for_tipo === "estudiantes")
-              ?.map((item) => (
-                <Card
-                  style={{
-                    width: "90%",
-                    paddingTop: "0px",
-                    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
-                    margin: "10px",
-                  }}
-                >
-                  <Card.Body
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    {parseInt(item.for_estado) === 1 && (
-                      <StudentIcon fill={"#000"} height={50} width={50} />
-                    )}
-                    <Form.Check
-                      type="switch"
-                      id="custom-switch"
-                      label={
-                        parseInt(item.for_estado) === 1 ? "Activo" : "Inactivo"
-                      }
-                      checked={parseInt(item.for_estado) === 1 ? true : false}
-                      inline
-                      onChange={(e) => handleCambiarEstado(e, item?.for_id)}
-                      disabled={parseInt(item.for_estado) === 1}
-                    />
-                    <sapn
+                        {parseInt(item.for_estado) === 1 && (
+                          <BussinesIcon fill={"#000"} height={50} width={50} />
+                        )}
+                        <Form.Check
+                          type="switch"
+                          id="custom-switch"
+                          label={
+                            parseInt(item.for_estado) === 1
+                              ? "Activo"
+                              : "Inactivo"
+                          }
+                          checked={
+                            parseInt(item.for_estado) === 1 ? true : false
+                          }
+                          inline
+                          onChange={(e) => handleCambiarEstado(e, item?.for_id)}
+                          disabled={parseInt(item.for_estado) === 1}
+                          style={{
+                            marginLeft:
+                              parseInt(item.for_estado) === 1 ? "10px" : "0px",
+                          }}
+                        />
+                        <span
+                          style={{
+                            width: "100%",
+                            color: "#000",
+                            textAlign:
+                              parseInt(item.for_estado) === 1
+                                ? "center"
+                                : "left",
+                          }}
+                        >
+                          <b>{item.for_nombre}</b>
+                        </span>
+                        <DropdownButton
+                          as={ButtonGroup}
+                          variant="outline-light"
+                          title={
+                            <>
+                              <EllipsisIcon
+                                fill={"#000"}
+                                height={20}
+                                width={20}
+                              />
+                            </>
+                          }
+                          style={{ float: "right" }}
+                        >
+                          <Dropdown.Item
+                            eventKey="2"
+                            onClick={() =>
+                              navigate(`/formularios/${item.for_id}`)
+                            }
+                          >
+                            Editar
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            eventKey="2"
+                            onClick={() => handleDuplicar(item.for_id)}
+                          >
+                            Duplicar
+                          </Dropdown.Item>
+                          {parseInt(item.for_estado) === 1 ? (
+                            <>
+                              <Dropdown.Item
+                                eventKey="1"
+                                onClick={() =>
+                                  window.open(
+                                    `/encuestas/${item.for_alias}`,
+                                    "_blank"
+                                  )
+                                }
+                              >
+                                Ver encuesta
+                              </Dropdown.Item>
+                              <Dropdown.Item
+                                eventKey="3"
+                                onClick={() =>
+                                  handleShow(
+                                    `http://hatunsoft.uta.edu.ec:4000/encuestas/${item.for_alias}`
+                                  )
+                                }
+                              >
+                                Compartir
+                              </Dropdown.Item>
+                            </>
+                          ) : (
+                            <Dropdown.Item
+                              eventKey="2"
+                              onClick={() => handleEliminar(item.for_id)}
+                            >
+                              Eliminar
+                            </Dropdown.Item>
+                          )}
+                          <PDFDownloadLink
+                            document={
+                              <MyDocumentEncuesta formularioId={item.for_id} />
+                            }
+                            style={{
+                              textDecoration: "none",
+                              color: "black",
+                              marginLeft: "16px",
+                            }}
+                            fileName={`encuesta_${item.for_alias}.pdf`}
+                          >
+                            Exportar PDF
+                          </PDFDownloadLink>
+                        </DropdownButton>
+                      </Card.Body>
+                    </Card>
+                  ))}
+              </Row>
+            </Col>
+            <Col style={{ width: "50%" }}>
+              <Row
+                style={{
+                  justifyContent: "center",
+                }}
+              >
+                {myData
+                  ?.filter((data) => data.for_tipo === "estudiantes")
+                  ?.map((item) => (
+                    <Card
+                      key={item?.for_id}
                       style={{
-                        color: "#000",
-                        textAlign:
-                          parseInt(item.for_estado) === 1 ? "center" : "left",
+                        width: "90%",
+                        paddingTop: "0px",
+                        boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
+                        margin: "10px",
                       }}
                     >
-                      <b>{item.for_nombre}</b>
-                    </sapn>
-                    <DropdownButton
-                      as={ButtonGroup}
-                      variant="outline-light"
-                      title={
-                        <>
-                          <EllipsisIcon fill={"#000"} height={20} width={20} />
-                        </>
-                      }
-                      style={{ float: "right" }}
-                    >
-                      <Dropdown.Item
-                        eventKey="2"
-                        onClick={() => navigate(`/formularios/${item.for_id}`)}
-                      >
-                        Editar
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        eventKey="2"
-                        onClick={() => handleDuplicar(item.for_id)}
-                      >
-                        Duplicar
-                      </Dropdown.Item>
-                      {parseInt(item.for_estado) === 1 ? (
-                        <>
-                          <Dropdown.Item
-                            eventKey="1"
-                            onClick={() =>
-                              window.open(
-                                `/encuestas/${item.for_alias}`,
-                                "_blank"
-                              )
-                            }
-                          >
-                            Ver encuesta
-                          </Dropdown.Item>
-                          <Dropdown.Item
-                            eventKey="3"
-                            onClick={() =>
-                              handleShow(
-                                `http://hatunsoft.uta.edu.ec:4000/encuestas/${item.for_alias}`
-                              )
-                            }
-                          >
-                            Compartir
-                          </Dropdown.Item>
-                        </>
-                      ) : (
-                        <Dropdown.Item
-                          eventKey="2"
-                          onClick={() => handleEliminar(item.for_id)}
-                        >
-                          Eliminar
-                        </Dropdown.Item>
-                      )}
-                      <PDFDownloadLink
-                        document={
-                          <MyDocumentEncuesta formularioId={item.for_id} />
-                        }
+                      <Card.Body
                         style={{
-                          textDecoration: "none",
-                          color: "black",
-                          marginLeft: "16px",
+                          width: "100%",
+                          display: "flex",
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
                         }}
-                        fileName={`encuesta_${item.for_alias}.pdf`}
                       >
-                        Exportar PDF
-                      </PDFDownloadLink>
-                    </DropdownButton>
-                  </Card.Body>
-                </Card>
-              ))}
-          </Row>
-        </Col>
+                        {parseInt(item.for_estado) === 1 && (
+                          <StudentIcon fill={"#000"} height={50} width={50} />
+                        )}
+                        <Form.Check
+                          type="switch"
+                          id="custom-switch"
+                          label={
+                            parseInt(item.for_estado) === 1
+                              ? "Activo"
+                              : "Inactivo"
+                          }
+                          checked={
+                            parseInt(item.for_estado) === 1 ? true : false
+                          }
+                          inline
+                          onChange={(e) => handleCambiarEstado(e, item?.for_id)}
+                          disabled={parseInt(item.for_estado) === 1}
+                          style={{
+                            marginLeft:
+                              parseInt(item.for_estado) === 1 ? "10px" : "0px",
+                          }}
+                        />
+                        <sapn
+                          style={{
+                            width: "100%",
+                            color: "#000",
+                            textAlign:
+                              parseInt(item.for_estado) === 1
+                                ? "center"
+                                : "left",
+                          }}
+                        >
+                          <b>{item.for_nombre}</b>
+                        </sapn>
+                        <DropdownButton
+                          as={ButtonGroup}
+                          variant="outline-light"
+                          title={
+                            <>
+                              <EllipsisIcon
+                                fill={"#000"}
+                                height={20}
+                                width={20}
+                              />
+                            </>
+                          }
+                          style={{ float: "right" }}
+                        >
+                          <Dropdown.Item
+                            eventKey="2"
+                            onClick={() =>
+                              navigate(`/formularios/${item.for_id}`)
+                            }
+                          >
+                            Editar
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            eventKey="2"
+                            onClick={() => handleDuplicar(item.for_id)}
+                          >
+                            Duplicar
+                          </Dropdown.Item>
+                          {parseInt(item.for_estado) === 1 ? (
+                            <>
+                              <Dropdown.Item
+                                eventKey="1"
+                                onClick={() =>
+                                  window.open(
+                                    `/encuestas/${item.for_alias}`,
+                                    "_blank"
+                                  )
+                                }
+                              >
+                                Ver encuesta
+                              </Dropdown.Item>
+                              <Dropdown.Item
+                                eventKey="3"
+                                onClick={() =>
+                                  handleShow(
+                                    `http://hatunsoft.uta.edu.ec:4000/encuestas/${item.for_alias}`
+                                  )
+                                }
+                              >
+                                Compartir
+                              </Dropdown.Item>
+                            </>
+                          ) : (
+                            <Dropdown.Item
+                              eventKey="2"
+                              onClick={() => handleEliminar(item.for_id)}
+                            >
+                              Eliminar
+                            </Dropdown.Item>
+                          )}
+                          <PDFDownloadLink
+                            document={
+                              <MyDocumentEncuesta formularioId={item.for_id} />
+                            }
+                            style={{
+                              textDecoration: "none",
+                              color: "black",
+                              marginLeft: "16px",
+                            }}
+                            fileName={`encuesta_${item.for_alias}.pdf`}
+                          >
+                            Exportar PDF
+                          </PDFDownloadLink>
+                        </DropdownButton>
+                      </Card.Body>
+                    </Card>
+                  ))}
+              </Row>
+            </Col>
+          </>
+        )}
       </div>
-      <h3
-        style={{
-          color: "#000",
-          textAlign: "left",
-          width: "83vw",
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}
-      >
-        <b>Otros Formularios</b>
-      </h3>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "83vw",
-          marginLeft: "auto",
-          marginRight: "auto",
-          marginTop: "5px",
-        }}
-      >
-        <InputGroup className="mb-2" style={{ width: "50%" }}>
-          <Form.Control
-            type="search"
-            placeholder="Buscar"
-            className="me-2"
-            aria-label="Buscar"
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-        </InputGroup>
-      </div>
-      <br />
       <div
         style={{
           width: "83vw",
@@ -646,6 +674,40 @@ const Formularios = () => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
+        <h3
+          style={{
+            color: "#000",
+            textAlign: "left",
+            width: "83vw",
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginTop: "20px",
+          }}
+        >
+          <b>Otros Formularios</b>
+        </h3>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "83vw",
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginTop: "5px",
+          }}
+        >
+          <InputGroup className="mb-2" style={{ width: "50%" }}>
+            <Form.Control
+              type="search"
+              placeholder="Buscar"
+              className="me-2"
+              aria-label="Buscar"
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          </InputGroup>
+        </div>
+        <br />
         <table style={{ width: "100%" }}>
           <thead>
             <tr>
@@ -733,7 +795,7 @@ const Formularios = () => {
             </tbody>
           </Table>
         ) : (
-          <div>No hay datos registrados</div>
+          <div style={{ marginTop: "30px" }}>No hay datos registrados</div>
         )}
         <div style={{ alignSelf: "center", marginTop: "10px" }}>
           <Pagination>
@@ -787,7 +849,7 @@ const Formularios = () => {
       </Modal>
       <Modal show={showEncuesta} onHide={handleCloseEncuesta}>
         <Modal.Header closeButton>
-          <Modal.Title>Datos de la Carrera</Modal.Title>
+          <Modal.Title>Datos del Formulario</Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ marginLeft: "20px", marginRight: "20px" }}>
           <Form>
@@ -820,11 +882,20 @@ const Formularios = () => {
                     </Form.Label>
                     <Form.Control
                       type="text"
-                      autoFocus
                       name="for_alias"
                       value={formData.for_alias}
                       onChange={handleChange}
                     />
+                    {(myData.find(
+                      (item) => item.for_alias === formData.for_alias
+                    ) ||
+                      otherData.find(
+                        (item) => item.for_alias === formData.for_alias
+                      )) && (
+                      <p style={{ color: "red" }}>
+                        Ya existe un formulario bajo este alias
+                      </p>
+                    )}
                   </Form.Group>
                 </Col>
               </Row>
@@ -862,7 +933,7 @@ const Formularios = () => {
                       value={formData.for_tipo}
                       onChange={handleChange}
                     >
-                      <option value="">Seleccionar tipo de formulario</option>
+                      <option value="">Seleccione</option>
                       <option value="empresas">
                         Encuesta de empleabilidad
                       </option>

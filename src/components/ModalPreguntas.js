@@ -8,11 +8,11 @@ import {
 
 const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
   const tipos_pregunta = [
-    { id: 1, tipo: "radio" },
-    { id: 2, tipo: "checkbox" },
-    { id: 3, tipo: "accordeon" },
-    { id: 4, tipo: "text" },
-    { id: 5, tipo: "scale" },
+    { id: 1, tipo: "radio", label: "Pregunta de Selección Única" },
+    { id: 2, tipo: "checkbox", label: "Pregunta de Selección Múltiple" },
+    { id: 3, tipo: "accordeon", label: "Pregunta Desplegable por Carrera" },
+    { id: 4, tipo: "text", label: "Pregunta de Respuesta Abierta" },
+    { id: 5, tipo: "scale", label: "Pregunta de Escala" },
   ];
 
   const tipos_imagen = [
@@ -50,13 +50,18 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
   const handleValidate = () => {
     if (
       formData.pre_alias !== "" &&
+      formData.pre_tipo !== "" &&
       formData.pre_titulo !== "" &&
-      formData.pre_texto !== "" &&
-      formData.pre_tipo !== ""
+      (formData.pre_tipo_imagen !== ""
+        ? formData.pre_tipo_imagen !== "" && formData.pre_url_imagen !== ""
+        : true) &&
+      (formData.pre_url_imagen !== ""
+        ? formData.pre_url_imagen !== "" && formData.pre_tipo_imagen !== ""
+        : true)
     ) {
       handleSave();
     } else {
-      toast.error("Complete los campos", {
+      toast.error("Campos incompletos o incorrectos", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -69,20 +74,19 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
 
   //para guardar
   const handleSave = () => {
-    const pre_numero = formData.pre_numero.toString();
-    const pre_alias = formData.pre_alias.toString();
-    const pre_titulo = formData.pre_titulo.toString();
-    const pre_texto = formData.pre_texto.toString();
-    const pre_tipo = formData.pre_tipo.toString();
-    const pre_url_imagen = formData.pre_url_imagen.toString();
-    const pre_tipo_imagen = formData.pre_tipo_imagen.toString();
-    const pre_tooltip_texto = formData.pre_tooltip_texto.toString();
-    const pre_tooltip_imagen = formData.pre_tooltip_imagen.toString();
-    const pre_es_abierta = formData.pre_es_abierta.toString();
-    const pre_es_obligatoria = formData.pre_es_obligatoria.toString();
-    const pre_estado = formData.pre_estado.toString();
-    const pre_seccion_pertenece = seccion_pertenece.toString();
-
+    const pre_numero = formData.pre_numero;
+    const pre_alias = formData.pre_alias;
+    const pre_titulo = formData.pre_titulo;
+    const pre_texto = formData.pre_texto;
+    const pre_tipo = formData.pre_tipo;
+    const pre_url_imagen = formData.pre_url_imagen;
+    const pre_tipo_imagen = formData.pre_tipo_imagen;
+    const pre_tooltip_texto = formData.pre_tooltip_texto;
+    const pre_tooltip_imagen = formData.pre_tooltip_imagen;
+    const pre_es_abierta = formData.pre_es_abierta;
+    const pre_es_obligatoria = formData.pre_es_obligatoria;
+    const pre_estado = formData.pre_estado;
+    const pre_seccion_pertenece = seccion_pertenece;
     if (formData.pre_id) {
       const pre_id = formData.pre_id;
       editarPregunta({
@@ -183,11 +187,7 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
                   type="switch"
                   id="custom-switch"
                   name="pre_es_obligatoria"
-                  label={
-                    parseInt(formData.pre_es_obligatoria) === 1
-                      ? "Pregunta Obligatoria"
-                      : "Pregunta Opcional"
-                  }
+                  label={"Pregunta Obligatoria"}
                   checked={
                     parseInt(formData.pre_es_obligatoria) === 1 ? true : false
                   }
@@ -212,10 +212,10 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
                     value={formData.pre_tipo}
                     onChange={handleChange}
                   >
-                    <option value="">Seleccionar Tipo de Pregunta</option>
-                    {tipos_pregunta.map((tipo, index) => (
+                    <option value="">Seleccione</option>
+                    {tipos_pregunta?.map((tipo, index) => (
                       <option key={index} value={tipo.tipo}>
-                        {tipo.tipo}
+                        {tipo.label}
                       </option>
                     ))}
                   </Form.Select>
@@ -275,7 +275,8 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
                 </Form.Group>
               </Col>
             </Row>
-            {formData.pre_tipo === "checkbox" && (
+            {(formData.pre_tipo === "checkbox" ||
+              formData.pre_tipo === "radio") && (
               <>
                 <br />
                 <Row>
@@ -313,8 +314,8 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
                     value={formData.pre_tipo_imagen}
                     onChange={handleChange}
                   >
-                    <option value="">Seleccionar Tipo de Imagen</option>
-                    {tipos_imagen.map((tipo, index) => (
+                    <option value="">Seleccione</option>
+                    {tipos_imagen?.map((tipo, index) => (
                       <option key={index} value={tipo.id}>
                         {tipo.tipo}
                       </option>

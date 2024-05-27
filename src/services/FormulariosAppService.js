@@ -70,6 +70,30 @@ export async function obtenerForSecciones(formularioId) {
   }
 }
 
+export async function obtenerAlias(formularioId) {
+  try {
+    const respuesta = await fetch(
+      `${URL_acceso}listarForAlias.php?formulario_id=${formularioId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!respuesta.ok) {
+      throw new Error("Error al obtener las carreras");
+    }
+
+    const resultado = await respuesta.json();
+
+    return resultado;
+  } catch (error) {
+    console.error("Error al obtener las carreras:", error);
+  }
+}
+
 export async function agregarFormulario(data) {
   try {
     const respuesta = await fetch(`${URL_acceso}agregarFormulario.php`, {
@@ -223,7 +247,6 @@ export async function eliminarSeccion(data) {
 }
 
 export async function agregarPregunta(data) {
-  console.log(data);
   try {
     const respuesta = await fetch(`${URL_acceso}agregarPregunta.php`, {
       method: "POST",
@@ -281,7 +304,6 @@ export async function eliminarPregunta(data) {
 }
 
 export async function agregarOpcion(data) {
-  console.log(data);
   try {
     const respuesta = await fetch(`${URL_acceso}agregarOpcion.php`, {
       method: "POST",

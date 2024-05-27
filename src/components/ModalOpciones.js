@@ -9,6 +9,7 @@ const ModalOpciones = ({
   show,
   handleClose,
   isAccordeon,
+  isScale,
   pregunta_pertenece,
 }) => {
   const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
@@ -68,7 +69,7 @@ const ModalOpciones = ({
     ) {
       handleSave();
     } else {
-      toast.error("Campos inválidos o incorrectos", {
+      toast.error("Campos incompletos o incorrectos", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -191,43 +192,47 @@ const ModalOpciones = ({
               </Row>
             )}
             <br />
-            <h6>Configuración de Tooltip (Opcional)</h6>
-            <Row>
-              <Col>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput1"
-                >
-                  <Form.Label>
-                    <b>Texto del Tooltip</b>
-                  </Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={2}
-                    name="opc_tooltip_texto"
-                    value={formData.opc_tooltip_texto}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
-              </Col>
-              <Col>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput1"
-                >
-                  <Form.Label>
-                    <b>URL para imgen del Tooltip</b>
-                  </Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={2}
-                    name="opc_tooltip_imagen"
-                    value={formData.opc_tooltip_imagen}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
+            {!isScale && (
+              <>
+                <h6>Configuración de Tooltip (Opcional)</h6>
+                <Row>
+                  <Col>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>
+                        <b>Texto del Tooltip</b>
+                      </Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={2}
+                        name="opc_tooltip_texto"
+                        value={formData.opc_tooltip_texto}
+                        onChange={handleChange}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>
+                        <b>URL para imgen del Tooltip</b>
+                      </Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={2}
+                        name="opc_tooltip_imagen"
+                        value={formData.opc_tooltip_imagen}
+                        onChange={handleChange}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </>
+            )}
           </Container>
         </Form>
       </Modal.Body>

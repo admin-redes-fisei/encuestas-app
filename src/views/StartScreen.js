@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import { Button } from "react-bootstrap";
+import { Alert, Button, Image } from "react-bootstrap";
 import Spinner from "react-bootstrap/Spinner";
 import { useNavigate } from "react-router-dom";
 import { obtenerPreguntas } from "../services/FormulariosService";
+import imagenNoFormulario from "../assets/enmantenimiento.png";
 
 function StartPage() {
   //para navegacion
@@ -12,6 +13,7 @@ function StartPage() {
   const [ampliarElemento, setAmpliarElemento] = useState(true);
   //para carga
   const [isLoading, setIsLoading] = useState(true);
+  const [formSize, setFormSize] = useState(0);
   //para obtener preguntas
   const rutaActual = window.location.pathname;
 
@@ -24,7 +26,8 @@ function StartPage() {
       localStorage.setItem("for_pub_preguntas", preguntas);
       localStorage.setItem("respuestas", JSON.stringify([]));
       seleccionarSecciones(response);
-      setIsLoading(false)
+      setIsLoading(false);
+      setFormSize(response?.length);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -91,40 +94,81 @@ function StartPage() {
           <Spinner animation="border" variant="danger" />
         ) : (
           <div>
-            <div
-              className="titles"
-              style={{
-                textAlign: "center",
-                marginTop: "100px",
-                width: "60%",
-                marginRight: "auto",
-                marginLeft: "auto",
-              }}
-            >
-              <h2>
-                <strong>¡BIENVENIDO/A!</strong>
-              </h2>
-              <p>
-                ¡Estamos emocionados de contar con tu participación. Tu opinión
-                es muy valiosa para nosotros. Por favor, tómate el tiempo
-                necesario para responder con sinceridad y detalle. ¡Gracias por
-                formar parte de este proceso!
-              </p>
-            </div>
-            <Button
-              variant="secondary"
-              onClick={handleStarButton}
-              style={{
-                alignSelf: "left",
-                bottom: 0,
-                zIndex: 210,
-                marginTop: "20px",
-                backgroundColor: "#aa1415",
-                border: "none",
-              }}
-            >
-              Comenzar
-            </Button>
+            {formSize > 0 ? (
+              <>
+                <div
+                  className="titles"
+                  style={{
+                    textAlign: "center",
+                    marginTop: "100px",
+                    width: "60%",
+                    marginRight: "auto",
+                    marginLeft: "auto",
+                  }}
+                >
+                  <h2>
+                    <strong>¡BIENVENIDO/A!</strong>
+                  </h2>
+                  <p>
+                    ¡Estamos emocionados de contar con tu participación. Tu
+                    opinión es muy valiosa para nosotros. Por favor, tómate el
+                    tiempo necesario para responder con sinceridad y detalle.
+                    ¡Gracias por formar parte de este proceso!
+                  </p>
+                </div>
+                <Button
+                  variant="secondary"
+                  onClick={handleStarButton}
+                  style={{
+                    alignSelf: "left",
+                    bottom: 0,
+                    zIndex: 210,
+                    marginTop: "20px",
+                    backgroundColor: "#aa1415",
+                    border: "none",
+                  }}
+                >
+                  Comenzar
+                </Button>
+              </>
+            ) : (
+              <div
+                style={{
+                  width: "83vw",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  borderRadius: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "20px",
+                  paddingTop: "10px",
+                  paddingLeft: "45px",
+                  paddingRight: "45px",
+                  backgroundColor: "white",
+                  boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
+                }}
+              >
+                <br />
+                <Alert
+                  key="secondary"
+                  variant="warning"
+                  style={{
+                    width: "fit-content",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                  }}
+                >
+                  Encuesta en Construcción
+                </Alert>
+                <Image
+                  src={imagenNoFormulario}
+                  rounded
+                  style={{ width: "280px" }}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>

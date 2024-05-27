@@ -16,6 +16,7 @@ import {
   editarFormulario,
   editarSeccion,
   eliminarSeccion,
+  obtenerAlias,
   obtenerForSecciones,
 } from "../services/FormulariosAppService";
 import { useNavigate, useParams } from "react-router-dom";
@@ -68,6 +69,7 @@ const Secciones = () => {
   let { forID } = useParams();
   const [dataFormulario, setDataFormulario] = useState([]);
   const [data, setData] = useState([]);
+  const [dataAlias, setDataAlias] = useState([]);
   //Para el buscador
   const [searchValue, setSearchValue] = useState("");
   const [searchedData, setSearchedData] = useState([]);
@@ -113,18 +115,21 @@ const Secciones = () => {
     setIsLoading(true);
     obtenerForSecciones(forID).then((datos) => {
       setFormData({
-        for_id: datos.for_id,
-        for_nombre: datos.for_nombre,
-        for_alias: datos.for_alias,
-        for_descripcion: datos.for_descripcion,
-        for_tipo: datos.for_tipo,
-        for_estado: datos.for_estado,
+        for_id: datos?.for_id,
+        for_nombre: datos?.for_nombre,
+        for_alias: datos?.for_alias,
+        for_descripcion: datos?.for_descripcion,
+        for_tipo: datos?.for_tipo,
+        for_estado: datos?.for_estado,
       });
       setDataFormulario(datos?.for_nombre);
       setData(datos?.secciones);
-      console.log(datos);
-      setIsLoading(false);
+      obtenerAlias(forID).then((datosAlias) => {
+        setDataAlias(datosAlias);
+        setIsLoading(false);
+      });
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forID, refresh]);
 
@@ -135,11 +140,15 @@ const Secciones = () => {
   };
 
   //para validar
-  const handleValidate = () => {
-    if (formData.for_nombre !== "" && formData.for_alias !== "") {
-      handleSave();
+  const handleValidateFormulario = () => {
+    if (
+      formData.for_nombre !== "" &&
+      formData.for_tipo !== "" &&
+      !dataAlias?.find((item) => item.for_alias === formData.for_alias)
+    ) {
+      handleSaveFormulario();
     } else {
-      toast.error("Complete los campos", {
+      toast.error("Campos incompletos o incorrectos", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -150,7 +159,7 @@ const Secciones = () => {
     }
   };
 
-  const handleSave = () => {
+  const handleSaveFormulario = () => {
     const for_nombre = formData.for_nombre.toString();
     const for_alias = formData.for_alias.toString();
     const for_descripcion = formData.for_descripcion.toString();
@@ -161,9 +170,9 @@ const Secciones = () => {
       editarFormulario({
         for_nombre: for_nombre,
         for_alias: for_alias,
+        for_tipo: for_tipo,
         for_descripcion: for_descripcion,
         for_id: for_id,
-        for_tipo: for_tipo,
       }).then((resultado) => {
         if (resultado.mensaje === "OK") {
           setRefresh(refresh + 1);
@@ -286,13 +295,12 @@ const Secciones = () => {
     const { value } = e.target;
     setNuevaSec(value);
   };
-  //para guardar una nueva seccion
+
+  //para editar y agregar seccion
   const handleSaveSeccion = () => {
     const sec_nombre = nuevaSec;
     const sec_numero = data.length + 1;
     const sec_formulario_pertenece = parseInt(formData.for_id);
-    console.log(nuevaSec);
-    console.log(secActualizarId);
     if (nuevaSec) {
       if (secActualizarId) {
         editarSeccion({
@@ -316,7 +324,6 @@ const Secciones = () => {
           }
         });
       } else {
-        console.log("agregar");
         agregarSeccion({
           sec_numero: sec_numero,
           sec_nombre: sec_nombre,
@@ -341,7 +348,7 @@ const Secciones = () => {
   };
 
   //para eliminar
-  const handleDelete = (idSeccion) => {
+  const handleDeleteSeccion = (idSeccion) => {
     const confirmDelete = window.confirm(
       "¿Está seguro de eliminar la sección?"
     );
@@ -432,6 +439,20 @@ const Secciones = () => {
                 onChange={handleChange}
                 disabled={parseInt(formData.for_estado) === 1 ? true : false}
               />
+              {dataAlias?.find(
+                (item) => item.for_alias === formData.for_alias
+              ) && (
+                <p
+                  style={{
+                    color: "red",
+                    backgroundColor: "white",
+                    marginTop: "2px",
+                  }}
+                >
+                  El alias ingresado ya está en uso. Por favor, elige uno
+                  diferente.
+                </p>
+              )}
             </Form.Group>
           </Col>
           <Col>
@@ -472,7 +493,7 @@ const Secciones = () => {
             <div className="d-grid gap-2">
               <Button
                 variant="dark"
-                onClick={handleValidate}
+                onClick={handleValidateFormulario}
                 style={{ width: "auto", marginTop: "30px" }}
               >
                 Guardar
@@ -661,7 +682,7 @@ const Secciones = () => {
                     </Button>
                     <Button
                       variant="outline-light"
-                      onClick={() => handleDelete(item.sec_id)}
+                      onClick={() => handleDeleteSeccion(item.sec_id)}
                       title="Eliminar"
                     >
                       <DeleteIcon />
@@ -672,7 +693,7 @@ const Secciones = () => {
             </tbody>
           </Table>
         ) : (
-          <div>No hay datos registrados</div>
+          <div style={{ marginTop: "30px" }}>No hay datos registrados</div>
         )}
         <div style={{ alignSelf: "center", marginTop: "10px" }}>
           <Pagination>

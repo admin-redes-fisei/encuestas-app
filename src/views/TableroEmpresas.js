@@ -280,7 +280,6 @@ const TableroEmpresas = () => {
               Exportar
             </>
           }
-          onClick={() => console.log("hoaaa")}
         >
           <PDFDownloadLink
             document={
