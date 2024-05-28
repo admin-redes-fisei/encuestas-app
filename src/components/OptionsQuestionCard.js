@@ -176,7 +176,10 @@ function OptionsQuestionCard({
               <Tooltip id={7}>
                 <Image
                   src={question?.pre_tooltip_imagen}
-                  style={{ height: "auto", width: "100%" }}
+                  style={{
+                    height: "auto",
+                    width: "100%",
+                  }}
                 />
                 {question?.pre_tooltip_texto}
               </Tooltip>
@@ -300,68 +303,70 @@ function OptionsQuestionCard({
                 justifyContent: "space-evenly",
               }}
             >
-              {question?.options?.length > 1 && question?.options?.map((option, index) => (
-                <Form.Group className="mb-3" key={option?.id}>
-                  <Form.Check
-                    label={index+1}
-                    type="radio"
-                    name={option?.name}
-                    value={option?.id}
-                    onChange={(e) => {
-                      handleCheckChange(
-                        e,
-                        question?.id,
-                        option?.label,
-                        "radio"
-                      );
-                      setRespondida(e.target.checked);
-                    }}
-                    checked={
-                      respuestas[option?.name]?.respuesta_texto ===
-                      option?.label
-                    }
-                  />
-                  {option?.tooltip_texto && (
-                    <>
-                      <Button
-                        variant="outline-light"
-                        ref={(ref) =>
-                          (buttonRefs.current[`${question?.id}${option?.id}`] =
-                            ref)
-                        } // Asigna un ref al botón
-                        onClick={() =>
-                          handleButtonClick(`${question?.id}${option?.id}`)
-                        }
-                      >
-                        <InfoIcon width="20px" />
-                      </Button>
-                      <Overlay
-                        target={
-                          buttonRefs.current[`${question?.id}${option?.id}`]
-                        }
-                        show={tooltipStates[`${question?.id}${option?.id}`]} //
-                        placement="bottom"
-                        key={`${question?.id}${option?.id}`}
-                      >
-                        {(props) => (
-                          <Tooltip
-                            id={`${question?.id}${option?.id}`}
-                            {...props}
-                          >
-                            {option?.tooltip_img && (
-                              <Image
-                                src={option?.tooltip_img}
-                                style={{ height: "auto", width: "100%" }}
-                              />
-                            )}
-                            {option?.tooltip_texto}
-                          </Tooltip>
-                        )}
-                      </Overlay>
-                    </>
-                  )}
-                </Form.Group>
-              ))}
+              {question?.options?.length > 1 &&
+                question?.options?.map((option, index) => (
+                  <Form.Group className="mb-3" key={option?.id}>
+                    <Form.Check
+                      label={index + 1}
+                      type="radio"
+                      name={option?.name}
+                      value={option?.id}
+                      onChange={(e) => {
+                        handleCheckChange(
+                          e,
+                          question?.id,
+                          option?.label,
+                          "radio"
+                        );
+                        setRespondida(e.target.checked);
+                      }}
+                      checked={
+                        respuestas[option?.name]?.respuesta_texto ===
+                        option?.label
+                      }
+                    />
+                    {option?.tooltip_texto && (
+                      <>
+                        <Button
+                          variant="outline-light"
+                          ref={(ref) =>
+                            (buttonRefs.current[
+                              `${question?.id}${option?.id}`
+                            ] = ref)
+                          } // Asigna un ref al botón
+                          onClick={() =>
+                            handleButtonClick(`${question?.id}${option?.id}`)
+                          }
+                        >
+                          <InfoIcon width="20px" />
+                        </Button>
+                        <Overlay
+                          target={
+                            buttonRefs.current[`${question?.id}${option?.id}`]
+                          }
+                          show={tooltipStates[`${question?.id}${option?.id}`]} //
+                          placement="bottom"
+                          key={`${question?.id}${option?.id}`}
+                        >
+                          {(props) => (
+                            <Tooltip
+                              id={`${question?.id}${option?.id}`}
+                              {...props}
+                            >
+                              {option?.tooltip_img && (
+                                <Image
+                                  src={option?.tooltip_img}
+                                  style={{ height: "auto", width: "100%" }}
+                                />
+                              )}
+                              {option?.tooltip_texto}
+                            </Tooltip>
+                          )}
+                        </Overlay>
+                      </>
+                    )}
+                  </Form.Group>
+                ))}
             </div>
           )}
           {question?.questionType === "accordeon" && (

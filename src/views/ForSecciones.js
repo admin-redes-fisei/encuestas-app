@@ -313,7 +313,7 @@ const Secciones = () => {
             setRefresh(refresh + 1);
             handleClose();
           } else {
-            toast.error("Verifique los campos", {
+            toast.error("Campo vacío o incorrecto", {
               position: "top-right",
               autoClose: 5000,
               hideProgressBar: false,
@@ -333,7 +333,7 @@ const Secciones = () => {
             setRefresh(refresh + 1);
             handleClose();
           } else {
-            toast.error("Verifique los campos", {
+            toast.error("Campo vacío o incorrecto", {
               position: "top-right",
               autoClose: 5000,
               hideProgressBar: false,
@@ -344,6 +344,15 @@ const Secciones = () => {
           }
         });
       }
+    } else {
+      toast.error("Campo vacío o incorrecto", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 
