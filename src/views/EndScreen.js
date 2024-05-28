@@ -104,7 +104,7 @@ function EndPage() {
             >
               <Card>
                 <Card.Body>
-                  <MailIcon /> <b>informacion.fisei@uta.edu.ec</b>
+                  <MailIcon /> <b>comunicacionuta@uta.edu.ec</b>
                 </Card.Body>
               </Card>
             </div>
@@ -153,7 +153,9 @@ function EndPage() {
               />
               <InstagramIcon
                 onClick={() => {
-                  handleRedirect("https://fisei.uta.edu.ec/v4.0/");
+                  handleRedirect(
+                    "https://www.instagram.com/utecnicaambato/?hl=es"
+                  );
                 }}
                 style={{ cursor: "pointer" }}
               />

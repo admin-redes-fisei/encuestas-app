@@ -5,7 +5,13 @@ import {
   obtenerDataset,
   obtenerFormularios,
 } from "../services/ReportesService";
-import { ButtonGroup, Card, DropdownButton, Spinner } from "react-bootstrap";
+import {
+  Alert,
+  ButtonGroup,
+  Card,
+  DropdownButton,
+  Spinner,
+} from "react-bootstrap";
 import StatisticsQuestionCard from "../components/StatisticsQuestionCard";
 import DownloadIcon from "../assets/downloadIcon";
 import "jspdf-autotable";
@@ -23,26 +29,32 @@ function Reportes() {
   //para tabs
   const [enlaceSeleccionado, setEnlaceSeleccionado] = useState(1);
   //para carga
+  const [isLoadingFormularios, setIsLoadingFormularios] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDatasetLoading, setIsDatasetLoading] = useState(false);
   //para dataset
   const [dataset, setDataset] = useState([]);
   const [datasetHeaders, setDatasetHeaders] = useState([]);
   const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
 
+  //para listar
   useEffect(() => {
+    setIsLoadingFormularios(true);
     obtenerFormularios(parseInt(usuario_actual.usu_facultad_pertenece)).then(
       (response) => {
         setformularios(response);
+        setIsLoadingFormularios(false);
       }
     );
   }, [usuario_actual.usu_facultad_pertenece]);
 
+  //obtener conteo de datos
   const handleObtenerDatosFormulario = (id) => {
     setIsLoading(true);
     obtenerConteoRespuestas(id).then((response) => {
       setData(response);
       const valoresUnicos = [
-        ...new Set(response.map((item) => item.res_pregunta_pertenece)),
+        ...new Set(response?.map((item) => item.res_pregunta_pertenece)),
       ];
       setPreguntasId(valoresUnicos);
       setIsLoading(false);
@@ -53,19 +65,22 @@ function Reportes() {
     setformularioSeleccionado(seleccion);
   };
 
+  //para el dataset
   useEffect(() => {
+    setIsDatasetLoading(true);
     if (formularioSeleccionado !== 0) {
       obtenerDataset(formularioSeleccionado[0]?.for_id).then((response) => {
         if (response?.error) {
           setDataset([]);
           setDatasetHeaders(getHeadersFromData([]));
+          setIsDatasetLoading(false);
         } else {
           setDataset(response);
           setDatasetHeaders(getHeadersFromData(response));
+          setIsDatasetLoading(false);
         }
       });
     }
-    console.log(formularioSeleccionado);
   }, [formularioSeleccionado]);
 
   //para tabs
@@ -79,7 +94,7 @@ function Reportes() {
 
     // Obtenemos las keys de la primera fila para los headers
     const headers = Object.keys(data[0]);
-    return headers.map((header) => ({ label: header, key: header }));
+    return headers?.map((header) => ({ label: header, key: header }));
   };
 
   return (
@@ -128,33 +143,51 @@ function Reportes() {
           defaultActiveKey="0"
           style={{ marginBottom: "50px", marginTop: "20px" }}
         >
-          {formularios?.map((form) => (
-            <Nav.Item key={form.for_id}>
-              <Nav.Link
-                eventKey={form.for_id}
-                onClick={() => {
-                  handleObtenerDatosFormulario(form.for_id);
-                  handleClick(form.for_id);
-                }}
-                style={{
-                  backgroundColor:
-                    enlaceSeleccionado === form.for_id ? "#2B3035" : "white",
-                  color: enlaceSeleccionado === form.for_id ? "white" : "black",
-                }}
-              >
-                {form.for_nombre}
-              </Nav.Link>
-            </Nav.Item>
-          ))}
+          {isLoadingFormularios ? (
+            <Spinner animation="border" variant="secondary" />
+          ) : (
+            formularios?.map((form) => (
+              <Nav.Item key={form.for_id}>
+                <Nav.Link
+                  eventKey={form.for_id}
+                  onClick={() => {
+                    handleObtenerDatosFormulario(form.for_id);
+                    handleClick(form.for_id);
+                  }}
+                  style={{
+                    backgroundColor:
+                      enlaceSeleccionado === form.for_id ? "#2B3035" : "white",
+                    color:
+                      enlaceSeleccionado === form.for_id ? "white" : "black",
+                    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
+                    margin: "10px",
+                  }}
+                >
+                  {form.for_nombre}
+                </Nav.Link>
+              </Nav.Item>
+            ))
+          )}
         </Nav>
         {isLoading ? (
           <>
             <br />
             <br />
             {formularios?.length === 0 ? (
-              <span>Sin datos</span>
-            ) : formularioSeleccionado === 0 ? (
-              <span>Seleccione una encuesta</span>
+              <span>Cargando...</span>
+            ) : !isLoadingFormularios && formularioSeleccionado === 0 ? (
+              <Alert
+                key="secondary"
+                variant="secondary"
+                style={{
+                  width: "fit-content",
+                  margin: "20px",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                }}
+              >
+                Seleccione una encuesta
+              </Alert>
             ) : (
               <Spinner animation="border" variant="danger" />
             )}
@@ -163,6 +196,7 @@ function Reportes() {
           <div className="contenido_encuestas" style={{ position: "relative" }}>
             <DropdownButton
               as={ButtonGroup}
+              disabled={isDatasetLoading}
               align={{ lg: "end" }}
               variant="light"
               style={{
@@ -174,7 +208,11 @@ function Reportes() {
               }}
               title={
                 <>
-                  <DownloadIcon color="#333F49" />
+                  {isDatasetLoading ? (
+                    <Spinner animation="border" variant="secondary" size="sm" />
+                  ) : (
+                    <DownloadIcon color="#333F49" />
+                  )}
                   Exportar
                 </>
               }
@@ -227,7 +265,9 @@ function Reportes() {
                     }}
                   >
                     <Card.Body>
-                      <Card.Title>{item.cantidad_respuestas}</Card.Title>
+                      <Card.Title style={{ fontSize: "30px" }}>
+                        {item.cantidad_respuestas}
+                      </Card.Title>
                     </Card.Body>
                     <Card.Footer>
                       <small className="text-muted">TOTAL ENCUESTADOS</small>
@@ -235,8 +275,7 @@ function Reportes() {
                   </Card>
                 </div>
               ))}
-
-            {preguntasId.map((valor) => (
+            {preguntasId?.map((valor) => (
               <div key={valor}>
                 <StatisticsQuestionCard
                   questionData={Array.from(

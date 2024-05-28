@@ -12,10 +12,15 @@ function ApexPieChart({ data }) {
   const seriesData = valores;
   const chartOptions = {
     chart: {
-      width: 380,
+      width: 180,
       type: "pie",
       toolbar: {
         show: true, // Ocultar la barra de herramientas con opciones de descarga
+      },
+    },
+    plotOptions: {
+      pie: {
+        size: 10,
       },
     },
     legend: {
@@ -23,18 +28,17 @@ function ApexPieChart({ data }) {
       showForSingleSeries: false,
       showForNullSeries: true,
       showForZeroSeries: true,
-      position: "right",
-      horizontalAlign: "left",
-      floating: true,
-      fontSize: "13px",
+      position: "bottom",
+      horizontalAlign: "center",
+      floating: false,
+      fontSize: "12px",
       fontFamily: "Helvetica, Arial",
       fontWeight: 400,
-      formatter: function (seriesName, opts) {
-        const percentage = opts.w.globals.seriesPercent[opts.seriesIndex]; // Obtiene el porcentaje y lo formatea
-        return `${seriesName}: ${parseFloat(percentage).toFixed(2)}%`; // Concatena la serie y el porcentaje con un salto de línea
+      formatter: function (seriesName) {
+        return `${seriesName}`;
       },
       inverseOrder: false,
-      width: 250,
+      width: "100%",
       height: undefined,
       tooltipHoverFormatter: undefined,
       customLegendItems: [],
@@ -67,7 +71,7 @@ function ApexPieChart({ data }) {
         breakpoint: 480,
         options: {
           chart: {
-            width: 200,
+            width: "100%",
           },
           legend: {
             position: "bottom",
@@ -78,17 +82,14 @@ function ApexPieChart({ data }) {
   };
 
   return (
-    <div>
-      <div id="chart">
-        <ReactApexChart
-          options={chartOptions}
-          series={seriesData}
-          type="pie"
-          width={800}
-          height={300}
-        />
-      </div>
-      <div id="html-dist"></div>
+    <div style={{ height: "100%", width:"100%" }}>
+      <ReactApexChart
+        options={chartOptions}
+        series={seriesData}
+        type="pie"
+        width="100%"
+        height="100%"
+      />
     </div>
   );
 }

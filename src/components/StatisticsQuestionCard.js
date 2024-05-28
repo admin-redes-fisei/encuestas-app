@@ -8,6 +8,7 @@ function StatisticsQuestionCard({ questionData }) {
       <Card
         style={{
           width: "85%",
+          height: "fit-content",
           marginRight: "auto",
           marginLeft: "auto",
           marginTop: "10px",
