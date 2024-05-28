@@ -183,7 +183,7 @@ const Carreras = () => {
           handleClose();
           setRefresh(refresh + 1);
         } else {
-          toast.error("Verifique los campos", {
+          toast.error("Campos vacios o incorrectos", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -270,7 +270,7 @@ const Carreras = () => {
     if (formData.car_nombre !== "" && formData.car_estado !== "") {
       handleSave();
     } else {
-      toast.error("Complete los campos", {
+      toast.error("Campos vacios o incorrectos", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -298,7 +298,7 @@ const Carreras = () => {
           handleClose();
           setRefresh(refresh + 1);
         } else {
-          toast.error("Verifique los campos", {
+          toast.error("Campos vacios o incorrectos", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -318,7 +318,7 @@ const Carreras = () => {
           handleClose();
           setRefresh(refresh + 1);
         } else {
-          toast.error("Verifique los campos", {
+          toast.error("Campos vacios o incorrectos", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,

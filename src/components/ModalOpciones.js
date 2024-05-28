@@ -36,7 +36,8 @@ const ModalOpciones = ({
           datos?.filter(
             (item) =>
               item.car_facultad_pertenece ===
-              usuario_actual.usu_facultad_pertenece
+                usuario_actual.usu_facultad_pertenece &&
+              parseInt(item.car_estado) === 1
           )
         );
       }

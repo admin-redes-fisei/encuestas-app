@@ -142,7 +142,6 @@ function SSD() {
         pregunta,
       ]);
     }
-    console.log(antecedentesSeleccionados);
   };
 
   const handleRemoveCons = (pregunta) => {
@@ -182,7 +181,6 @@ function SSD() {
           });
         }
         setResultados(data);
-        console.log(data);
         setIsResultadosLoading(false);
       });
     } catch (error) {
@@ -194,7 +192,6 @@ function SSD() {
     const antecedentesSeleccionadosTemp = [];
     const consecuentesSeleccionadosTemp = [];
     setResultados([]);
-    console.log(formularioSeleccionado);
 
     antecedentesSeleccionados?.forEach((pregunta) => {
       const select = document.getElementById(

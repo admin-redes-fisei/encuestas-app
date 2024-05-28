@@ -56,7 +56,6 @@ const styles = StyleSheet.create({
 
 // Componente para renderizar el PDF
 const MyDocumentDashboard = ({ data, total, facultad, filtros }) => {
-  console.log(data);
   // Obtener la fecha actual
   const currentDate = new Date();
   const day = currentDate.getDate();
@@ -89,10 +88,7 @@ const MyDocumentDashboard = ({ data, total, facultad, filtros }) => {
             <Text style={styles.title}>UNIVERSIDAD TÉCNICA DE AMBATO</Text>
             <Text style={styles.title}>{facultad.toUpperCase()}</Text>
           </View>
-          {/*<Image src={logoRight} style={{ width: "40px", height: "auto" }} />*/}
         </View>
-
-        {/* Tabla */}
         <View style={styles.table}>
           <View style={styles.tableRow}>
             <View style={styles.tableCell}>

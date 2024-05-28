@@ -336,8 +336,6 @@ const Usuarios = () => {
 
   //para validar
   const handleValidate = () => {
-    console.log(formData);
-    console.log(usuario_actual);
     if (
       formData.usu_cedula !== "" &&
       formData.usu_nombres !== "" &&

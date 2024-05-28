@@ -48,9 +48,9 @@ const Login = () => {
       iniciarSesion(username, password, aud).then((resultado) => {
         if (
           resultado &&
-          resultado.user &&
-          resultado.token &&
-          parseInt(resultado.user.usu_estado) === 1
+          resultado?.user &&
+          resultado?.token &&
+          parseInt(resultado?.user.usu_estado) === 1
         ) {
           localStorage.setItem("token", JSON.stringify(resultado.token));
           localStorage.setItem("userdata", JSON.stringify(resultado.user));

@@ -87,10 +87,7 @@ const MyDocument = ({ data, preguntasId, formulario, total, facultad }) => {
             <Text style={styles.title}>UNIVERSIDAD TÉCNICA DE AMBATO</Text>
             <Text style={styles.title}>{facultad.toUpperCase()}</Text>
           </View>
-          {/*<Image src={logoRight} style={{ width: "40px", height: "auto" }} />*/}
         </View>
-
-        {/* Tabla */}
         <View style={styles.table}>
           <View style={styles.tableRow}>
             <View style={styles.tableCell}>

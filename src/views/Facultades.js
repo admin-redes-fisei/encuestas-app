@@ -191,7 +191,7 @@ const Facultades = () => {
           handleClose();
           setRefresh(refresh + 1);
         } else {
-          toast.error("Verifique los campos", {
+          toast.error("Campos vacios o incorrectos", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -222,7 +222,7 @@ const Facultades = () => {
         if (respuesta?.mensaje === "OK") {
           setRefresh(refresh + 1);
         } else {
-          toast.error("Error al eliminar: Facultad con dependencias", {
+          toast.error("Error: Facultad con dependencias", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -237,7 +237,6 @@ const Facultades = () => {
 
   //para listar
   useEffect(() => {
-    //const token = JSON.parse(localStorage.getItem("token"));
     listarFacultades().then((datos) => {
       if (datos?.error) {
         setData([]);
@@ -274,7 +273,7 @@ const Facultades = () => {
     ) {
       handleSave();
     } else {
-      toast.error("Complete los campos", {
+      toast.error("Campos vacios o incorrectos", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -303,7 +302,7 @@ const Facultades = () => {
           handleClose();
           setRefresh(refresh + 1);
         } else {
-          toast.error("Verifique los campos", {
+          toast.error("Campos vacios o incorrectos", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -323,7 +322,7 @@ const Facultades = () => {
           handleClose();
           setRefresh(refresh + 1);
         } else {
-          toast.error("Verifique los campos", {
+          toast.error("Campos vacios o incorrectos", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,

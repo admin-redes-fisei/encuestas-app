@@ -34,7 +34,6 @@ export async function agregarFacultad(data) {
     if (!respuesta.ok) {
       throw new Error(`Error al agregar la facultad: ${respuesta.statusText}`);
     }
-    console.log(respuesta);
     return await respuesta.json();
   } catch (error) {
     console.error("Error:", error.message);
