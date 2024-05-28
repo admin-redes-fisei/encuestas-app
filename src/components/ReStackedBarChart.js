@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip} from "recharts";
+import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 function ReStackedBarChart({ data, onOptionClick }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -48,14 +48,13 @@ function ReStackedBarChart({ data, onOptionClick }) {
     <ResponsiveContainer width="100%" height="80%">
       <div style={{ display: "flex" }}>
         {padres.map((padre) => (
-          <div style={{display:"flex", flexDirection:"column"}}>
+          <div key={padre} style={{ display: "flex", flexDirection: "column" }}>
             <BarChart
               width={100}
               height={220}
               data={data.filter(
                 (item) => item.name !== "Otra" && item.padre === padre
               )}
-
             >
               <Tooltip content={<CustomTooltip />} />
               <Bar
@@ -69,7 +68,7 @@ function ReStackedBarChart({ data, onOptionClick }) {
                 ))}
               </Bar>
             </BarChart>
-            <p className="content" style={{fontSize:"10px"}}>{`${padre}`}</p>
+            <p className="content" style={{ fontSize: "10px" }}>{`${padre}`}</p>
           </div>
         ))}
       </div>

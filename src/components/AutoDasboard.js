@@ -44,26 +44,28 @@ const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
             maxConstraints={[300, 200]}
             style={{ margin: "8px" }}
           >
-            <Card style={{ height: "100%", width: "100%" }}>
-              <Card.Body>
-                {tipo === "estudiantes" ? (
-                  <StudentIcon height={60} width={60} />
-                ) : (
-                  <BussinesIcon height={60} width={60} />
-                )}
-                <br />
-                <div>
-                  <Card.Title style={{ fontSize: "30px" }}>
-                    {data?.total_encuestados}
-                  </Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">
-                    {tipo === "estudiantes"
-                      ? "Total Estudiantes"
-                      : "Total Empresas"}
-                  </Card.Subtitle>
-                </div>
-              </Card.Body>
-            </Card>
+            <>
+              <Card style={{ height: "100%", width: "100%" }}>
+                <Card.Body>
+                  {tipo === "estudiantes" ? (
+                    <StudentIcon height={60} width={60} />
+                  ) : (
+                    <BussinesIcon height={60} width={60} />
+                  )}
+                  <br />
+                  <div>
+                    <Card.Title style={{ fontSize: "30px" }}>
+                      {data?.total_encuestados}
+                    </Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">
+                      {tipo === "estudiantes"
+                        ? "Total Estudiantes"
+                        : "Total Empresas"}
+                    </Card.Subtitle>
+                  </div>
+                </Card.Body>
+              </Card>
+            </>
           </ResizableBox>
           {data?.preguntas?.map((pregunta, idx) => (
             <ResizableBox

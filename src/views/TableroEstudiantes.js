@@ -192,36 +192,21 @@ const TableroEstudiantes = () => {
 
   return (
     <div>
+      <AdminSideBar /><br/>
       <div
         style={{
           display: "flex",
           flexDirection: "row",
+          justifyContent: "space-between",
           width: "85vw",
           marginLeft: "auto",
           marginRight: "auto",
-          marginTop: "20px",
-          justifyContent: "space-between",
-          alignItems: "center",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
+        <Form.Group
+          className="mb-3"
+          controlId="exampleForm.ControlSelect1"
         >
-          <AdminSideBar />
-          <h3
-            style={{
-              color: "#fff",
-              textAlign: "left",
-            }}
-          >
-            <b>Tablero de Demanda Estudiantil</b>
-          </h3>
-        </div>
-        <Form.Group className="mb-3" controlId="exampleForm.ControlSelect1">
           <Form.Select
             aria-label="Tipo de usuario"
             name="tab_tipo"
@@ -235,32 +220,13 @@ const TableroEstudiantes = () => {
             ))}
           </Form.Select>
         </Form.Group>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "85vw",
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}
-      >
-        <div style={{ width: "100px" }}></div>
-        {filter?.length > 1 ? (
+        {filter?.length > 1 && (
           <Button
             variant="dark"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
             onClick={handleShowModal}
           >
             <b>Analizar Datos Filtrados</b>
           </Button>
-        ) : (
-          <div style={{ width: "100px" }}></div>
         )}
         <DropdownButton
           as={ButtonGroup}

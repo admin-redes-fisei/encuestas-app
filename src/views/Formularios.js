@@ -92,7 +92,7 @@ const Formularios = () => {
   //para compartir
   const [show, setShow] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [link, setLink] = useState(false);
+  const [link, setLink] = useState("");
   //para actualizar
   const [refresh, setRefresh] = useState(0);
   //para el modal
@@ -561,7 +561,7 @@ const Formularios = () => {
                               parseInt(item.for_estado) === 1 ? "10px" : "0px",
                           }}
                         />
-                        <sapn
+                        <span
                           style={{
                             width: "100%",
                             color: "#000",
@@ -572,7 +572,7 @@ const Formularios = () => {
                           }}
                         >
                           <b>{item.for_nombre}</b>
-                        </sapn>
+                        </span>
                         <DropdownButton
                           as={ButtonGroup}
                           variant="outline-light"

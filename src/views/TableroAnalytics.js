@@ -89,36 +89,7 @@ const TableroAnalytics = () => {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          width: "85vw",
-          marginLeft: "auto",
-          marginRight: "auto",
-          marginTop: "20px",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <AdminSideBar />
-          <h3
-            style={{
-              color: "#fff",
-              textAlign: "left",
-            }}
-          >
-            <b>Tablero de Comportamiento</b>
-          </h3>
-        </div>
-      </div>
+      <AdminSideBar />
       <br />
       {isLoading ? (
         <Spinner animation="border" variant="danger" />
