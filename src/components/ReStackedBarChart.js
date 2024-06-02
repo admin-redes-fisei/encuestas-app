@@ -19,7 +19,7 @@ function ReStackedBarChart({ data, onOptionClick }) {
 
   const clickOption = (index) => {
     if (index !== null) {
-      const selectedName = data[index].name;
+      const selectedName = data[index];
       onOptionClick(selectedName);
     }
   };

@@ -88,6 +88,7 @@ const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
                   data={pregunta?.opciones?.map((item) => ({
                     name: item?.texto_opcion,
                     value: parseInt(item?.numero_selecciones),
+                    id_pregunta: pregunta?.id_pregunta,
                   }))}
                   onOptionClick={handleOptionClick}
                 />
@@ -96,6 +97,7 @@ const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
                   data={pregunta?.opciones?.map((item) => ({
                     name: item?.texto_opcion,
                     value: parseInt(item?.numero_selecciones),
+                    id_pregunta: pregunta?.id_pregunta,
                   }))}
                   onOptionClick={handleOptionClick}
                 />
@@ -104,6 +106,7 @@ const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
                   data={pregunta?.opciones?.map((item) => ({
                     name: item?.texto_opcion,
                     value: parseInt(item?.numero_selecciones),
+                    id_pregunta: pregunta?.id_pregunta,
                   }))}
                   onOptionClick={handleOptionClick}
                 />
@@ -113,6 +116,7 @@ const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
                     name: item?.texto_opcion,
                     value: parseInt(item?.numero_selecciones),
                     padre: item?.padre_opcion,
+                    id_pregunta: pregunta?.id_pregunta,
                   }))}
                   onOptionClick={handleOptionClick}
                 />
@@ -121,6 +125,7 @@ const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
                   data={pregunta?.opciones?.map((item) => ({
                     name: item?.texto_opcion,
                     value: parseInt(item?.numero_selecciones),
+                    id_pregunta: pregunta?.id_pregunta,
                   }))}
                   onOptionClick={handleOptionClick}
                 />

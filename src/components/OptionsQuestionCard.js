@@ -380,9 +380,9 @@ function OptionsQuestionCard({
                 marginRight: "auto",
               }}
             >
-              {question?.options?.length > 1 &&
-                subsecciones?.map((subseccion) => (
-                  <Accordion>
+              <Accordion>
+                {question?.options?.length > 1 &&
+                  subsecciones?.map((subseccion) => (
                     <Accordion.Item eventKey="0" key={subseccion}>
                       <Accordion.Header>{subseccion}</Accordion.Header>
                       <Accordion.Body>
@@ -480,8 +480,8 @@ function OptionsQuestionCard({
                           ))}
                       </Accordion.Body>
                     </Accordion.Item>
-                  </Accordion>
-                ))}
+                  ))}
+              </Accordion>
             </div>
           )}
           {question?.questionType === "text" && (

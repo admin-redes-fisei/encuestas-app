@@ -1,5 +1,5 @@
-const URL_acceso = "http://localhost:8084/pruebaTesis/encuestas_services/";
-//const URL_acceso = "https://hatunsoft.uta.edu.ec/encuestas/encuestas_back/";
+//const URL_acceso = "http://localhost:8084/pruebaTesis/encuestas_services/";
+const URL_acceso = "https://hatunsoft.uta.edu.ec/encuestas/encuestas_back/";
 
 export async function listarFacultades() {
   try {

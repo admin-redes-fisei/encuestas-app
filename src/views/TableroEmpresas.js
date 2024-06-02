@@ -11,32 +11,25 @@ import {
   Badge,
   Button,
   ButtonGroup,
-  Card,
-  CardGroup,
   Col,
   DropdownButton,
   Form,
   ListGroup,
   Modal,
-  OverlayTrigger,
-  Popover,
   Row,
   Spinner,
+  Table,
 } from "react-bootstrap";
 import ReloadIcon from "../assets/reloadIcon";
 import { obtenerFormularioFacultad } from "../services/FormulariosAppService";
-import DownloadIcon from "../assets/downloadIcon";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import MyDocumentDashboard from "../components/DocumentoDashboard";
+import DownloadIcon from "../assets/downloadIcon";
 import HtmlEmbedder from "../components/HtmlEmbedder";
-import { toast } from "react-toastify";
 import { enviarReglas } from "../services/PythonService";
+import { toast } from "react-toastify";
 import { CSVLink } from "react-csv";
-import ApexRadialChart from "../components/ApexRadialChart";
-import RightIcon from "../assets/rightIcon";
-import LeftIcon from "../assets/leftIcon";
 import AlertIcon from "../assets/alertIcon";
-import InfoIcon from "../assets/infoIncon";
 
 const TableroEmpresas = () => {
   const dataTipos = [
@@ -48,7 +41,7 @@ const TableroEmpresas = () => {
   const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
   const [filter, setFilter] = useState(null);
   const [antecedentes, setAntecedentes] = useState([]);
-  const [consecuentes, setConsecuentes] = useState([]);
+  const [idPreguntaPrediccion, setidPreguntaPrediccion] = useState("");
   //para el modal
   const [showModal, setShowModal] = useState(false);
   //para carga
@@ -63,8 +56,6 @@ const TableroEmpresas = () => {
   const [resultados, setResultados] = useState(null);
   //para el dataset
   const [dataset, setDataset] = useState([]);
-  //para la alerta
-  const [alert, setAlert] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -73,19 +64,24 @@ const TableroEmpresas = () => {
       "empresas"
     ).then((response) => {
       setIdFormulario(parseInt(response?.for_id));
+      const nombresFiltros = filter?.map((f) => f.name);
       if (filter) {
         obtenerConteoDatosFiltrados({
           id: parseInt(response?.for_id),
-          valores_filtro: filter,
+          valores_filtro: nombresFiltros,
         }).then((response) => {
-          setData(response);
-          setIsLoading(false);
+          if (parseInt(response) !== 0) {
+            setData(response);
+            setIsLoading(false);
+          }
         });
       } else {
         setIsLoading(true);
         obtenerConteoDatos(parseInt(response?.for_id)).then((response) => {
-          setData(response);
-          setIsLoading(false);
+          if (parseInt(response) !== 0) {
+            setData(response);
+            setIsLoading(false);
+          }
         });
       }
     });
@@ -111,35 +107,31 @@ const TableroEmpresas = () => {
 
   //para modal de apriori
   const handleShowModal = () => {
-    if (antecedentes.length + consecuentes.length !== filter.length) {
+    if (antecedentes?.length !== filter?.length) {
       setAntecedentes(filter);
-      setConsecuentes([]);
+      setResultados(null);
     }
     setShowModal(true);
   };
   const handleCloseModal = () => setShowModal(false);
 
-  //para manejor de antecedente y consecuentes
-  const handleMoveToConsecuentes = (item) => {
-    setAntecedentes((prev) => prev.filter((i) => i !== item));
-    setConsecuentes((prev) => [...prev, item]);
-  };
-
-  const handleMoveToAntecedentes = (item) => {
-    setConsecuentes((prev) => prev.filter((i) => i !== item));
-    setAntecedentes((prev) => [...prev, item]);
+  //para seleccion de pregunta a predecir
+  const handleChangePreguntaPerdiccion = (e) => {
+    const { value } = e.target;
+    setidPreguntaPrediccion(value);
   };
 
   //para validar datos llenos
   const handleValidar = () => {
-    if (antecedentes?.length > 0 && consecuentes?.length > 0) {
+    if (antecedentes?.length > 0 && idPreguntaPrediccion !== "") {
       handleEnviarClick({
-        antecedente: antecedentes,
-        consecuente: consecuentes,
+        headers: antecedentes?.map((a) => `P${a.id_pregunta}`),
+        valores: antecedentes?.map((a) => a.name),
         formulario_id: idFormulario,
+        target: `P${idPreguntaPrediccion}`,
       });
     } else {
-      toast.error("Dede existir al menos un antecedente y un consecuente", {
+      toast.error("Seleccione una pregunta para predecir", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -153,13 +145,11 @@ const TableroEmpresas = () => {
   //para calcular valores de regla
   const handleEnviarClick = (reglas) => {
     setIsResultadosLoading(true);
-    handleCloseModal();
     setResultados([]);
-    setAlert(false);
     try {
       enviarReglas(reglas).then((data) => {
         if (data.error) {
-          setAlert(true);
+          console.log("error");
         }
         setResultados(data);
         setIsResultadosLoading(false);
@@ -172,9 +162,10 @@ const TableroEmpresas = () => {
   //para el dataset
   useEffect(() => {
     setIsDatasetLoading(true);
+    const nombresFiltros = filter?.map((f) => f.name);
     obtenerDatasetFiltrado({
       formulario_id: idFormulario,
-      filtros: filter ? filter : [],
+      filtros: nombresFiltros ? nombresFiltros : [],
     }).then((response) => {
       if (response?.error) {
         setDataset([]);
@@ -214,14 +205,13 @@ const TableroEmpresas = () => {
             ))}
           </Form.Select>
         </Form.Group>
-        {filter?.length > 1 && (
-          <Button
-            variant="dark"
-            onClick={handleShowModal}
-          >
-            <b>Analizar Datos Filtrados</b>
-          </Button>
-        )}
+        <Button
+          variant="dark"
+          onClick={handleShowModal}
+          disabled={!(filter && filter?.length >= 1)}
+        >
+          <b>Analizar Datos Filtrados</b>
+        </Button>
         <DropdownButton
           as={ButtonGroup}
           disabled={
@@ -251,7 +241,7 @@ const TableroEmpresas = () => {
                 data={data}
                 total={data?.total_encuestados}
                 facultad={usuario_actual.fac_nombre}
-                filtros={filter}
+                filtros={filter?.map((f) => f.name)}
               />
             }
             style={{
@@ -277,240 +267,6 @@ const TableroEmpresas = () => {
           </CSVLink>
         </DropdownButton>
       </div>
-      {resultados && parseInt(formData.tab_tipo) === 1 && (
-        <div
-          style={{
-            width: "90vw",
-            marginRight: "auto",
-            marginLeft: "auto",
-            borderRadius: "20px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            marginTop: "25px",
-            backgroundColor: "white",
-            boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          <div style={{ margin: "10px" }}>
-            <b>Regla: </b> Si{" "}
-            {antecedentes?.map((item) => (
-              <>
-                <Badge pill bg="primary" key={item}>
-                  {item}
-                </Badge>{" "}
-              </>
-            ))}
-            Entonces{" "}
-            {consecuentes?.map((item) => (
-              <>
-                <Badge
-                  pill
-                  bg={
-                    isResultadosLoading
-                      ? "secondary"
-                      : alert === true
-                      ? "warning"
-                      : parseInt(resultados["lift"]) >= 1
-                      ? "success"
-                      : "warning"
-                  }
-                  key={item}
-                >
-                  {item}
-                </Badge>{" "}
-              </>
-            ))}
-          </div>
-          {parseInt(resultados["lift"]) < 1 && (
-            <Alert
-              key="secondary"
-              variant="warning"
-              style={{
-                width: "fit-content",
-                margin: "20px",
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}
-            >
-              <AlertIcon /> La regla no es relevante debido a su lift menor a 1.
-            </Alert>
-          )}
-          <CardGroup
-            style={{
-              width: "100%",
-              borderRadius: "20px",
-              backgroundColor: "white",
-            }}
-          >
-            {alert === true ? (
-              <Alert
-                key="secondary"
-                variant="warning"
-                style={{
-                  width: "fit-content",
-                  margin: "20px",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                }}
-              >
-                <AlertIcon /> La regla no se ha tomado en cuenta debido a su
-                bajo soporte y confianza.
-              </Alert>
-            ) : (
-              <>
-                <Card>
-                  <Card.Body>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <strong>CONFIANZA</strong>
-                      <OverlayTrigger
-                        trigger="click"
-                        key="topconfianza"
-                        placement="top"
-                        overlay={
-                          <Popover id={`popoverConfianza`}>
-                            <Popover.Header as="h3">{`Confianza`}</Popover.Header>
-                            <Popover.Body>
-                              Mide el <strong>interés</strong> de la regla.{" "}
-                              <br />
-                              La confianza indica la probabilidad de que el
-                              consecuente ocurra cuando el antecedente está
-                              presente.
-                            </Popover.Body>
-                          </Popover>
-                        }
-                      >
-                        <Button variant="light">
-                          <InfoIcon />
-                        </Button>
-                      </OverlayTrigger>
-                    </div>
-                    {isResultadosLoading ? (
-                      <>
-                        <br />
-                        <Spinner animation="border" variant="secondary" />
-                      </>
-                    ) : (
-                      <div>
-                        <ApexRadialChart
-                          series={
-                            resultados["confianza"]
-                              ? resultados["confianza"]
-                              : 0
-                          }
-                        />
-                      </div>
-                    )}
-                  </Card.Body>
-                </Card>
-                <Card>
-                  <Card.Body>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <strong>SOPORTE</strong>
-                      <OverlayTrigger
-                        trigger="click"
-                        key="topsoporte"
-                        placement="top"
-                        overlay={
-                          <Popover id={`popoverSoporte`}>
-                            <Popover.Header as="h3">{`Soporte`}</Popover.Header>
-                            <Popover.Body>
-                              Mide la <strong>frecuencia</strong> de la regla.{" "}
-                              <br />
-                              El soporte mide cuántas veces ocurre una
-                              combinación de ítems en el conjunto de datos.
-                            </Popover.Body>
-                          </Popover>
-                        }
-                      >
-                        <Button variant="light">
-                          <InfoIcon />
-                        </Button>
-                      </OverlayTrigger>
-                    </div>
-                    {isResultadosLoading ? (
-                      <>
-                        <br />
-                        <Spinner animation="border" variant="secondary" />
-                      </>
-                    ) : (
-                      <div>
-                        <ApexRadialChart
-                          series={
-                            resultados["soporte"] ? resultados["soporte"] : 0
-                          }
-                        />
-                      </div>
-                    )}
-                  </Card.Body>
-                </Card>
-                <Card>
-                  <Card.Body>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <strong>LIFT</strong>
-                      <OverlayTrigger
-                        trigger="click"
-                        key="toplift"
-                        placement="top"
-                        overlay={
-                          <Popover id={`popoverLift`}>
-                            <Popover.Header as="h3">{`Lift`}</Popover.Header>
-                            <Popover.Body>
-                              Mide la <strong>correlación</strong> entre los
-                              items. <br />
-                              El lift define la relevancia de una regla,
-                              comparando la probabilidad observada de los ítems
-                              juntos con la probabilidad de que ocurran por
-                              separado.
-                            </Popover.Body>
-                          </Popover>
-                        }
-                      >
-                        <Button variant="light">
-                          <InfoIcon />
-                        </Button>
-                      </OverlayTrigger>
-                    </div>
-                    {isResultadosLoading ? (
-                      <>
-                        <br />
-                        <Spinner animation="border" variant="secondary" />
-                      </>
-                    ) : (
-                      <div>
-                        <ApexRadialChart
-                          series={resultados["lift"] ? resultados["lift"] : 0}
-                        />
-                      </div>
-                    )}
-                  </Card.Body>
-                </Card>
-              </>
-            )}
-          </CardGroup>
-        </div>
-      )}
       <br />
       {isLoading ? (
         <Spinner animation="border" variant="danger" />
@@ -533,9 +289,9 @@ const TableroEmpresas = () => {
                 onClick={() => {
                   setFilter(null);
                   setAntecedentes([]);
-                  setConsecuentes([]);
                   setResultados(null);
-                  setAlert(false);
+                  setidPreguntaPrediccion("");
+                  setIsResultadosLoading(false);
                 }}
                 title="Restaurar"
                 disabled={!data?.total_encuestados}
@@ -545,7 +301,7 @@ const TableroEmpresas = () => {
               <AutoDasboard
                 data={data}
                 setSelectedOption={handlefilterClick}
-                tipo={"empresas"}
+                tipo={"estudiantes"}
               />
             </>
           ) : (
@@ -558,49 +314,237 @@ const TableroEmpresas = () => {
       )}
       <Modal show={showModal} onHide={handleCloseModal} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Definición de la Regla</Modal.Title>
+          <Modal.Title>Definición de Valores</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Row>
             <Col>
               <h5>Antecedentes</h5>
               <ListGroup>
-                {antecedentes.map((item, index) => (
+                {antecedentes?.map((item, index) => (
                   <ListGroup.Item key={index} style={{ textAlign: "left" }}>
-                    {item}
-                    <Button
-                      variant="outline-light"
-                      size="sm"
-                      onClick={() => handleMoveToConsecuentes(item)}
-                      title="Mover a Consecuentes"
-                      style={{ float: "right" }}
-                    >
-                      <RightIcon />
-                    </Button>
+                    {item.name}
                   </ListGroup.Item>
                 ))}
               </ListGroup>
             </Col>
             <Col>
-              <h5>Consecuentes</h5>
-              <ListGroup>
-                {consecuentes.map((item, index) => (
-                  <ListGroup.Item key={index} style={{ textAlign: "right" }}>
-                    <Button
-                      variant="outline-light"
-                      size="sm"
-                      onClick={() => handleMoveToAntecedentes(item)}
-                      title="Mover a Antecedentes"
-                      style={{ float: "left" }}
-                    >
-                      <LeftIcon />
-                    </Button>{" "}
-                    {item}
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
+              <h5>Predicción</h5>
+              <Form.Group
+                className="mb-3"
+                controlId="exampleForm.ControlSelect1"
+              >
+                <Form.Select
+                  aria-label="Pregunta Predicción"
+                  name="id_pregunta"
+                  value={idPreguntaPrediccion}
+                  onChange={handleChangePreguntaPerdiccion}
+                >
+                  <option value="">Seleccione</option>
+                  {data?.preguntas
+                    ?.filter(
+                      (pre) =>
+                        !antecedentes?.some(
+                          (a) =>
+                            parseInt(a.id_pregunta) ===
+                            parseInt(pre.id_pregunta)
+                        )
+                    )
+                    ?.map((pregunta, index) => (
+                      <option key={index} value={pregunta?.id_pregunta}>
+                        {pregunta?.titulo_pregunta}
+                      </option>
+                    ))}
+                </Form.Select>
+              </Form.Group>
             </Col>
           </Row>
+          <br />
+          <Row>
+            <Button
+              variant="dark"
+              onClick={() => {
+                handleValidar();
+              }}
+              style={{ width: "50%", marginLeft: "auto", marginRight: "auto" }}
+              disabled={isResultadosLoading}
+            >
+              Predecir
+            </Button>
+          </Row>
+          <br />
+          {isResultadosLoading ? (
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Spinner animation="border" variant="danger" />
+            </div>
+          ) : (
+            resultados &&
+            parseInt(formData.tab_tipo) === 1 && (
+              <>
+                <Row style={{ margin: "10px" }}>
+                  <Alert key="light" variant="light">
+                    <h6>
+                      <b>Regla: </b> Si{" "}
+                      {antecedentes?.map((item) => (
+                        <>
+                          <Badge pill bg="primary" key={item.name}>
+                            {item.name}
+                          </Badge>{" "}
+                        </>
+                      ))}
+                      Entonces{" "}
+                      <Badge
+                        pill
+                        bg="success"
+                        key={resultados?.clasificacion?.clase}
+                      >
+                        {resultados?.clasificacion?.clase}
+                      </Badge>
+                    </h6>
+                  </Alert>
+                </Row>
+                <br />
+                <h5>Tendencias Descubiertas</h5>
+                {resultados?.asociacion?.error ? (
+                  <Alert key="warning1" variant="warning">
+                    <AlertIcon /> No se encontraron reglas asociadas válidas
+                  </Alert>
+                ) : (
+                  <>
+                    <table style={{ width: "100%" }}>
+                      <thead>
+                        <tr>
+                          <th
+                            style={{
+                              width: "70%",
+                              color: "#333F49",
+                              paddingTop: "15px",
+                              textAlign: "center",
+                            }}
+                          >
+                            Regla
+                          </th>
+                          <th
+                            style={{
+                              width: "10%",
+                              color: "#333F49",
+                              paddingTop: "15px",
+                              textAlign: "center",
+                            }}
+                          >
+                            Confianza
+                          </th>
+                          <th
+                            style={{
+                              width: "10%",
+                              color: "#333F49",
+                              paddingTop: "15px",
+                              textAlign: "center",
+                            }}
+                          >
+                            Soporte
+                          </th>
+                          <th
+                            style={{
+                              width: "10%",
+                              color: "#333F49",
+                              paddingTop: "15px",
+                              textAlign: "center",
+                            }}
+                          >
+                            Lift
+                          </th>
+                        </tr>
+                      </thead>
+                    </table>
+                    <Table
+                      hover
+                      style={{
+                        width: "100%",
+                        borderRadius: "20px",
+                        marginTop: "5px",
+                      }}
+                    >
+                      <tbody>
+                        {resultados?.asociacion?.reglas.map((item, index) => (
+                          <tr key={index} style={{ marginTop: "50px" }}>
+                            <td
+                              style={{
+                                width: "70%",
+                                color: "#333F49",
+                                paddingTop: "10px",
+                                textAlign: "left",
+                              }}
+                            >
+                              <b>SI</b>{" "}
+                              {item.antecedentes.map((a, index) =>
+                                index < item.antecedentes.length - 1
+                                  ? `${a}, `
+                                  : a
+                              )}
+                              <br />
+                              <b>ENTONCES</b>{" "}
+                              {item.consecuentes.map((a, index) =>
+                                index < item.consecuentes.length - 1
+                                  ? `${a}, `
+                                  : a
+                              )}
+                            </td>
+                            <td
+                              style={{
+                                width: "10%",
+                                color: "#333F49",
+                                paddingTop: "10px",
+                              }}
+                            >
+                              {(
+                                parseFloat(
+                                  resultados?.asociacion?.confianza[index]
+                                ) * 100
+                              ).toFixed(1)}
+                              %
+                            </td>
+                            <td
+                              style={{
+                                width: "10%",
+                                color: "#333F49",
+                                paddingTop: "10px",
+                              }}
+                            >
+                              {(
+                                parseFloat(
+                                  resultados?.asociacion?.soporte[index]
+                                ) * 100
+                              ).toFixed(1)}
+                              %
+                            </td>
+                            <td
+                              style={{
+                                width: "10%",
+                                color: "#333F49",
+                                paddingTop: "10px",
+                              }}
+                            >
+                              {parseFloat(
+                                resultados?.asociacion?.lift[index]
+                              ).toFixed(4)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </>
+                )}
+              </>
+            )
+          )}
         </Modal.Body>
         <Modal.Footer
           style={{
@@ -608,15 +552,6 @@ const TableroEmpresas = () => {
             alignItems: "center",
           }}
         >
-          <Button
-            variant="dark"
-            onClick={() => {
-              handleValidar();
-            }}
-            style={{ width: "25%" }}
-          >
-            Calcular
-          </Button>
           <Button
             variant="secondary"
             onClick={handleCloseModal}
@@ -633,5 +568,4 @@ const TableroEmpresas = () => {
     </div>
   );
 };
-
 export default TableroEmpresas;
