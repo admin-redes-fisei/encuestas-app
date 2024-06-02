@@ -38,7 +38,6 @@ function EncuestaSideBar() {
     const rutaDestino = `${rutaRaiz}/${index}`;
     navigate(rutaDestino);
     window.scrollTo(0, 0);
-    console.log(JSON.parse(localStorage.getItem("respuestas")));
   };
 
   return (

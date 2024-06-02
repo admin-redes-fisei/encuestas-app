@@ -1,14 +1,17 @@
 //const URL_acceso = "http://localhost:8084/pruebaTesis/encuestas_services/";
 const URL_acceso = "https://hatunsoft.uta.edu.ec/encuestas/encuestas_back/";
 
-export async function obtenerFormularios() {
+export async function obtenerFormularios(facultad_id) {
   try {
-    const response = await fetch(`${URL_acceso}obtenerFormularios.php`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${URL_acceso}obtenerFormularios.php?facultad_id=${facultad_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return await response.json();
   } catch (error) {
     console.error("Error al obtener las preguntas:", error);

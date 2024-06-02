@@ -10,6 +10,7 @@ import {
   Modal,
   Pagination,
   Row,
+  Spinner,
   Table,
 } from "react-bootstrap";
 import PlusIcon from "../assets/addIcon";
@@ -60,11 +61,13 @@ const Carreras = () => {
     },
   ];
   //data de carreras
+  const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
   const [data, setData] = useState([]);
   const [formData, setFormData] = useState({
     car_id: "",
     car_nombre: "",
     car_estado: 1,
+    car_facultad_pertenece: parseInt(usuario_actual.usu_facultad_pertenece),
   });
   //para filtros
   const [filteredData, setFilteredData] = useState([]);
@@ -83,6 +86,8 @@ const Carreras = () => {
   const totalPages = Math.ceil(searchedData?.length / itemsPerPage);
   //para actualizar
   const [refresh, setRefresh] = useState(0);
+  //para carga
+  const [isLoading, setIsLoading] = useState(true);
 
   //para los filtros
   const handleCheckFiltrosChange = (e, filtro, padre) => {
@@ -153,6 +158,7 @@ const Carreras = () => {
       car_id: "",
       car_nombre: "",
       car_estado: 1,
+      car_facultad_pertenece: parseInt(usuario_actual.usu_facultad_pertenece),
     });
   };
 
@@ -177,7 +183,7 @@ const Carreras = () => {
           handleClose();
           setRefresh(refresh + 1);
         } else {
-          toast.error("Verifique los campos", {
+          toast.error("Campos vacios o incorrectos", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -205,7 +211,7 @@ const Carreras = () => {
 
     if (confirmDelete) {
       eliminarCarreras({ car_id: idcarrera }).then((respuesta) => {
-        if (respuesta.mensaje === "OK") {
+        if (respuesta?.mensaje === "OK") {
           setRefresh(refresh + 1);
         } else {
           toast.error("Error al intentar eliminar", {
@@ -224,14 +230,22 @@ const Carreras = () => {
   //para listar
   useEffect(() => {
     //const token = JSON.parse(localStorage.getItem("token"));
+    setIsLoading(true);
     listarCarreras().then((datos) => {
       if (datos?.error) {
         setData([]);
       } else {
-        setData(datos);
+        setData(
+          datos?.filter(
+            (item) =>
+              item.car_facultad_pertenece ===
+              usuario_actual.usu_facultad_pertenece
+          )
+        );
       }
+      setIsLoading(false);
     });
-  }, [refresh]);
+  }, [refresh, usuario_actual.usu_facultad_pertenece]);
 
   //para data del formulario
   const handleChange = (e) => {
@@ -256,7 +270,7 @@ const Carreras = () => {
     if (formData.car_nombre !== "" && formData.car_estado !== "") {
       handleSave();
     } else {
-      toast.error("Complete los campos", {
+      toast.error("Campos vacios o incorrectos", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -271,6 +285,7 @@ const Carreras = () => {
   const handleSave = () => {
     const car_nombre = formData.car_nombre.toString();
     const car_estado = formData.car_estado.toString();
+    const car_facultad_pertenece = formData.car_facultad_pertenece.toString();
 
     if (formData.car_id) {
       const car_id = formData.car_id;
@@ -283,7 +298,7 @@ const Carreras = () => {
           handleClose();
           setRefresh(refresh + 1);
         } else {
-          toast.error("Verifique los campos", {
+          toast.error("Campos vacios o incorrectos", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -297,12 +312,13 @@ const Carreras = () => {
       agregarCarreras({
         car_nombre: car_nombre,
         car_estado: car_estado,
+        car_facultad_pertenece: car_facultad_pertenece,
       }).then((resultado) => {
         if (resultado.mensaje === "OK") {
           handleClose();
           setRefresh(refresh + 1);
         } else {
-          toast.error("Verifique los campos", {
+          toast.error("Campos vacios o incorrectos", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -382,7 +398,7 @@ const Carreras = () => {
                   "car_estado"
                 )
               }
-              checked={filteredInfo["usu_estado"]?.find(
+              checked={filteredInfo["car_estado"]?.find(
                 (item) => item.nombre === "Inactivo"
               )}
             />
@@ -461,7 +477,9 @@ const Carreras = () => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
-        {searchedData?.length > 0 ? (
+        {isLoading ? (
+          <Spinner animation="border" variant="danger" />
+        ) : searchedData?.length > 0 ? (
           <Table
             hover
             style={{
@@ -520,12 +538,14 @@ const Carreras = () => {
                     <Button
                       variant="outline-light"
                       onClick={() => handleEdit(item.car_id)}
+                      title="Editar"
                     >
                       <EditIcon />
                     </Button>
                     <Button
                       variant="outline-light"
                       onClick={() => handleDelete(item.car_id)}
+                      title="Eliminar"
                     >
                       <DeleteIcon />
                     </Button>

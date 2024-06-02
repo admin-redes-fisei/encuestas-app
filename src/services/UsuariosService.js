@@ -23,12 +23,9 @@ export async function iniciarSesion(username, password, aud) {
     const resultado = await respuesta.json();
 
     // Extraer los datos necesarios de la respuesta
-    const { user, token } = resultado;
+    //const { user, token } = resultado;
 
-    return {
-      user: user,
-      token: token,
-    };
+    return resultado;
   } catch (error) {
     console.error("Error:", error.message);
   }

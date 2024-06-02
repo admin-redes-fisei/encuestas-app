@@ -15,6 +15,7 @@ import {
   DropdownButton,
   InputGroup,
   Row,
+  Spinner,
 } from "react-bootstrap";
 import {
   agregarUsuario,
@@ -27,6 +28,7 @@ import OpenEyeIcon from "../assets/openEyeIcon";
 import CloseEyeIcon from "../assets/closeEyeIcon";
 import CryptoJS from "crypto-js";
 import UserPasswordIcon from "../assets/userPasswordIcon";
+import { listarFacultades } from "../services/FacultadesService";
 
 const Usuarios = () => {
   //data de encabezados
@@ -91,6 +93,11 @@ const Usuarios = () => {
   ];
   //data de usuarios
   const [data, setData] = useState([]);
+  //para tipo de usuarioa actual
+  const usuario_actual = JSON.parse(localStorage.getItem("userdata"));
+  //para listar facultades
+  const [facultades, setFacultades] = useState([]);
+  //para datos
   const [formData, setFormData] = useState({
     usu_id: "",
     usu_cedula: "",
@@ -103,12 +110,14 @@ const Usuarios = () => {
     usu_tipo: "",
     usu_permisos: "",
     usu_estado: 1,
+    usu_facultad_pertenece: parseInt(usuario_actual.usu_facultad_pertenece),
   });
   //para tipos
   const dataTipos = [
-    { id: 1, nombre: "Líder de Investigación", permisos: "TRFCU" },
-    { id: 2, nombre: "Investigador", permisos: "FRC" },
-    { id: 3, nombre: "Autoridad", permisos: "TR" },
+    { id: 1, nombre: "Superadministrador", permisos: "S" },
+    { id: 2, nombre: "Líder de Investigación", permisos: "TRFCU" },
+    { id: 3, nombre: "Investigador", permisos: "FRC" },
+    { id: 4, nombre: "Autoridad", permisos: "TR" },
   ];
   //para permisos
   const dataPermisos = [
@@ -144,6 +153,8 @@ const Usuarios = () => {
   const [viewValidationPass, setViewVlidationPass] = useState(false);
   //para encriptado de datos
   const clave = "HatunSoft@2023";
+  //para carga
+  const [isLoading, setIsLoading] = useState(true);
 
   //para los filtros
   const handleCheckFiltrosChange = (e, filtro, padre) => {
@@ -254,6 +265,7 @@ const Usuarios = () => {
       usu_tipo: "",
       usu_permisos: "",
       usu_estado: 1,
+      usu_facultad_pertenece: parseInt(usuario_actual.usu_facultad_pertenece),
     });
     setPermisosSeleccionados([]);
     setIsView(false);
@@ -274,6 +286,7 @@ const Usuarios = () => {
       usu_tipo: "",
       usu_permisos: "",
       usu_estado: 1,
+      usu_facultad_pertenece: parseInt(usuario_actual.usu_facultad_pertenece),
     });
     setViewPassword(false);
     setViewVlidationPass(false);
@@ -340,7 +353,10 @@ const Usuarios = () => {
           usuario.usu_id !== formData.usu_id
       ) &&
       formData.usu_clave === formData.usu_clave2 &&
-      formData.usu_tipo !== ""
+      formData.usu_tipo !== "" &&
+      (formData.usu_tipo !== "S"
+        ? formData.usu_facultad_pertenece !== null
+        : true)
     ) {
       if (formData.usu_clave !== "" && formData.usu_id !== "") {
         handleSavePassword();
@@ -373,6 +389,7 @@ const Usuarios = () => {
 
   //para listar
   useEffect(() => {
+    setIsLoading(true);
     listarUsuarios().then((datos) => {
       if (datos?.error) {
         setData([]);
@@ -389,10 +406,25 @@ const Usuarios = () => {
             usu_clave2: "",
           };
         });
-        setData(datosDesencriptados);
+        if (usuario_actual.usu_permisos === "S") {
+          setData(datosDesencriptados);
+        } else {
+          setData(
+            datosDesencriptados.filter(
+              (item) =>
+                item.usu_facultad_pertenece ===
+                usuario_actual.usu_facultad_pertenece
+            )
+          );
+        }
       }
+      setIsLoading(false);
     });
-  }, [refresh]);
+  }, [
+    refresh,
+    usuario_actual.usu_facultad_pertenece,
+    usuario_actual.usu_permisos,
+  ]);
 
   //Para editar
   const handleEdit = (idusuario) => {
@@ -458,10 +490,12 @@ const Usuarios = () => {
     const usu_clave = formData.usu_clave.toString();
 
     const usu_tipo = formData.usu_tipo.toString();
-    const usu_permisos = permisosSeleccionados
-      .map((permiso) => permiso.id)
-      .join("");
+    const usu_permisos =
+      parseInt(formData.usu_tipo) === 1
+        ? "S"
+        : permisosSeleccionados.map((permiso) => permiso.id).join("");
     const usu_estado = formData.usu_estado.toString();
+    const usu_facultad_pertenece = formData.usu_facultad_pertenece;
 
     if (formData.usu_id) {
       const usu_id = formData.usu_id;
@@ -475,6 +509,7 @@ const Usuarios = () => {
         usu_permisos: usu_permisos,
         usu_estado: usu_estado,
         usu_id: usu_id,
+        usu_facultad_pertenece: usu_facultad_pertenece,
       }).then((resultado) => {
         if (resultado.mensaje === "OK") {
           handleClose();
@@ -501,6 +536,7 @@ const Usuarios = () => {
         usu_tipo: usu_tipo,
         usu_permisos: usu_permisos,
         usu_estado: usu_estado,
+        usu_facultad_pertenece: usu_facultad_pertenece,
       }).then((resultado) => {
         if (resultado.mensaje === "OK") {
           handleClose();
@@ -529,8 +565,10 @@ const Usuarios = () => {
     const usu_correo = usuario.usu_correo.toString();
     const usu_usuario = usuario.usu_usuario.toString();
     const usu_tipo = usuario.usu_tipo.toString();
-    const usu_permisos = usuario.usu_permisos;
+    const usu_permisos =
+      parseInt(usuario.usu_tipo) === 1 ? "S" : usuario.usu_permisos;
     const usu_estado = (isChecked ? 1 : 0).toString();
+    const usu_facultad_pertenece = formData.usu_facultad_pertenece;
 
     const confirmChange = window.confirm(
       "Está a punto de cambiar el estado del usuario ¿Desea continuar?"
@@ -547,6 +585,7 @@ const Usuarios = () => {
         usu_permisos: usu_permisos,
         usu_estado: usu_estado,
         usu_id: usu_id,
+        usu_facultad_pertenece: usu_facultad_pertenece,
       }).then((resultado) => {
         if (resultado.mensaje === "OK") {
           handleClose();
@@ -588,6 +627,27 @@ const Usuarios = () => {
         });
       }
     });
+  };
+
+  //para listar facultades
+  useEffect(() => {
+    //const token = JSON.parse(localStorage.getItem("token"));
+    listarFacultades().then((datos) => {
+      if (datos?.error) {
+        setFacultades([]);
+      } else {
+        setFacultades(datos.filter((item) => parseInt(item.fac_estado) !== 0));
+      }
+    });
+  }, [refresh]);
+
+  const handleChangeFacultad = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+      usu_facultad_pertenece: value,
+    }));
   };
 
   return (
@@ -769,7 +829,9 @@ const Usuarios = () => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.3)",
         }}
       >
-        {searchedData?.length > 0 ? (
+        {isLoading ? (
+          <Spinner animation="border" variant="danger" />
+        ) : searchedData?.length > 0 ? (
           <Table
             hover
             style={{
@@ -1144,6 +1206,7 @@ const Usuarios = () => {
                   )}
                 </>
               )}
+              {}
 
               <Row>
                 <Col>
@@ -1162,7 +1225,10 @@ const Usuarios = () => {
                       disabled={isView}
                     >
                       <option value="">Seleccionar tipo</option>
-                      {dataTipos.map((tipo, index) => (
+                      {(usuario_actual.usu_permisos === "S"
+                        ? dataTipos
+                        : dataTipos.filter((item) => item.id !== 1)
+                      ).map((tipo, index) => (
                         <option key={index} value={tipo.id}>
                           {tipo.nombre}
                         </option>
@@ -1188,7 +1254,9 @@ const Usuarios = () => {
                             checked={permisosSeleccionados?.find(
                               (item) => item.id === seccion.id
                             )}
-                            disabled={isView}
+                            disabled={
+                              isView || parseInt(formData.usu_tipo) === 1
+                            }
                           />
                         </Form.Group>
                       </div>
@@ -1196,6 +1264,35 @@ const Usuarios = () => {
                   )}
                 </Col>
               </Row>
+              {usuario_actual.usu_permisos === "S" &&
+                parseInt(formData.usu_tipo) !== 1 && (
+                  <Row>
+                    <Col>
+                      <Form.Group
+                        className="mb-3"
+                        controlId="exampleForm.ControlSelect1"
+                      >
+                        <Form.Label>
+                          <b>Facultad</b>
+                        </Form.Label>
+                        <Form.Select
+                          aria-label="Tipo de usuario"
+                          name="usu_facultad_pertenece"
+                          value={formData.usu_facultad_pertenece}
+                          onChange={handleChangeFacultad}
+                          disabled={isView}
+                        >
+                          <option value="">Seleccionar facultad</option>
+                          {facultades.map((tipo, index) => (
+                            <option key={index} value={tipo.fac_id}>
+                              {tipo.fac_nombre}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                )}
             </Container>
           </Form>
         </Modal.Body>

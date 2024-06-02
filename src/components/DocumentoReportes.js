@@ -1,5 +1,4 @@
 import logoLeft from "../assets/logoLeft.jpg";
-import logoRight from "../assets/logoRight.png";
 import {
   Page,
   Text,
@@ -19,8 +18,9 @@ Font.register({
 const styles = StyleSheet.create({
   page: { padding: 50, fontFamily: "Tinos" },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 10,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
 });
 
 // Componente para renderizar el PDF
-const MyDocument = ({ data, preguntasId, formulario, total }) => {
+const MyDocument = ({ data, preguntasId, formulario, total, facultad }) => {
   // Obtener la fecha actual
   const currentDate = new Date();
   const day = currentDate.getDate();
@@ -76,6 +76,7 @@ const MyDocument = ({ data, preguntasId, formulario, total }) => {
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <Image src={logoLeft} style={{ width: "40px", height: "auto" }} />
+          <br />
           <View
             style={{
               justifyContent: "center",
@@ -84,14 +85,9 @@ const MyDocument = ({ data, preguntasId, formulario, total }) => {
             }}
           >
             <Text style={styles.title}>UNIVERSIDAD TÉCNICA DE AMBATO</Text>
-            <Text style={styles.title}>
-              FACULTAD DE INGENIERÍA EN SISTEMAS, ELECTRÓNICA E INDUSTRIAL
-            </Text>
+            <Text style={styles.title}>{facultad.toUpperCase()}</Text>
           </View>
-          <Image src={logoRight} style={{ width: "40px", height: "auto" }} />
         </View>
-
-        {/* Tabla */}
         <View style={styles.table}>
           <View style={styles.tableRow}>
             <View style={styles.tableCell}>

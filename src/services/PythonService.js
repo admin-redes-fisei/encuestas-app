@@ -14,14 +14,9 @@ export async function enviarReglas(reglas) {
       throw new Error("Error al enviar la solicitud.");
     }
     const data = await response.json();
-    // Aquí puedes usar los valores recibidos, por ejemplo:
-    console.log("Confianza:", data.confianza);
-    console.log("Lift:", data.lift);
-    console.log("Soporte:", data.soporte);
-    // Puedes realizar otras acciones según lo necesites con estos valores
-    return data; // Opcional: puedes retornar los datos si deseas usarlos en otro lugar de tu aplicación
+    return data; 
   } catch (error) {
     console.error("Error al enviar la respuesta:", error);
-    throw error; // Opcional: puedes manejar el error aquí o lanzarlo para ser manejado en otro lugar
+    throw error; 
   }
 }

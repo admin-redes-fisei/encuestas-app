@@ -18,6 +18,13 @@ import Carreras from "./views/Carreras";
 import Tablero from "./views/Tablero";
 import Formularios from "./views/Formularios";
 import SystemNavbar from "./components/Navbar";
+import TableroEstudiantes from "./views/TableroEstudiantes";
+import Facultades from "./views/Facultades";
+import TableroEmpresas from "./views/TableroEmpresas";
+import DashboardPersonalizado from "./views/DasboardPersonalizado";
+import Secciones from "./views/ForSecciones";
+import Preguntas from "./views/ForSecPreguntas";
+import TableroAnalytics from "./views/TableroAnalytics";
 //import SSD from "./views/Ssd";
 
 function App() {
@@ -70,9 +77,9 @@ function App() {
     if (!token && !userPermisos) {
       return <Navigate to="/" />;
     }
-    const userIsAuthenticated = JSON.parse(
-      localStorage.getItem("userpermisos")
-    ).includes("U");
+    const userIsAuthenticated =
+      JSON.parse(localStorage.getItem("userpermisos")).includes("U") ||
+      JSON.parse(localStorage.getItem("userpermisos")).includes("S");
 
     return userIsAuthenticated ? children : <Navigate to="/" />;
   };
@@ -88,6 +95,30 @@ function App() {
     ).includes("R");
 
     return userIsAuthenticated ? children : <Navigate to="/" />;
+  };
+
+  const PrivateRouteFacultades = ({ children }) => {
+    const token = localStorage.getItem("token");
+    const userPermisos = localStorage.getItem("userpermisos");
+
+    if (!token && !userPermisos) {
+      return <Navigate to="/" />;
+    }
+    const userIsAuthenticated = JSON.parse(
+      localStorage.getItem("userpermisos")
+    ).includes("S");
+
+    return userIsAuthenticated ? children : <Navigate to="/" />;
+  };
+
+  const PrivateRouteFormularioPublico = ({ children }) => {
+    const hasData = localStorage.getItem("for_pub_preguntas");
+    const storedForAlias = JSON.parse(localStorage.getItem("for_alias"));
+    return hasData ? (
+      children
+    ) : (
+      <Navigate to={`/encuestas/${storedForAlias}`} />
+    );
   };
 
   return (
@@ -134,6 +165,14 @@ function App() {
             }
           />
           <Route
+            path="/facultades"
+            element={
+              <PrivateRouteFacultades>
+                <Facultades />
+              </PrivateRouteFacultades>
+            }
+          />
+          <Route
             path="/tablero"
             element={
               <PrivateRouteTableros>
@@ -142,10 +181,54 @@ function App() {
             }
           />
           <Route
+            path="/tablero/estudiantes"
+            element={
+              <PrivateRouteTableros>
+                <TableroEstudiantes />
+              </PrivateRouteTableros>
+            }
+          />
+          <Route
+            path="/tablero/empresas"
+            element={
+              <PrivateRouteTableros>
+                <TableroEmpresas />
+              </PrivateRouteTableros>
+            }
+          />
+          <Route
+            path="/tablero/comportamiento"
+            element={
+              <PrivateRouteTableros>
+                <TableroAnalytics />
+              </PrivateRouteTableros>
+            }
+          />
+          <Route
+            path="/tablero/personalizado-estudiantes"
+            element={<DashboardPersonalizado />}
+          />
+          <Route
             path="/formularios"
             element={
               <PrivateRouteFormularios>
                 <Formularios />
+              </PrivateRouteFormularios>
+            }
+          />
+          <Route
+            path="/formularios/:forID"
+            element={
+              <PrivateRouteFormularios>
+                <Secciones />
+              </PrivateRouteFormularios>
+            }
+          />
+          <Route
+            path="/formularios/:forID/:secID"
+            element={
+              <PrivateRouteFormularios>
+                <Preguntas />
               </PrivateRouteFormularios>
             }
           />
@@ -157,11 +240,15 @@ function App() {
               </PrivateRouteReportes>
             }
           />
-          <Route path="/encuestas/endpage" element={<EndPage />} />
+          <Route path="/encuestas/:for_alias/endpage" element={<EndPage />} />
           <Route path="/encuestas/:for_alias" element={<StartPage />} />
           <Route
             path="/encuestas/:for_alias/:seccion"
-            element={<FormularioPublico />}
+            element={
+              <PrivateRouteFormularioPublico>
+                <FormularioPublico />
+              </PrivateRouteFormularioPublico>
+            }
           />
           {/*<Route path="/ssd" element={<SSD />} />*/}
         </Routes>
