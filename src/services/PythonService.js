@@ -1,7 +1,7 @@
 //const URL_acceso = "http://172.18.0.2:5000/";
-//const URL_acceso = "http://hatunsoft.uta.edu.ec:5000/";
+const URL_acceso = "http://hatunsoft.uta.edu.ec:5000/";
 //const URL_acceso = "http://172.17.0.1:5000/";
-const URL_acceso = "http://fisei-encuestas-docker-backend-1:5000/";
+//const URL_acceso = "http://fisei-encuestas-docker-backend-1:5000/";
 
 export async function enviarReglas(reglas) {
   try {
@@ -16,9 +16,12 @@ export async function enviarReglas(reglas) {
       throw new Error("Error al enviar la solicitud.");
     }
     const data = await response.json();
-    return data; 
+    return data;
   } catch (error) {
     console.error("Error al enviar la respuesta:", error);
-    throw error; 
+    return {
+      error:
+        "Hubo un problema al enviar la solicitud. Por favor, inténtalo de nuevo más tarde.",
+    };
   }
 }

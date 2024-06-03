@@ -148,9 +148,6 @@ const TableroEstudiantes = () => {
     setResultados([]);
     try {
       enviarReglas(reglas).then((data) => {
-        if (data.error) {
-          console.log("error");
-        }
         setResultados(data);
         setIsResultadosLoading(false);
       });
@@ -384,6 +381,14 @@ const TableroEstudiantes = () => {
             >
               <Spinner animation="border" variant="danger" />
             </div>
+          ) : resultados && resultados?.error ? (
+            <>
+              <Row style={{ margin: "10px" }}>
+                <Alert key="danger" variant="danger">
+                  {resultados.error}
+                </Alert>
+              </Row>
+            </>
           ) : (
             resultados &&
             parseInt(formData.tab_tipo) === 1 && (

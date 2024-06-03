@@ -363,8 +363,8 @@ const Formularios = () => {
         {isLoading ? (
           <div
             style={{
-              width:"100%",
-              display:"flex",
+              width: "100%",
+              display: "flex",
               justifyContent: "center",
               alignItems: "center",
             }}
@@ -962,7 +962,7 @@ const Formularios = () => {
           </Button>
           <Button
             variant="secondary"
-            onClick={handleClose}
+            onClick={handleCloseEncuesta}
             style={{
               backgroundColor: "#AA1415",
               borderColor: "#AA1415",
