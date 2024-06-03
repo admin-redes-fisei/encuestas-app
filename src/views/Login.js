@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import * as Msal from "msal";
 import { iniciarSesion } from "../services/UsuariosService";
+import banner from "../assets/bannerlogin.png";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -113,8 +114,8 @@ const Login = () => {
             <div className="logo"></div>
             <div className="imagen">
               <img
-                src="https://voipberry.com/wp-content/uploads/2021/09/banner001a01comp-768x707.png"
-                alt="Descripción de la imagen"
+                src={banner}
+                alt="Banner para inicio de sesion"
                 style={{ width: "400px" }}
               />
             </div>
