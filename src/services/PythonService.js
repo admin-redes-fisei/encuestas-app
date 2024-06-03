@@ -1,4 +1,4 @@
-const URL_acceso = "http://172.17.0.1:5000/";
+const URL_acceso = "http://127.0.0.1:5000/";
 //const URL_acceso = "http://hatunsoft.uta.edu.ec:5000/";
 
 export async function enviarReglas(reglas) {
