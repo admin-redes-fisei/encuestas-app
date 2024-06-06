@@ -231,7 +231,7 @@ const Facultades = () => {
             draggable: true,
           });
         }
-      })
+      });
     }
   };
 
@@ -266,10 +266,12 @@ const Facultades = () => {
 
   //para validar
   const handleValidate = () => {
+    const noSpacesOrSpecialChars = /^[a-zA-Z]*$/;
     if (
       formData.fac_nombre !== "" &&
       formData.fac_siglas !== "" &&
-      formData.fac_estado !== ""
+      formData.fac_estado !== "" &&
+      noSpacesOrSpecialChars.test(formData.fac_siglas)
     ) {
       handleSave();
     } else {

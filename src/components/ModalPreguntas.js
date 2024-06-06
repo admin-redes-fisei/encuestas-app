@@ -48,8 +48,10 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
 
   //para validar
   const handleValidate = () => {
+    const noSpacesOrSpecialChars = /^[a-zA-Z0-9_-]*$/;
     if (
       formData.pre_alias !== "" &&
+      noSpacesOrSpecialChars.test(formData.pre_alias) &&
       formData.pre_tipo !== "" &&
       formData.pre_titulo !== "" &&
       (formData.pre_tipo_imagen !== ""
@@ -211,6 +213,7 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
                     name="pre_tipo"
                     value={formData.pre_tipo}
                     onChange={handleChange}
+                    disabled={formData?.opciones?.length > 0}
                   >
                     <option value="">Seleccione</option>
                     {tipos_pregunta?.map((tipo, index) => (

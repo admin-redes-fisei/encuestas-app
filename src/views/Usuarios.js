@@ -336,8 +336,10 @@ const Usuarios = () => {
 
   //para validar
   const handleValidate = () => {
+    const cedulaRegex = /^\d{10}$/; 
     if (
       formData.usu_cedula !== "" &&
+      cedulaRegex.test(formData.usu_cedula) &&
       formData.usu_nombres !== "" &&
       formData.usu_apellidos !== "" &&
       formData.usu_correo !== "" &&

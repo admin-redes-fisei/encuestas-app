@@ -383,7 +383,7 @@ function OptionsQuestionCard({
               <Accordion>
                 {question?.options?.length > 1 &&
                   subsecciones?.map((subseccion) => (
-                    <Accordion.Item eventKey="0" key={subseccion}>
+                    <Accordion.Item eventKey={subseccion} key={subseccion}>
                       <Accordion.Header>{subseccion}</Accordion.Header>
                       <Accordion.Body>
                         {question?.options
