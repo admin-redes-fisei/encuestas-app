@@ -129,14 +129,15 @@ const Formularios = () => {
         setIsLoading(false);
       } else {
         setOtherData(
-          datos.filter(
+          datos?.filter(
             (item) =>
-              item.for_facultad_pertenece !==
-              usuario_actual.usu_facultad_pertenece
+              item?.for_facultad_pertenece !==
+                usuario_actual?.usu_facultad_pertenece &&
+              parseInt(item?.for_estado) === 1
           )
         );
         setMyyData(
-          datos.filter(
+          datos?.filter(
             (item) =>
               item.for_facultad_pertenece ===
               usuario_actual.usu_facultad_pertenece
@@ -171,10 +172,12 @@ const Formularios = () => {
 
   //para validar
   const handleValidate = () => {
+    const noSpacesOrSpecialChars = /^[a-zA-Z0-9_-]*$/;
     if (
       formData.for_nombre !== "" &&
       !myData.find((item) => item.for_alias === formData.for_alias) &&
       !otherData.find((item) => item.for_alias === formData.for_alias) &&
+      noSpacesOrSpecialChars.test(formData.for_alias) &&
       formData.for_tipo !== ""
     ) {
       handleSave();
