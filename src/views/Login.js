@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import FloatingLabel from "react-bootstrap/esm/FloatingLabel";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
-import * as Msal from "msal";
 import { iniciarSesion } from "../services/UsuariosService";
 import banner from "../assets/bannerlogin.png";
 
@@ -13,34 +12,34 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [aud, setAud] = useState("");
-  const [ms, setMs] = useState(false);
+  //const [ms, setMs] = useState(false);
   const navigate = useNavigate();
 
-  const msalConfig = {
+  /*const msalConfig = {
     auth: {
       clientId: "9beb7af4-2e55-47f1-99e1-1f1d313ce88a",
       redirectUri: window.location.origin,
     },
-  };
+  };*/
 
-  const msalInstance = new Msal.UserAgentApplication(msalConfig);
+  //const msalInstance = new Msal.UserAgentApplication(msalConfig);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (ms) {
       handleSubmit();
       setMs(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [username, password, aud, ms]);
+  }, [username, password]);*/
 
-  const handleLoginMS = async () => {
+  /*const handleLoginMS = async () => {
     msalInstance.loginPopup().then((response) => {
       setUsername(response?.account.userName);
       setPassword("");
       setAud(response?.account.idToken.aud);
       setMs(true);
     });
-  };
+  };*/
 
   const handleSubmit = async (event) => {
     event?.preventDefault();
@@ -74,7 +73,7 @@ const Login = () => {
   };
 
   return (
-    <div style={{backgroundColor:"white"}}>
+    <div style={{ backgroundColor: "white" }}>
       <div
         className="backgraund-container"
         style={{
@@ -179,6 +178,7 @@ const Login = () => {
                 >
                   Ingresar
                 </Button>
+                {/*
                 <br />
                 <br />
                 <p style={{ margin: "0", textAlign: "left" }}>
@@ -198,7 +198,7 @@ const Login = () => {
                     style={{ width: "25px", marginRight: "5px" }}
                   />
                   Microsoft Office 365
-                </Button>
+                </Button>*/}
               </Form>
             </div>
           </div>
