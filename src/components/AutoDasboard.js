@@ -144,7 +144,7 @@ const AutoDasboard = ({ data, setSelectedOption, tipo }) => {
         >
           <br />
           <Alert key="secondary" variant="secondary">
-            Aún no se ha recibido ninguna respuesta para esta encuesta.
+            No se encontró una encuesta activa o esta aún no ha recibido ninguna respuesta.
           </Alert>
           <Image src={imagenNoTablero} rounded style={{ width: "50%" }} />
         </div>

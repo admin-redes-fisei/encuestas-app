@@ -6,7 +6,13 @@ import {
   editarPregunta,
 } from "../services/FormulariosAppService";
 
-const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
+const ModalPreguntas = ({
+  data,
+  show,
+  handleClose,
+  seccion_pertenece,
+  alias_preguntas,
+}) => {
   const tipos_pregunta = [
     { id: 1, tipo: "radio", label: "Pregunta de Selección Única" },
     { id: 2, tipo: "checkbox", label: "Pregunta de Selección Múltiple" },
@@ -37,9 +43,13 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
     pre_seccion_pertenece: "",
   });
 
+  const [preguntas_alias, setPreguntas_alias] = useState(alias_preguntas);
+
   useEffect(() => {
+    setPreguntas_alias(alias_preguntas);
     setFormData(data);
-  }, [data]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, alias_preguntas]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,6 +62,7 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
     if (
       formData.pre_alias !== "" &&
       noSpacesOrSpecialChars.test(formData.pre_alias) &&
+      !preguntas_alias.includes(formData.pre_alias) &&
       formData.pre_tipo !== "" &&
       formData.pre_titulo !== "" &&
       (formData.pre_tipo_imagen !== ""
@@ -241,6 +252,20 @@ const ModalPreguntas = ({ data, show, handleClose, seccion_pertenece }) => {
                     onChange={handleChange}
                   />
                 </Form.Group>
+                {preguntas_alias.includes(formData.pre_alias) && (
+                  <Row>
+                    <spam
+                      style={{
+                        color: "red",
+                        fontSize: "small",
+                        marginTop: "-5px",
+                        marginBottom: "15px",
+                      }}
+                    >
+                      Ya existe una pregunta con el alias
+                    </spam>
+                  </Row>
+                )}
               </Col>
               <Col>
                 <Form.Group

@@ -240,31 +240,30 @@ const Formularios = () => {
 
   //para cambio directo de estado
   const handleCambiarEstado = (e, formulario) => {
-    const isChecked = e.target.checked;
+    const estado = e.target.checked ? 1 : 0;
 
-    if (isChecked) {
-      const confirmChange = window.confirm(
-        "Está a punto de cambiar el formulario activo ¿Desea continuar?"
-      );
+    const confirmChange = window.confirm(
+      "Está a punto de cambiar el formulario activo ¿Desea continuar?"
+    );
 
-      if (confirmChange) {
-        editarFormularioActivo({
-          for_id: formulario,
-        }).then((resultado) => {
-          if (resultado?.mensaje === "OK") {
-            setRefresh(refresh + 1);
-          } else {
-            toast.error("Error al actualizar", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-            });
-          }
-        });
-      }
+    if (confirmChange) {
+      editarFormularioActivo({
+        for_id: formulario,
+        for_estado: estado,
+      }).then((resultado) => {
+        if (resultado?.mensaje === "OK") {
+          setRefresh(refresh + 1);
+        } else {
+          toast.error("Error al actualizar", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
+      });
     }
   };
 
@@ -418,7 +417,7 @@ const Formularios = () => {
                           }
                           inline
                           onChange={(e) => handleCambiarEstado(e, item?.for_id)}
-                          disabled={parseInt(item.for_estado) === 1}
+                          //disabled={parseInt(item.for_estado) === 1}
                           style={{
                             marginLeft:
                               parseInt(item.for_estado) === 1 ? "10px" : "0px",
@@ -558,7 +557,7 @@ const Formularios = () => {
                           }
                           inline
                           onChange={(e) => handleCambiarEstado(e, item?.for_id)}
-                          disabled={parseInt(item.for_estado) === 1}
+                          //disabled={parseInt(item.for_estado) === 1}
                           style={{
                             marginLeft:
                               parseInt(item.for_estado) === 1 ? "10px" : "0px",
