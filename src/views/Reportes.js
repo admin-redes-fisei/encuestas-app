@@ -174,7 +174,22 @@ function Reportes() {
             <br />
             <br />
             {formularios?.length === 0 ? (
-              <span>Cargando...</span>
+              isLoadingFormularios ? (
+                <span>Cargando...</span>
+              ) : (
+                <Alert
+                  key="secondary"
+                  variant="secondary"
+                  style={{
+                    width: "fit-content",
+                    margin: "20px",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                  }}
+                >
+                  No se encontraron encuestas activas
+                </Alert>
+              )
             ) : !isLoadingFormularios && formularioSeleccionado === 0 ? (
               <Alert
                 key="secondary"

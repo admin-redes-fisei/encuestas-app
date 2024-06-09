@@ -116,6 +116,11 @@ function StartPage() {
                     tiempo necesario para responder con sinceridad y detalle.
                     ¡Gracias por formar parte de este proceso!
                   </p>
+                  <br />
+                  <Alert key="warning" variant="warning">
+                    Recuerda que <span style={{ color: "red" }}>*</span> indica que la
+                    pregunta es obligatoria
+                  </Alert>
                 </div>
                 <Button
                   variant="secondary"

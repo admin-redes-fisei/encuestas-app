@@ -335,14 +335,36 @@ const Usuarios = () => {
   };
 
   //para validar
+  const validarCedulaEcuador = (cedula) => {
+    if (cedula.length !== 10) return false;
+
+    const digitoRegion = parseInt(cedula.substring(0, 2));
+    if (digitoRegion < 1 || digitoRegion > 24) return false;
+
+    const digitos = cedula.split("").map(Number);
+    const digitoVerificador = digitos.pop();
+
+    const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+    let suma = 0;
+    for (let i = 0; i < coeficientes.length; i++) {
+      let valor = digitos[i] * coeficientes[i];
+      if (valor >= 10) valor -= 9;
+      suma += valor;
+    }
+
+    const digitoCalculado = suma % 10 === 0 ? 0 : 10 - (suma % 10);
+    return digitoCalculado === digitoVerificador;
+  };
+
   const handleValidate = () => {
-    const cedulaRegex = /^\d{10}$/; 
+    const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (
       formData.usu_cedula !== "" &&
-      cedulaRegex.test(formData.usu_cedula) &&
+      validarCedulaEcuador(formData.usu_cedula) &&
       formData.usu_nombres !== "" &&
       formData.usu_apellidos !== "" &&
       formData.usu_correo !== "" &&
+      correoRegex.test(formData.usu_correo) &&
       !data?.some(
         (usuario) =>
           usuario.usu_correo === formData.usu_correo &&
@@ -376,6 +398,7 @@ const Usuarios = () => {
       });
     }
   };
+
 
   // Función para encriptar
   function encriptar(texto) {

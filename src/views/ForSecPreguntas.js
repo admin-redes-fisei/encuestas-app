@@ -80,6 +80,8 @@ const Preguntas = () => {
   const navigate = useNavigate();
   //cargando
   const [isLoading, setIsLoading] = useState(true);
+  //para lista de alias
+  const [preguntas_alias, setPreguntas_alias] = useState([]);
 
   //para listar
   useEffect(() => {
@@ -101,6 +103,12 @@ const Preguntas = () => {
           (item) => parseInt(item.sec_id) === parseInt(secID)
         )[0]?.preguntas
       );
+
+      const allPreguntas = datos.secciones.flatMap(
+        (seccion) => seccion.preguntas || []
+      );
+      const aliases = allPreguntas.map((pregunta) => pregunta.pre_alias);
+      setPreguntas_alias(aliases);
       setIsLoading(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -710,6 +718,9 @@ const Preguntas = () => {
         show={showPregunta}
         handleClose={handleClosePregunta}
         seccion_pertenece={parseInt(secID)}
+        alias_preguntas={preguntas_alias.filter(
+          (alias) => alias !== formDataPreguntas?.pre_alias
+        )}
       />
     </div>
   );
