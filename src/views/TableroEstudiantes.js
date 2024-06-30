@@ -64,7 +64,12 @@ const TableroEstudiantes = () => {
       "estudiantes"
     ).then((response) => {
       setIdFormulario(parseInt(response?.for_id));
-      const nombresFiltros = filter?.map((f) => f.name);
+      const nombresFiltros = filter?.reduce((acc, f) => {
+        if (!acc.includes(f.name)) {
+          acc.push(f.name);
+        }
+        return acc;
+      }, []);
       if (filter) {
         obtenerConteoDatosFiltrados({
           id: parseInt(response?.for_id),
