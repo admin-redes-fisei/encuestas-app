@@ -358,6 +358,16 @@ const Usuarios = () => {
 
   const handleValidate = () => {
     const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const validarFacultad = () => {
+      if (usuario_actual.usu_permisos !== "S") {
+        return true;
+      }
+      if (parseInt(formData.usu_tipo) === 1) {
+        return true;
+      }
+      return !!formData.usu_facultad_pertenece;
+    };
+
     if (
       formData.usu_cedula !== "" &&
       validarCedulaEcuador(formData.usu_cedula) &&
@@ -378,8 +388,9 @@ const Usuarios = () => {
       ) &&
       formData.usu_clave === formData.usu_clave2 &&
       formData.usu_tipo !== "" &&
-      (formData.usu_tipo !== "S"
-        ? formData.usu_facultad_pertenece !== null
+      validarFacultad() &&
+      (parseInt(formData.usu_tipo) !== 1
+        ? permisosSeleccionados?.length > 0
         : true)
     ) {
       if (formData.usu_clave !== "" && formData.usu_id !== "") {
@@ -398,7 +409,6 @@ const Usuarios = () => {
       });
     }
   };
-
 
   // Función para encriptar
   function encriptar(texto) {
