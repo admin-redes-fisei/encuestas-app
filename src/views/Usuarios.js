@@ -386,15 +386,27 @@ const Usuarios = () => {
           usuario.usu_usuario === formData.usu_usuario &&
           usuario.usu_id !== formData.usu_id
       ) &&
-      formData.usu_clave === formData.usu_clave2 &&
       formData.usu_tipo !== "" &&
       validarFacultad() &&
       (parseInt(formData.usu_tipo) !== 1
-        ? permisosSeleccionados?.length > 0
+        ? formData.usu_clave === ""
+          ? permisosSeleccionados?.length > 0
+          : true
         : true)
     ) {
       if (formData.usu_clave !== "" && formData.usu_id !== "") {
-        handleSavePassword();
+        if (formData.usu_clave === formData.usu_clave2) {
+          handleSavePassword();
+        } else {
+          toast.error("Las contraseñas no coinsiden", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
       } else {
         handleSave();
       }
