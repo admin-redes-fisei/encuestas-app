@@ -36,7 +36,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start --port 4000",
+    "start": "HTTPS=true SSL_CRT_FILE=./ssl/star_uta_edu_ec.crt SSL_KEY_FILE=./ssl/star_uta_edu_ec.key react-scripts start --port 4000",
     "build": "react-scripts build --port 4000",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
